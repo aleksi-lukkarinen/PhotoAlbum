@@ -1,8 +1,11 @@
+# This Python file uses the following encoding: utf-8
+
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from models import Album
+from forms import RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 
 
@@ -43,19 +46,32 @@ def edit_album(request, album_id):
 
 def get_registration_information(request):
     """ Allows user to register himself/herself into this service """
-    return render_to_response("accounts/register.html", RequestContext(request, {"is_registration_page": True}))
 
+    if request.method == "GET":
+        form = RegistrationForm()
+        return render_to_response("accounts/register.html",
+                                  RequestContext(request, {"is_registration_page": True, "form": form}))
+
+    elif request.method == "POST":
+        form = RegistrationForm(request)
+        if form.is_valid():
+            userdata = form.cleaned_data
+            # add user to database ( onko käyttäjä jo olemassa?)
+            # auth.login(request, user)
+            return HttpResponseRedirect("/accounts/profile/")
+
+        else:
+            return render_to_response("accounts/register.html",
+                                      RequestContext(request, {"is_registration_page": True, "form": form}))
+
+    else:
+        return HttpResponseBadRequest()
 
 
 
 def log_in(request):
     """ Allows user to log in """
-
-    if request.method == "GET":
-        nextURL = request.GET.get("next")
-        return render_to_response('accounts/login.html',
-                                  RequestContext(request, {"is_login_page": True, "nextURL": nextURL}))
-    elif request.method == "POST":
+    if request.method == "POST":
         error_list = []
 
         username = request.POST.get("txtLoginUserName", "").strip()
@@ -82,7 +98,9 @@ def log_in(request):
             template_parameters = {"is_login_page": True, "username": username, "error_list": error_list}
             return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
     else:
-        return HttpResponseBadRequest()
+        nextURL = request.GET.get("next")
+        return render_to_response('accounts/login.html',
+                                  RequestContext(request, {"is_login_page": True, "nextURL": nextURL}))
 
 
 

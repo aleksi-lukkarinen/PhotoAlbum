@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
 import albumizer.urls

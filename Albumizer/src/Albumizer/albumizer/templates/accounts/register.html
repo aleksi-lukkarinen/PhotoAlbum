@@ -10,6 +10,8 @@
 
   $(function() {
     $("#cmdRegister").button();
+    $("input").addClass("text ui-widget-content");
+    $("#radio").buttonset();
   });
 
 {% endblock %}
@@ -22,24 +24,61 @@
 
   <p>If you want to register into the service, please enter the necessary information below.</p>
 
-  {% if error_list %}
+  {% if form.errors %}
     <table id="formErrorList" class="ui-state-highlight ui-corner-all">
-        {% for error in error_list %}
-          <tr><td valign="top"><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
-        {% endfor %}
+      {% for error in form.errors %}
+        <tr><td valign="top"><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+      {% endfor %}
     </table>
   {% endif %}
 
   <form id="frmRegister" method="post" action="/accounts/register/">
     <fieldset>
       {% csrf_token %}
-      <label for="txtUserName">User Name</label><input type="text" name="txtUserName" id="txtUserName" class="text ui-widget-content" value="{{ username }}" /><br />
-      <label for="txtPassword">Password</label><input type="password" name="txtPassword" id="txtPassword" value="" class="text ui-widget-content" /><br />
-      <label for="txtPasswordAgain">Retype Password</label><input type="password" name="txtPasswordAgain" id="txtPasswordAgain" value="" class="text ui-widget-content" /><br />
+		  <div class="fieldRow"><label for="id_{{ form.txtUserId.name }}">{{ form.txtUserId.label }}</label>{{ form.txtUserId }}</div>
+		  <div class="helpRow">{{ form.txtUserId.help_text }}</div>
+		  
+      <div class="fieldRow"><label for="id_{{ form.txtPassword.name }}">{{ form.txtPassword.label }}</label>{{ form.txtPassword }}</div>
+      <div class="helpRow">{{ form.txtPassword.help_text }}</div>
 
-      <label for="txtFirstName">First Name</label><input type="text" name="txtFirstName" id="txtFirstName" class="text ui-widget-content" value="{{ first_name }}" /><br />
-      <label for="txtLastName">Last Name</label><input type="text" name="txtLastName" id="txtLastName" class="text ui-widget-content" value="{{ lastName }}" /><br />
-      <label for="txtEmail">Email Address</label><input type="text" name="txtEmail" id="txtEmail" class="text ui-widget-content" value="{{ email }}" /><br />
+      <div class="fieldRow"><label for="id_{{ form.txtPasswordAgain.name }}">{{ form.txtPasswordAgain.label }}</label>{{ form.txtPasswordAgain }}</div>
+      <div class="helpRow">{{ form.txtPasswordAgain.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtFirstName.name }}">{{ form.txtFirstName.label }}</label>{{ form.txtFirstName }}</div>
+      <div class="helpRow">{{ form.txtFirstName.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtLastName.name }}">{{ form.txtLastName.label }}</label>{{ form.txtLastName }}</div>
+      <div class="helpRow">{{ form.txtLastName.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.radGender.name }}">{{ form.radGender.label }}</label>{{ form.radGender }}</div>
+      <div class="helpRow">{{ form.radGender.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtEmail.name }}">{{ form.txtEmail.label }}</label>{{ form.txtEmail }}</div>
+      <div class="helpRow">{{ form.txtEmail.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtEmailAgain.name }}">{{ form.txtEmailAgain.label }}</label>{{ form.txtEmailAgain }}</div>
+      <div class="helpRow">{{ form.txtEmailAgain.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtPostAddress1.name }}">{{ form.txtPostAddress1.label }}</label>{{ form.txtPostAddress1 }}</div>
+      <div class="helpRow">{{ form.txtPostAddress1.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtPostAddress2.name }}">{{ form.txtPostAddress2.label }}</label>{{ form.txtPostAddress2 }}</div>
+      <div class="helpRow">{{ form.txtPostAddress2.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtZipCode.name }}">{{ form.txtZipCode.label }}</label>{{ form.txtZipCode }}</div>
+      <div class="helpRow">{{ form.txtZipCode.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtCity.name }}">{{ form.txtCity.label }}</label>{{ form.txtCity }}</div>
+      <div class="helpRow">{{ form.txtCity.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtCountry.name }}">{{ form.txtCountry.label }}</label>{{ form.txtCountry }}</div>
+      <div class="helpRow">{{ form.txtCountry.help_text }}</div>
+
+      <div class="fieldRow"><label for="id_{{ form.txtHomePhone.name }}">{{ form.txtHomePhone.label }}</label>{{ form.txtHomePhone }}</div>
+      <div class="helpRow">{{ form.txtHomePhone.help_text }}</div>
+
+      <div class="fieldRow">{{ form.chkServiceConditionsAccepted }}<label id="lblServiceConditionsAccepted" for="id_{{ form.chkServiceConditionsAccepted.name }}">{{ form.chkServiceConditionsAccepted.label }}</label></div>
+      <div class="helpRow">{{ form.chkServiceConditionsAccepted.help_text }}</div>
 
       <input type="submit" name="cmdRegister" id="cmdRegister" value="   Register   " />
     </fieldset>

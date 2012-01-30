@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 # Django settings for Albumizer project.
 
 import os
@@ -139,6 +140,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'albumizer',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging

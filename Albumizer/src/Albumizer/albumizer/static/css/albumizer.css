@@ -266,11 +266,30 @@ p {
 
 #frmRegister label {
   display:                   inline-block;
-  width:                     10em;
+  width:                     13em;
 }
 
-#frmRegister #txtPassword {
-  margin-top:                0.5em;
+#frmRegister .fieldRow ul {
+  display:                   inline;  
+}
+
+#frmRegister .fieldRow li {
+  display:                   inline-block;
+  width:                     5em;
+}
+
+#frmRegister .helpRow {
+	margin-top:                0.2em;
+	margin-bottom:             1em;
+	padding-left:              13em;
+	font-style:                italic;
+	color:                     #888888;
+}
+
+#frmRegister #id_txtFirstName,
+#frmRegister #id_txtPostAddress1,
+#frmRegister #id_txtHomePhone {
+  margin-top:                1em;
 }
 
 #frmRegister #txtPasswordAgain {
@@ -278,6 +297,11 @@ p {
   margin-bottom:             1em;
 }
 
+#frmRegister #lblServiceConditionsAccepted {
+	display:                   inline-block;
+	width:                     40em;
+	margin:                    2em 0em 2em 0.7em;
+}
 
 
 

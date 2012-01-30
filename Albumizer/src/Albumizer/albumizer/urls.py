@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+
 import os
 from django.conf.urls.defaults import patterns, url
 from django.views.generic.simple import redirect_to
