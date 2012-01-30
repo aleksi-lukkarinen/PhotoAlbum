@@ -92,15 +92,15 @@ def log_in(request):
         if not error_list:
             auth.login(request, user)
 
-            nextURL = request.POST.get("nextURL", "/accounts/profile/")
-            return HttpResponseRedirect(nextURL)
+            next_url = request.POST.get("next_url", "/accounts/profile/")
+            return HttpResponseRedirect(next_url)
         else:
             template_parameters = {"is_login_page": True, "username": username, "error_list": error_list}
             return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
     else:
-        nextURL = request.GET.get("next")
+        next_url = request.GET.get("next")
         return render_to_response('accounts/login.html',
-                                  RequestContext(request, {"is_login_page": True, "nextURL": nextURL}))
+                                  RequestContext(request, {"is_login_page": True, "next_url": next_url}))
 
 
 
@@ -138,7 +138,10 @@ def edit_shopping_cart(request):
 
 @login_required
 def get_ordering_information(request):
-    """ Lets user to enter non-product-related information required for making an order, and finally accept the order """
+    """ 
+        Lets user to enter non-product-related information required
+        for making an order, and finally accept the order
+    """
     return render_to_response('order/information.html', RequestContext(request))
 
 
