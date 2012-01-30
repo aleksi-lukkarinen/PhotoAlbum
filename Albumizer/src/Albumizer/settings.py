@@ -3,7 +3,6 @@
 import os
 
 
-
 DEBUG = True
 TEMPLATE_DEBUG = True
 
@@ -164,3 +163,13 @@ LOGGING = {
         },
     }
 }
+
+
+
+workstation_owner = os.environ.get("WORKSTATION_OWNER", "").lower()
+if workstation_owner == 'aleksi':
+    from settings_aleksi import *
+elif workstation_owner == 'tomas':
+    from settings_tomas import *
+elif workstation_owner == 'lauri':
+    from settings_lauri import *
