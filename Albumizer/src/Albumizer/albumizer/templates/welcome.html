@@ -1,0 +1,94 @@
+{% extends "base-template.html" %}
+
+
+
+{% block page_title %}Welcome{% endblock %}
+
+
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#welcomePageIntroductionTabs").tabs();
+  });
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+  <div id="welcomePageSplash"></div>
+
+  <div id="welcomePageMainContent">
+  
+		<div id="welcomePageIntroductionTabs">
+		  <ul>
+		    <li><a href="#welcomePageIntroductionTabs-1">Create</a></li>
+		    <li><a href="#welcomePageIntroductionTabs-2">Share</a></li>
+		    <li><a href="#welcomePageIntroductionTabs-3">Order</a></li>
+		  </ul>
+		  <div id="welcomePageIntroductionTabs-1">
+		    <div class="welcomePageIntroductionTabHeading">Let Your Imagination Flow!</div>
+		    With Albumizer, creation of outstanding photo albums is a breeze: Just layout your photos and texts with
+		    ready-made page templates, and you have a masterpiece in your hands!
+		  </div>
+      <div id="welcomePageIntroductionTabs-2">
+        <div class="welcomePageIntroductionTabHeading">Share Your Experiences And Passions With Your Friends!</div>
+        Making photo albums for yourself is nice, but the real fun comes from sharing them with your friends
+        and loved ones. Albumizer makes it easy to publish photo albums for the whole world to see, and for more
+        private content, you can give specific friends a special access link for browsing your album.
+      </div>
+      <div id="welcomePageIntroductionTabs-3">
+        <div class="welcomePageIntroductionTabHeading">Order Your Albums As Printed Copies!</div>
+        All albums created with Albumizer can be ordered as printed copies for a very competitive price. Let your
+        memories become amazing and unforgettable presents and store your albums for future generations! 
+      </div>
+		</div>
+
+    <div id="welcomePageRandomAlbums">
+      <div id="welcomePageRandomAlbumsHeader">
+	      <div id="welcomePageRandomAlbumsTitle">Some Random Picks From Our Users</div>
+	      <a id="welcomePageRandomAlbumsSeeMoreLink" href="/album/">See more</a>
+	    </div>
+      <table id="welcomePageRandomAlbumsTable">
+        <tr>
+          <td>
+            <a href="/album/22/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of Tropical Vacation" /></a>
+            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/22/">Tropical Vacation</a></div>
+          </td>
+          <td>
+            <a href="/album/73/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of My New Ferrari" /></a>
+            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/73/">My New Ferrari</a></div>
+          </td>
+          <td>
+            <a href="/album/18/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of Ida's Birthday" /></a>
+            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/18/">Ida's Birthday</a></div>
+          </td>
+          <td>
+            <a href="/album/94/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of Nature's Call" /></a>
+            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/94/">Nature's Call</a></div>
+          </td>
+        </tr>
+      </table>
+    </div> 
+  </div>
+
+  <div id="welcomePageRightColumn">
+    <div id="welcomePageAlbumList" class="ui-widget-content">
+      <div id="welcomePageAlbumListHeading" class="ui-widget-header">The Latest Published Albums</div>
+      
+      <div class="welcomePageAlbumListItem"><a href="/album/34/">ergk</a></div>
+      <div class="welcomePageAlbumListItem">ephok</div>
+      <div class="welcomePageAlbumListItem">eorkhp</div>
+      <div class="welcomePageAlbumListItem">aerkohp</div>
+      <div class="welcomePageAlbumListItem">aerkho</div>
+      <div class="welcomePageAlbumListItem">aerkhop</div>
+      <div class="welcomePageAlbumListItem">aekrop</div>
+      <div class="welcomePageAlbumListItem">aerhkop</div>
+      <div class="welcomePageAlbumListItem">earhkop</div>
+      <div class="welcomePageAlbumListItem">aerhkop</div>
+    </div>    
+  </div>
+
+{% endblock %}

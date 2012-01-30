@@ -1,0 +1,48 @@
+{% extends "base-template.html" %}
+
+
+
+{% block page_title %}Register{% endblock %}
+
+
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#cmdRegister").button();
+  });
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+  <h1>Register</h1>
+
+  <p>If you want to register into the service, please enter the necessary information below.</p>
+
+  {% if error_list %}
+    <table id="formErrorList" class="ui-state-highlight ui-corner-all">
+        {% for error in error_list %}
+          <tr><td valign="top"><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+        {% endfor %}
+    </table>
+  {% endif %}
+
+  <form id="frmRegister" method="post" action="/accounts/register/">
+    <fieldset>
+      {% csrf_token %}
+      <label for="txtUserName">User Name</label><input type="text" name="txtUserName" id="txtUserName" class="text ui-widget-content" value="{{ username }}" /><br />
+      <label for="txtPassword">Password</label><input type="password" name="txtPassword" id="txtPassword" value="" class="text ui-widget-content" /><br />
+      <label for="txtPasswordAgain">Retype Password</label><input type="password" name="txtPasswordAgain" id="txtPasswordAgain" value="" class="text ui-widget-content" /><br />
+
+      <label for="txtFirstName">First Name</label><input type="text" name="txtFirstName" id="txtFirstName" class="text ui-widget-content" value="{{ first_name }}" /><br />
+      <label for="txtLastName">Last Name</label><input type="text" name="txtLastName" id="txtLastName" class="text ui-widget-content" value="{{ lastName }}" /><br />
+      <label for="txtEmail">Email Address</label><input type="text" name="txtEmail" id="txtEmail" class="text ui-widget-content" value="{{ email }}" /><br />
+
+      <input type="submit" name="cmdRegister" id="cmdRegister" value="   Register   " />
+    </fieldset>
+  </form>
+
+{% endblock %}

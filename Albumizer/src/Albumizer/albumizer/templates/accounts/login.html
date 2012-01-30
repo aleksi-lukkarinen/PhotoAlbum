@@ -1,0 +1,43 @@
+{% extends "base-template.html" %}
+
+
+
+{% block page_title %}Log In{% endblock %}
+
+
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#cmdLogIn").button();
+  });
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+  <h1>Log In</h1>
+
+  <p>Please enter your credentials to the fields below.</p>
+
+  {% if error_list %}
+    <table id="formErrorList" class="ui-state-highlight ui-corner-all">
+        {% for error in error_list %}
+          <tr><td valign="top"><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+        {% endfor %}
+    </table>
+  {% endif %}
+
+  <form id="frmLogin" method="post" action="/accounts/login/">
+    <fieldset>
+      {% csrf_token %}
+      {% if nextURL %}<input type="hidden" name="nextURL" value="{{ nextURL }}" />{% endif %}
+	    <label for="txtLoginUserName">User Name</label><input type="text" name="txtLoginUserName" id="txtLoginUserName" class="text ui-widget-content" value="{{ username }}" /><br />
+	    <label for="txtLoginPassword">Password</label><input type="password" name="txtLoginPassword" id="txtLoginPassword" value="" class="text ui-widget-content" /><br />
+	    <input type="submit" name="cmdLogIn" id="cmdLogIn" value="   Log In   " />
+    </fieldset>
+  </form>
+
+{% endblock %}

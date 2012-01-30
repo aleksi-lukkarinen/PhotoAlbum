@@ -1,0 +1,112 @@
+{% load static %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <title>{% block page_title %}Untitled{% endblock %} - Albumizer - Unleash Your Imagination</title>
+    
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    
+    <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
+
+    <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.min.js"></script>
+  
+    <script type="text/javascript">
+	    {% block page_scripts_before %}
+	    {% endblock %}
+
+	    {% if not is_login_page %}
+	    $(function() {
+	    	$("#login-dialog").dialog({
+	    	      autoOpen: false,
+	    	      height: 210,
+	    	      width: 350,
+	    	      modal: true,
+	    	      resizable: false,
+	    	      buttons: {
+	    	        "Log In": function() {
+                    $(this).dialog("close");
+	    	        	  $("#frmLoginDialog").submit();
+	    	            	    	            
+	    	        },
+	    	        Cancel: function() { $(this).dialog("close"); }
+	    	      }
+	    	});
+      });
+	    {% endif %}
+      
+      {% block page_scripts_after %}
+      {% endblock %}
+    </script>    
+  </head>
+
+  <body>
+    <div id="pageContainer">
+	    <div id="pageHeader">
+	      <div id="pageHeaderLeftPart">
+	        <a href="/"><img src="{% get_static_prefix %}images/albumizer-title.png"
+	             alt="Albumizer Logo" /></a><span id="pageHeaderSlogan">Unleash Your Imagination!</span>
+	      </div>
+	      <div id="pageHeaderRightPart">
+	        {% if user.is_authenticated %}
+            <a href="/accounts/logout/" id="headerLinkLogOut" class="header-link">Log Out</a>
+	          <a href="/accounts/profile/" id="headerLinkProfile" class="header-link">
+	          {% if user.first_name %}
+	            {{ user.first_name }}
+	            {% if user.last_name %}
+	              {{ user.last_name }}
+	            {% endif %}
+	          {% else %}
+              {{ user.username }}
+            {% endif %}
+            </a>
+	        {% else %}
+	          {% if not is_registration_page %}
+              <a href="/accounts/register/" id="headerLinkRegister" class="header-link">Register</a>
+            {% endif %}
+            {% if not is_login_page %}
+              <a href="/accounts/login/" onclick="$('#login-dialog').dialog('open'); return false;" id="headerLinkLogIn" class="header-link">Log In</a>
+            {% endif %}
+	        {% endif %}
+          {% if not is_album_list_page %}
+            <a href="/album/" id="headerLinkBrowse" class="header-link">Public Albums</a>
+          {% endif %}
+	      </div>
+	      <div class="clear-floats"></div>
+	    </div>
+	
+	    <div id="pageContent">
+	      {% block page_content %}{% endblock %}
+	    </div>
+	
+	    <div id="pageFooter">
+	      <div id="pageFooterLeftPart">
+	        This web service is an exercise for the T-106.4300 Web Software Development course at Aalto University.
+	      </div>
+        <div id="pageFooterRightPart">
+          Copyright &copy; 2012 Tomas, Lauri &amp; Aleksi. All Rights Reserved.
+        </div>
+	    </div>
+	  </div>
+	  
+	  {% if not is_login_page %}
+	  <div id="login-dialog" title="Enter Login Credentials" class="dialog">
+		  <form id="frmLoginDialog" method="post" action="/accounts/login/">
+			  <fieldset>
+			    {% csrf_token %}
+			    <label for="txtLoginUserName">User Name</label>
+			    <input type="text" name="txtLoginUserName" id="txtLoginUserName" class="text ui-widget-content" />
+			    <label for="txtLoginPassword">Password</label>
+			    <input type="password" name="txtLoginPassword" id="txtLoginPassword" value="" class="text ui-widget-content" />
+			  </fieldset>
+		  </form>
+    </div>
+    {% endif %}
+	  
+  </body>
+
+</html>
