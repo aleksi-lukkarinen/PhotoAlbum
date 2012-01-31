@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+﻿# This Python file uses the following encoding: utf-8
 # Django settings for Albumizer project.
 
 import os
@@ -29,10 +29,11 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(os.path.dirname(__file__), 'albumizer.db').replace('\\', '/'), # Or path to database file if using sqlite3.
+        'NAME': os.path.join(os.path.dirname(__file__), 'albumizer_'+os.environ["USERNAME"]+'.db').replace('\\', '/'), # Or path to database file if using sqlite3.
         'USER': '', # Not used with sqlite3.
         'PASSWORD': '', # Not used with sqlite3.
         'HOST': '', # Set to empty string for localhost. Not used with sqlite3.
@@ -168,7 +169,7 @@ LOGGING = {
 
 
 
-workstation_owner = os.environ.get("WORKSTATION_OWNER", "").lower()
+workstation_owner = os.environ["USERNAME"].lower()
 if workstation_owner == 'aleksi':
     from settings_aleksi import *
 elif workstation_owner == 'tomas':
