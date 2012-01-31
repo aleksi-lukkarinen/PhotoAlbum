@@ -53,7 +53,7 @@ def get_registration_information(request):
                                   RequestContext(request, {"is_registration_page": True, "form": form}))
 
     elif request.method == "POST":
-        form = RegistrationForm(request)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             userdata = form.cleaned_data
             # add user to database ( onko käyttäjä jo olemassa?)
