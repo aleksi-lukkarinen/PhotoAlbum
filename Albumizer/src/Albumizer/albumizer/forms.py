@@ -121,7 +121,8 @@ class RegistrationForm(forms.Form):
         if userid:
             userid = userid.strip()
 
-
+        if User.objects.filter(username = userid):
+            raise ValidationError("This user id is already reserved. Please try another one.")
 
         return userid
 

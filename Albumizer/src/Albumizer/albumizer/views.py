@@ -2,11 +2,12 @@
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from models import Album
 from forms import RegistrationForm
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError
 
 
 
@@ -55,9 +56,17 @@ def get_registration_information(request):
     elif request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            userdata = form.cleaned_data
-            # add user to database ( onko käyttäjä jo olemassa?)
-            # auth.login(request, user)
+            # The user information is already validated in the form handling code
+            userid = form.cleaned_data.get("txtUserId")
+            password = form.cleaned_data.get("txtPassword")
+            email = form.cleaned_data.get("txtEmail")
+
+            new_user = User.objects.create_user(userid, email, password)
+            new_user.save()
+
+            authenticated_user = auth.authenticate(username = userid, password = password)
+            auth.login(request, authenticated_user)
+
             return HttpResponseRedirect("/accounts/profile/")
 
         else:
