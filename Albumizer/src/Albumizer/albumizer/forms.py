@@ -1,13 +1,24 @@
 # This Python file uses the following encoding: utf-8
 
+import re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList
 
 
-GENDER_CHOICES = (("m", "Male"), ("f", "Female"))
+ERR_USERID_MISSING = u'Please enter a user id you would like to use.'
+ERR_FIRST_NAME_MISSING = u'Please enter your first name.'
+ERR_LAST_NAME_MISSING = u'Please enter your last name.'
+ERR_GENDER_MISSING = u'Please enter your gender.'
+ERR_EMAIL_MISSING = u'Please enter a real email address you are using.'
 
+
+GENDER_CHOICES = (("M", "Male"), ("F", "Female"))
+
+
+RE_VALID_USER_ID = re.compile("^[A-Za-z0-9_]*[A-Za-z0-9][A-Za-z0-9_]*$")
+RE_VALID_PHONE_NUMBER = re.compile("^\+?[ 0-9]+$")
 
 
 
@@ -17,8 +28,9 @@ class RegistrationForm(forms.Form):
         min_length = 5,
         max_length = 30,
         label = "User ID",
-        error_messages = {'required': (u'Please enter a user id you would like to use.')},
-        help_text = "e.g. \"lmikkola\" (5 - 30 characters)"
+        widget = forms.TextInput(attrs = {'size':'30'}),
+        error_messages = {'required': (ERR_USERID_MISSING)},
+        help_text = "e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
     )
     txtPassword = forms.CharField(
         min_length = 8,
@@ -38,31 +50,32 @@ class RegistrationForm(forms.Form):
         max_length = 30,
         label = "First Name",
         widget = forms.TextInput(attrs = {'size':'30'}),
-        error_messages = {'required': (u'Your first name is a mandatory information.')},
+        error_messages = {'required': (ERR_FIRST_NAME_MISSING)},
         help_text = "e.g. \"Terhi-Anneli\" or \"Derek\" (max. 30 characters)"
     )
     txtLastName = forms.CharField(
         max_length = 30,
         label = "Last Name",
-        error_messages = {'required': (u'Your last name is a mandatory information.')},
+        error_messages = {'required': (ERR_LAST_NAME_MISSING)},
         help_text = "e.g. \"Virtanen-Kulmala\" or \"Smith\" (max. 30 characters)"
     )
     radGender = forms.ChoiceField(
         label = "Gender",
         choices = GENDER_CHOICES,
-        error_messages = {'required': (u'Your gender is a mandatory information.')},
+        error_messages = {'required': (ERR_GENDER_MISSING)},
         widget = forms.RadioSelect
     )
     txtEmail = forms.EmailField(
         max_length = 100,
         label = "Email",
         widget = forms.TextInput(attrs = {'size':'50'}),
-        error_messages = {'required': (u'Please enter a real email address you are using.')},
+        error_messages = {'required': (ERR_EMAIL_MISSING)},
         help_text = "real address like \"matti.virtanen@company.com\" (max. 100 characters)"
     )
     txtEmailAgain = forms.CharField(
         required = False,
-        label = "Re-Enter Email"
+        label = "Re-Enter Email",
+        widget = forms.TextInput(attrs = {'size':'50'})
     )
 
     txtPostAddress1 = forms.CharField(
@@ -109,7 +122,7 @@ class RegistrationForm(forms.Form):
     )
 
     chkServiceConditionsAccepted = forms.BooleanField(
-        label = "I Hereby Accept Terms and Conditions of the Albumizer Service",
+        label = "I Hereby Accept the Terms and Conditions and the Privacy Policy of the Albumizer Service",
         error_messages = {'required': (u'This service cannot be used without accepting the Terms and Conditions.')}
     )
 
@@ -117,9 +130,12 @@ class RegistrationForm(forms.Form):
     def clean_txtUserId(self):
         """ Ensure that given userid is valid and that no user with that userid does already exist """
         userid = self.cleaned_data.get("txtUserId")
+        if not userid:
+            raise ValidationError(ERR_USERID_MISSING)
 
-        if userid:
-            userid = userid.strip()
+        userid = userid.strip()
+        if not re.match(RE_VALID_USER_ID, userid):
+            raise ValidationError("User id can contain only letters A-Z, numbers 0-9 and underscores.")
 
         if User.objects.filter(username = userid):
             raise ValidationError("This user id is already reserved. Please try another one.")
@@ -127,14 +143,42 @@ class RegistrationForm(forms.Form):
         return userid
 
 
+    def clean_txtFirstName(self):
+        """ Trim the first name. """
+        firstname = self.cleaned_data.get("txtFirstName")
+        if not firstname:
+            raise ValidationError(ERR_FIRST_NAME_MISSING)
+
+        return firstname.strip()
+
+
+    def clean_txtLastName(self):
+        """ Trim the last name. """
+        lastname = self.cleaned_data.get("txtLastName")
+        if not lastname:
+            raise ValidationError(ERR_LAST_NAME_MISSING)
+
+        return lastname.strip()
+
+
+    def clean_radGender(self):
+        gender = self.cleaned_data.get("radGender")
+        if not gender:
+            raise ValidationError(ERR_GENDER_MISSING)
+
+        if not gender in ('M', 'F'):
+            raise ValidationError("Unknown value as a gender.")
+
+        return gender
+
+
     def clean_txtEmail(self):
         """ Trim the first email address. """
         email = self.cleaned_data.get("txtEmail")
+        if not email:
+            raise ValidationError(ERR_EMAIL_MISSING)
 
-        if email:
-            email = email.strip()
-
-        return email
+        return email.strip()
 
 
     def clean_txtEmailAgain(self):
@@ -145,6 +189,19 @@ class RegistrationForm(forms.Form):
             email = email.strip()
 
         return email
+
+
+    def clean_txtHomePhone(self):
+        """ Trim the home phone number and ensure that it is well-formed. """
+        homephone = self.cleaned_data.get("txtHomePhone")
+
+        if homephone:
+            homephone = homephone.strip()
+            if not re.match(RE_VALID_PHONE_NUMBER, homephone):
+                raise ValidationError("Phone number can contain only numbers 0-9 and spaces, " +
+                                      "and it may begin with a plus character.")
+
+        return
 
 
     def clean(self):
@@ -183,8 +240,4 @@ class RegistrationForm(forms.Form):
                 errors["txtPasswordAgain"] = error_list
 
         self._errors = errors
-
-        if errors:
-            raise ValidationError("Please correct the errors presented below.")
-
         return cleaned_data

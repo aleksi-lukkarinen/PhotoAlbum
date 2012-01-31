@@ -59,9 +59,20 @@ def get_registration_information(request):
             # The user information is already validated in the form handling code
             userid = form.cleaned_data.get("txtUserId")
             password = form.cleaned_data.get("txtPassword")
+            firstname = form.cleaned_data.get("txtFirstName")
+            lastname = form.cleaned_data.get("txtLastName")
             email = form.cleaned_data.get("txtEmail")
+            gender = form.cleaned_data.get("radGender")
+            postaddressline1 = form.cleaned_data.get("txtPostAddress1")
+            postaddressline2 = form.cleaned_data.get("txtPostAddress2")
+            zipcode = form.cleaned_data.get("txtZipCode")
+            city = form.cleaned_data.get("txtCity")
+            country = form.cleaned_data.get("txtCountry")
+            homephone = form.cleaned_data.get("txtHomePhone")
 
             new_user = User.objects.create_user(userid, email, password)
+            new_user.first_name = firstname
+            new_user.last_name = lastname
             new_user.save()
 
             authenticated_user = auth.authenticate(username = userid, password = password)

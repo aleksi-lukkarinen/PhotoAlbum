@@ -222,6 +222,14 @@ p {
 	margin-bottom:             2em;
 }
 
+#formErrorList td {
+	vertical-align:            top;
+}
+
+#formErrorList td li {
+  margin-left:               2em;
+}
+
 #formErrorList .ui-icon {
   margin-right:              0.5em;
 }
@@ -257,6 +265,18 @@ p {
 
 
 
+#frmRegister fieldset {
+	margin-bottom:             2em;
+  padding:                   0em 1em 1em 1em;
+}
+
+#frmRegister .formSectionTitle {
+  padding:                   0.5em;
+  background-color:          #777777;
+  font-size:                 120%;
+  font-weight:               bold;
+  color:                     #efefef;
+}
 
 #frmRegister td {
   vertical-align:            top;
@@ -270,6 +290,11 @@ p {
 #frmRegister label {
   display:                   inline-block;
   width:                     13em;
+}
+
+#frmRegister .infoRow {
+	margin-top:                1em;
+	font-size:                 110%;
 }
 
 #frmRegister .fieldRow {
@@ -295,29 +320,32 @@ p {
   margin:                    0.5em 0em 2em 13em;
 }
 
+#frmRegister #errorRowHomePhone {
+  margin:                    0.5em 0em 0em 13em;
+}
+
+#frmRegister #errorRowServiceConditions {
+  margin-top:                0.5em;
+}
+
 #frmRegister .errorMessage {
   color:                     #dd0000;
   font-weight:               bold;
 }
 
-#frmRegister #id_txtFirstName,
 #frmRegister #id_txtPostAddress1,
 #frmRegister #id_txtHomePhone {
   margin-top:                1em;
 }
 
-#frmRegister #id_chkServiceConditionsAccepted {
-  margin-left:               10.5em;	
-}
-
 #frmRegister #lblServiceConditionsAccepted {
 	display:                   inline-block;
-  width:                     30em;
+  width:                     50em;
 	margin:                    1em 0em 0em 0.7em;
 }
 
 #frmRegister #id_cmdRegister {
 	margin-top:                2em;
-  margin-left:               12em;  
+	width:                     12em;
 }
 

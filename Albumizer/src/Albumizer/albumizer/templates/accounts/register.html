@@ -24,8 +24,26 @@
 
   <p>If you want to register into the service, please enter the necessary information below.</p>
 
-  {% if form.errors %}
+  {% if form.errors or form.non_field_errors %}
     <table id="formErrorList" class="ui-state-highlight ui-corner-all">
+      {% if form.errors %}
+        <tr>
+          <td><span class="ui-icon ui-icon-info"></span></td>
+          <td>
+            <span class="errorMessage">
+            <strong>To be accepted, the form below requires to be adjusted as follows:</strong>
+            <ul>
+				      {% for field in form %}
+				        {% for error in field.errors %}
+				          <li>{{ error }}</li>
+				        {% endfor %}
+				      {% endfor %}
+			      </ul>
+			      </span>
+	        </td>
+	      </tr> 
+      {% endif %}
+          
       {% for error in form.non_field_errors %}
         <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
       {% endfor %}
@@ -33,9 +51,10 @@
   {% endif %}
 
   <form id="frmRegister" method="post" action="/accounts/register/">
-    <fieldset>
-      {% csrf_token %}
-      
+    {% csrf_token %}
+    
+    <div class="formSectionTitle ui-widget-header">Account Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
 		  <div class="fieldRow"><label for="id_{{ form.txtUserId.name }}">{{ form.txtUserId.label }}</label>{{ form.txtUserId }}</div>
 		  <div class="helpRow">{{ form.txtUserId.help_text }}</div>
 		  {% if form.txtUserId.errors %}
@@ -65,7 +84,10 @@
 	        {% endfor %}
 	      </div>
       {% endif %}
+    </fieldset>
       
+    <div class="formSectionTitle ui-widget-header">Personal Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
       <div class="fieldRow"><label for="id_{{ form.txtFirstName.name }}">{{ form.txtFirstName.label }}</label>{{ form.txtFirstName }}</div>
       <div class="helpRow">{{ form.txtFirstName.help_text }}</div>
       {% if form.txtFirstName.errors %}
@@ -169,24 +191,33 @@
       <div class="fieldRow"><label for="id_{{ form.txtHomePhone.name }}">{{ form.txtHomePhone.label }}</label>{{ form.txtHomePhone }}</div>
       <div class="helpRow">{{ form.txtHomePhone.help_text }}</div>
       {% if form.txtHomePhone.errors %}
-	      <div class="errorRow">
+	      <div id="errorRowHomePhone">
 	        {% for error in form.txtHomePhone.errors %}
 	          <div class="errorMessage">{{ error }}</div>
 	        {% endfor %}
 	      </div>
       {% endif %}
-      
+    </fieldset>
+
+    <div class="formSectionTitle ui-widget-header">Confirmation</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+      <div class="infoRow">
+        The Terms and Conditions of Albumizer&reg; Service contain important information about using the Service,
+        including your rights and obligations. Also, the Privacy Policy of Albumizer&reg; Service describes how
+        the information you give to the Service is handled. These documents must be read, fully understood and
+        accepted before using this Service.
+      </div>
       <div class="fieldRow">{{ form.chkServiceConditionsAccepted }}<label id="lblServiceConditionsAccepted" for="id_{{ form.chkServiceConditionsAccepted.name }}">{{ form.chkServiceConditionsAccepted.label }}</label></div>
       <div class="helpRow">{{ form.chkServiceConditionsAccepted.help_text }}</div>
       {% if form.chkServiceConditionsAccepted.errors %}
-	      <div class="errorRow">
+	      <div id="errorRowServiceConditions">
 	        {% for error in form.chkServiceConditionsAccepted.errors %}
 	          <div class="errorMessage">{{ error }}</div>
 	        {% endfor %}
 	      </div>
       {% endif %}
       
-      <input type="submit" name="cmdRegister" id="id_cmdRegister" value="   Register   " />
+      <input type="submit" name="cmdRegister" id="id_cmdRegister" value="Register" />
     </fieldset>
   </form>
 
