@@ -1,0 +1,576 @@
+[
+    {
+        "pk": 57,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Acre"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Alabama"
+        }
+    },
+    {
+        "pk": 64,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Alagoas"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Alaska"
+        }
+    },
+    {
+        "pk": 58,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Amap\u00e1"
+        }
+    },
+    {
+        "pk": 59,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Amazonas"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Arizona"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Arkansas"
+        }
+    },
+    {
+        "pk": 65,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Bahia"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "California"
+        }
+    },
+    {
+        "pk": 66,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Cear\u00e1"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Colorado"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Connecticut"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Delaware"
+        }
+    },
+    {
+        "pk": 76,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Esp\u00edrito Santo"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Florida"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Georgia"
+        }
+    },
+    {
+        "pk": 73,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Goi\u00e1s"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Hawaii"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Idaho"
+        }
+    },
+    {
+        "pk": 13,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Illinois"
+        }
+    },
+    {
+        "pk": 14,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Indiana"
+        }
+    },
+    {
+        "pk": 15,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Iowa"
+        }
+    },
+    {
+        "pk": 16,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Kansas"
+        }
+    },
+    {
+        "pk": 17,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Kentucky"
+        }
+    },
+    {
+        "pk": 18,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Louisiana"
+        }
+    },
+    {
+        "pk": 20,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Maine"
+        }
+    },
+    {
+        "pk": 67,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Maranh\u00e3o"
+        }
+    },
+    {
+        "pk": 19,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Maryland"
+        }
+    },
+    {
+        "pk": 21,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Massachusetts"
+        }
+    },
+    {
+        "pk": 74,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Mato Grosso"
+        }
+    },
+    {
+        "pk": 75,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Mato Grosso do Sul"
+        }
+    },
+    {
+        "pk": 22,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Michigan"
+        }
+    },
+    {
+        "pk": 77,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Minas Gerais"
+        }
+    },
+    {
+        "pk": 23,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Minnesota"
+        }
+    },
+    {
+        "pk": 24,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Mississippi"
+        }
+    },
+    {
+        "pk": 25,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Missouri"
+        }
+    },
+    {
+        "pk": 26,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Montana"
+        }
+    },
+    {
+        "pk": 27,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Nebraska"
+        }
+    },
+    {
+        "pk": 28,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Nevada"
+        }
+    },
+    {
+        "pk": 29,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New Hampshire"
+        }
+    },
+    {
+        "pk": 30,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New Jersey"
+        }
+    },
+    {
+        "pk": 31,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New Mexico"
+        }
+    },
+    {
+        "pk": 51,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New South Wales"
+        }
+    },
+    {
+        "pk": 32,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New York"
+        }
+    },
+    {
+        "pk": 33,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "North Carolina"
+        }
+    },
+    {
+        "pk": 34,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "North Dakota"
+        }
+    },
+    {
+        "pk": 35,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Ohio"
+        }
+    },
+    {
+        "pk": 36,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Oklahoma"
+        }
+    },
+    {
+        "pk": 37,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Oregon"
+        }
+    },
+    {
+        "pk": 80,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Paran\u00e1"
+        }
+    },
+    {
+        "pk": 68,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Para\u00edba"
+        }
+    },
+    {
+        "pk": 60,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Par\u00e1"
+        }
+    },
+    {
+        "pk": 38,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Pennsylvania"
+        }
+    },
+    {
+        "pk": 69,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Pernambuco"
+        }
+    },
+    {
+        "pk": 70,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Piau\u00ed"
+        }
+    },
+    {
+        "pk": 52,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Queensland"
+        }
+    },
+    {
+        "pk": 39,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rhode Island"
+        }
+    },
+    {
+        "pk": 71,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rio Grande do Norte"
+        }
+    },
+    {
+        "pk": 81,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rio Grande do Sul"
+        }
+    },
+    {
+        "pk": 78,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rio de Janeiro"
+        }
+    },
+    {
+        "pk": 61,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rond\u00f4nia"
+        }
+    },
+    {
+        "pk": 62,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Roraima"
+        }
+    },
+    {
+        "pk": 82,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Santa Catarina"
+        }
+    },
+    {
+        "pk": 72,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Sergipe"
+        }
+    },
+    {
+        "pk": 53,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "South Australia"
+        }
+    },
+    {
+        "pk": 40,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "South Carolina"
+        }
+    },
+    {
+        "pk": 41,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "South Dakota"
+        }
+    },
+    {
+        "pk": 79,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "S\u00e3o Paulo"
+        }
+    },
+    {
+        "pk": 54,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Tasmania"
+        }
+    },
+    {
+        "pk": 42,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Tennessee"
+        }
+    },
+    {
+        "pk": 43,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Texas"
+        }
+    },
+    {
+        "pk": 63,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Tocantins"
+        }
+    },
+    {
+        "pk": 44,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Utah"
+        }
+    },
+    {
+        "pk": 45,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Vermont"
+        }
+    },
+    {
+        "pk": 55,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Victoria"
+        }
+    },
+    {
+        "pk": 46,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Virginia"
+        }
+    },
+    {
+        "pk": 47,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Washington"
+        }
+    },
+    {
+        "pk": 48,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "West Virginia"
+        }
+    },
+    {
+        "pk": 56,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Western Australia"
+        }
+    },
+    {
+        "pk": 49,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Wisconsin"
+        }
+    },
+    {
+        "pk": 50,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Wyoming"
+        }
+    }
+]

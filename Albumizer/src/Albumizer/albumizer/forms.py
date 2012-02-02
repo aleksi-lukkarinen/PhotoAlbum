@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList
+from models import UserProfile, Country, State
 
 
 ERR_USERID_MISSING = u'Please enter a user id you would like to use.'
@@ -12,9 +13,6 @@ ERR_FIRST_NAME_MISSING = u'Please enter your first name.'
 ERR_LAST_NAME_MISSING = u'Please enter your last name.'
 ERR_GENDER_MISSING = u'Please enter your gender.'
 ERR_EMAIL_MISSING = u'Please enter a real email address you are using.'
-
-
-GENDER_CHOICES = (("M", "Male"), ("F", "Female"))
 
 
 RE_VALID_USER_ID = re.compile("^[A-Za-z0-9_]*[A-Za-z0-9][A-Za-z0-9_]*$")
@@ -61,7 +59,7 @@ class RegistrationForm(forms.Form):
     )
     radGender = forms.ChoiceField(
         label = "Gender",
-        choices = GENDER_CHOICES,
+        choices = UserProfile.GENDER_CHOICES,
         error_messages = {'required': (ERR_GENDER_MISSING)},
         widget = forms.RadioSelect
     )
@@ -76,6 +74,13 @@ class RegistrationForm(forms.Form):
         required = False,
         label = "Re-Enter Email",
         widget = forms.TextInput(attrs = {'size':'50'})
+    )
+    txtHomePhone = forms.CharField(
+        required = False,
+        max_length = 20,
+        widget = forms.TextInput(attrs = {'size':'20'}),
+        label = "Home Phone",
+        help_text = "e.g. \"+358 44 123 4567\" (max. 20 characters)"
     )
 
     txtPostAddress1 = forms.CharField(
@@ -105,20 +110,18 @@ class RegistrationForm(forms.Form):
         label = "City",
         help_text = "e.g. \"Tampere\" or \"Stockholm\" (max. 50 characters)"
     )
-    txtCountry = forms.CharField(
+    cmbState = forms.ModelChoiceField(
         required = False,
-        max_length = 100,
-        widget = forms.TextInput(attrs = {'size':'30'}),
-        label = "Country",
-        help_text = "e.g. \"Danmark\" (max. 100 characters)"
+        queryset = State.objects.all(),
+        widget = forms.Select(),
+        label = "State",
+        help_text = "only for customers from USA, Australia and Brazil"
     )
-
-    txtHomePhone = forms.CharField(
+    cmbCountry = forms.ModelChoiceField(
         required = False,
-        max_length = 20,
-        widget = forms.TextInput(attrs = {'size':'20'}),
-        label = "Home Phone",
-        help_text = "e.g. \"+358 44 123 4567\" (max. 20 characters)"
+        queryset = Country.objects.all(),
+        widget = forms.Select(),
+        label = "Country"
     )
 
     chkServiceConditionsAccepted = forms.BooleanField(
@@ -137,7 +140,7 @@ class RegistrationForm(forms.Form):
         if not re.match(RE_VALID_USER_ID, userid):
             raise ValidationError("User id can contain only letters A-Z, numbers 0-9 and underscores.")
 
-        if User.objects.filter(username = userid):
+        if User.objects.filter(username__exact = userid):
             raise ValidationError("This user id is already reserved. Please try another one.")
 
         return userid

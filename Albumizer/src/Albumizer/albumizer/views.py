@@ -1,13 +1,14 @@
 # This Python file uses the following encoding: utf-8
 
+import datetime
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from models import Album
+from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
 from forms import RegistrationForm
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, HttpResponseForbidden
 
 
 
@@ -61,19 +62,37 @@ def get_registration_information(request):
             password = form.cleaned_data.get("txtPassword")
             firstname = form.cleaned_data.get("txtFirstName")
             lastname = form.cleaned_data.get("txtLastName")
-            email = form.cleaned_data.get("txtEmail")
             gender = form.cleaned_data.get("radGender")
-            postaddressline1 = form.cleaned_data.get("txtPostAddress1")
-            postaddressline2 = form.cleaned_data.get("txtPostAddress2")
-            zipcode = form.cleaned_data.get("txtZipCode")
-            city = form.cleaned_data.get("txtCity")
-            country = form.cleaned_data.get("txtCountry")
-            homephone = form.cleaned_data.get("txtHomePhone")
+            email = form.cleaned_data.get("txtEmail")
+            homephone = form.cleaned_data.get("txtHomePhone") or ""
+            postaddressline1 = form.cleaned_data.get("txtPostAddress1") or ""
+            postaddressline2 = form.cleaned_data.get("txtPostAddress2") or ""
+            zipcode = form.cleaned_data.get("txtZipCode") or ""
+            city = form.cleaned_data.get("txtCity") or ""
+            state = form.cleaned_data.get("cmbState")
+            country = form.cleaned_data.get("cmbCountry")
 
             new_user = User.objects.create_user(userid, email, password)
             new_user.first_name = firstname
             new_user.last_name = lastname
             new_user.save()
+
+            user_profile = new_user.get_profile()
+            user_profile.gender = gender
+            user_profile.homePhone = homephone
+            user_profile.save()
+
+            if postaddressline1 or postaddressline2 or zipcode or city or state or country:
+                new_address = Address(
+                    owner = new_user,
+                    postAddressLine1 = postaddressline1,
+                    postAddressLine2 = postaddressline2,
+                    zipCode = zipcode,
+                    city = city,
+                    state = state,
+                    country = country
+                )
+                new_address.save()
 
             authenticated_user = auth.authenticate(username = userid, password = password)
             auth.login(request, authenticated_user)
@@ -86,6 +105,7 @@ def get_registration_information(request):
 
     else:
         return HttpResponseBadRequest()
+
 
 
 

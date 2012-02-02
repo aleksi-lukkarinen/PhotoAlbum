@@ -1,6 +1,98 @@
 # This Python file uses the following encoding: utf-8
 
 from django.contrib import admin
-from models import Album
+from django.contrib.auth.models import User
+from models import UserProfile, Album, Page, PageContent, Country, State, Address, Order, OrderItem
 
-admin.site.register(Album)
+
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'facebookID', 'gender', 'serviceConditionsAccepted')
+    list_filter = ('gender', 'serviceConditionsAccepted')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'facebookID')
+    date_hierarchy = 'serviceConditionsAccepted'
+
+
+
+
+class AlbumAdmin(admin.ModelAdmin):
+    list_display = ('title', 'owning_customer', 'isPublic', 'description')
+    list_filter = ('isPublic',)
+    search_fields = ('title', 'owner__djangoUserId', 'description')
+
+    def owning_customer(self, obj):
+        return obj.owner
+    owning_customer.short_description = 'owning user'
+    owning_customer.admin_order_field = 'owner'
+
+
+
+
+class PageAdmin(admin.ModelAdmin):
+    list_display = ('album', 'pageNumber', 'layoutID')
+    search_fields = ('album__title',)
+
+
+
+
+class PageContentAdmin(admin.ModelAdmin):
+    list_display = ('page', 'placeHolderID', 'content')
+
+
+
+
+class CountryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'code')
+    search_fields = ('name', 'code')
+    list_max_show_all = 500
+
+
+
+
+class StateAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+    list_max_show_all = 500
+
+
+
+
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('owner', 'postAddressLine1', 'zipCode', 'city', 'state', 'country')
+    search_fields = ('owner__username', 'postAddressLine1', 'zipCode', 'city', 'state__name', 'country__name')
+    list_editable = ('postAddressLine1', 'zipCode', 'city', 'state', 'country')
+
+
+
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('orderer', 'purchaseDate', 'status')
+    list_filter = ('status',)
+    search_fields = ('customer__djangoUserId',)
+    date_hierarchy = 'purchaseDate'
+
+
+
+
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('album', 'count', 'order', 'date_of_order')
+    search_fields = ('order__orderer__username', 'album__title')
+
+    def date_of_order(self, obj):
+        return obj.order.purchaseDate
+    date_of_order.short_description = 'date of order'
+
+
+
+
+admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(Album, AlbumAdmin)
+admin.site.register(Page, PageAdmin)
+admin.site.register(PageContent, PageContentAdmin)
+admin.site.register(Country, CountryAdmin)
+admin.site.register(State, StateAdmin)
+admin.site.register(Address, AddressAdmin)
+admin.site.register(Order, OrderAdmin)
+admin.site.register(OrderItem, OrderItemAdmin)
+

@@ -1,0 +1,2796 @@
+[
+    {
+        "pk": 1, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "aleksi", 
+            "first_name": "Aleksi", 
+            "last_name": "Lukkarinen", 
+            "is_active": true, 
+            "is_superuser": true, 
+            "is_staff": true, 
+            "last_login": "2012-02-02 00:46:47", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$57f8e$3edb5ad887464c2edafcd69a1e2a4018cc558664", 
+            "email": "aleksi.lukkarinen@aalto.fi", 
+            "date_joined": "2012-01-25 21:52:53"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "lauri", 
+            "first_name": "Lauri", 
+            "last_name": "Helkkula", 
+            "is_active": true, 
+            "is_superuser": true, 
+            "is_staff": true, 
+            "last_login": "2012-01-25 22:08:41", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$3b441$9499ed8c551f483cdcbba70c863da017bbfefb3b", 
+            "email": "lauri.helkkula@aalto.fi", 
+            "date_joined": "2012-01-25 22:08:41"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "tomas", 
+            "first_name": "Tomas", 
+            "last_name": "Heiskanen", 
+            "is_active": true, 
+            "is_superuser": true, 
+            "is_staff": true, 
+            "last_login": "2012-01-31 13:43:44", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$c3469$f9ca2d321ac882396fe27e553820706ae86e5f39", 
+            "email": "tomas.heiskanen@gmail.com", 
+            "date_joined": "2012-01-25 22:08:54"
+        }
+    },
+    {
+        "pk": 1, 
+        "model": "albumizer.userprofile", 
+        "fields": {
+            "gender": "M", 
+            "facebookID": "", 
+            "user": 1, 
+            "homePhone": "", 
+            "serviceConditionsAccepted": "2012-02-02 00:48:50"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "albumizer.userprofile", 
+        "fields": {
+            "gender": "M", 
+            "facebookID": "", 
+            "user": 2, 
+            "homePhone": "", 
+            "serviceConditionsAccepted": "2012-02-02 00:48:56"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "albumizer.userprofile", 
+        "fields": {
+            "gender": "M", 
+            "facebookID": "", 
+            "user": 3, 
+            "homePhone": "", 
+            "serviceConditionsAccepted": "2012-02-02 00:49:04"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "albumizer.address", 
+        "fields": {
+            "city": "Vantaa", 
+            "country": "FI", 
+            "state": null, 
+            "zipCode": "01370", 
+            "postAddressLine1": "T\u00e4hk\u00e4kuja 5 L 156", 
+            "postAddressLine2": "", 
+            "owner": 1
+        }
+    }, 
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+        "pk": 57,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Acre"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Alabama"
+        }
+    },
+    {
+        "pk": 64,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Alagoas"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Alaska"
+        }
+    },
+    {
+        "pk": 58,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Amap\u00e1"
+        }
+    },
+    {
+        "pk": 59,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Amazonas"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Arizona"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Arkansas"
+        }
+    },
+    {
+        "pk": 65,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Bahia"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "California"
+        }
+    },
+    {
+        "pk": 66,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Cear\u00e1"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Colorado"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Connecticut"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Delaware"
+        }
+    },
+    {
+        "pk": 76,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Esp\u00edrito Santo"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Florida"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Georgia"
+        }
+    },
+    {
+        "pk": 73,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Goi\u00e1s"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Hawaii"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Idaho"
+        }
+    },
+    {
+        "pk": 13,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Illinois"
+        }
+    },
+    {
+        "pk": 14,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Indiana"
+        }
+    },
+    {
+        "pk": 15,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Iowa"
+        }
+    },
+    {
+        "pk": 16,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Kansas"
+        }
+    },
+    {
+        "pk": 17,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Kentucky"
+        }
+    },
+    {
+        "pk": 18,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Louisiana"
+        }
+    },
+    {
+        "pk": 20,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Maine"
+        }
+    },
+    {
+        "pk": 67,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Maranh\u00e3o"
+        }
+    },
+    {
+        "pk": 19,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Maryland"
+        }
+    },
+    {
+        "pk": 21,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Massachusetts"
+        }
+    },
+    {
+        "pk": 74,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Mato Grosso"
+        }
+    },
+    {
+        "pk": 75,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Mato Grosso do Sul"
+        }
+    },
+    {
+        "pk": 22,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Michigan"
+        }
+    },
+    {
+        "pk": 77,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Minas Gerais"
+        }
+    },
+    {
+        "pk": 23,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Minnesota"
+        }
+    },
+    {
+        "pk": 24,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Mississippi"
+        }
+    },
+    {
+        "pk": 25,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Missouri"
+        }
+    },
+    {
+        "pk": 26,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Montana"
+        }
+    },
+    {
+        "pk": 27,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Nebraska"
+        }
+    },
+    {
+        "pk": 28,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Nevada"
+        }
+    },
+    {
+        "pk": 29,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New Hampshire"
+        }
+    },
+    {
+        "pk": 30,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New Jersey"
+        }
+    },
+    {
+        "pk": 31,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New Mexico"
+        }
+    },
+    {
+        "pk": 51,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New South Wales"
+        }
+    },
+    {
+        "pk": 32,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "New York"
+        }
+    },
+    {
+        "pk": 33,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "North Carolina"
+        }
+    },
+    {
+        "pk": 34,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "North Dakota"
+        }
+    },
+    {
+        "pk": 35,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Ohio"
+        }
+    },
+    {
+        "pk": 36,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Oklahoma"
+        }
+    },
+    {
+        "pk": 37,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Oregon"
+        }
+    },
+    {
+        "pk": 80,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Paran\u00e1"
+        }
+    },
+    {
+        "pk": 68,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Para\u00edba"
+        }
+    },
+    {
+        "pk": 60,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Par\u00e1"
+        }
+    },
+    {
+        "pk": 38,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Pennsylvania"
+        }
+    },
+    {
+        "pk": 69,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Pernambuco"
+        }
+    },
+    {
+        "pk": 70,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Piau\u00ed"
+        }
+    },
+    {
+        "pk": 52,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Queensland"
+        }
+    },
+    {
+        "pk": 39,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rhode Island"
+        }
+    },
+    {
+        "pk": 71,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rio Grande do Norte"
+        }
+    },
+    {
+        "pk": 81,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rio Grande do Sul"
+        }
+    },
+    {
+        "pk": 78,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rio de Janeiro"
+        }
+    },
+    {
+        "pk": 61,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Rond\u00f4nia"
+        }
+    },
+    {
+        "pk": 62,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Roraima"
+        }
+    },
+    {
+        "pk": 82,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Santa Catarina"
+        }
+    },
+    {
+        "pk": 72,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Sergipe"
+        }
+    },
+    {
+        "pk": 53,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "South Australia"
+        }
+    },
+    {
+        "pk": 40,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "South Carolina"
+        }
+    },
+    {
+        "pk": 41,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "South Dakota"
+        }
+    },
+    {
+        "pk": 79,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "S\u00e3o Paulo"
+        }
+    },
+    {
+        "pk": 54,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Tasmania"
+        }
+    },
+    {
+        "pk": 42,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Tennessee"
+        }
+    },
+    {
+        "pk": 43,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Texas"
+        }
+    },
+    {
+        "pk": 63,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Tocantins"
+        }
+    },
+    {
+        "pk": 44,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Utah"
+        }
+    },
+    {
+        "pk": 45,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Vermont"
+        }
+    },
+    {
+        "pk": 55,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Victoria"
+        }
+    },
+    {
+        "pk": 46,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Virginia"
+        }
+    },
+    {
+        "pk": 47,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Washington"
+        }
+    },
+    {
+        "pk": 48,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "West Virginia"
+        }
+    },
+    {
+        "pk": 56,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Western Australia"
+        }
+    },
+    {
+        "pk": 49,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Wisconsin"
+        }
+    },
+    {
+        "pk": 50,
+        "model": "albumizer.state",
+        "fields": {
+            "name": "Wyoming"
+        }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+        "pk": "AF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Afghanistan"
+        }
+    },
+    {
+        "pk": "AL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Albania"
+        }
+    },
+    {
+        "pk": "DZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Algeria"
+        }
+    },
+    {
+        "pk": "AS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "American Samoa"
+        }
+    },
+    {
+        "pk": "AD",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Andorra"
+        }
+    },
+    {
+        "pk": "AO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Angola"
+        }
+    },
+    {
+        "pk": "AI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Anguilla"
+        }
+    },
+    {
+        "pk": "AQ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Antarctica"
+        }
+    },
+    {
+        "pk": "AG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Antigua And Barbuda"
+        }
+    },
+    {
+        "pk": "AR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Argentina"
+        }
+    },
+    {
+        "pk": "AM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Armenia"
+        }
+    },
+    {
+        "pk": "AW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Aruba"
+        }
+    },
+    {
+        "pk": "AU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Australia"
+        }
+    },
+    {
+        "pk": "AT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Austria"
+        }
+    },
+    {
+        "pk": "AZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Azerbaijan"
+        }
+    },
+    {
+        "pk": "BS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bahamas"
+        }
+    },
+    {
+        "pk": "BH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bahrain"
+        }
+    },
+    {
+        "pk": "BD",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bangladesh"
+        }
+    },
+    {
+        "pk": "BB",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Barbados"
+        }
+    },
+    {
+        "pk": "BY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Belarus"
+        }
+    },
+    {
+        "pk": "BE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Belgium"
+        }
+    },
+    {
+        "pk": "BZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Belize"
+        }
+    },
+    {
+        "pk": "BJ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Benin"
+        }
+    },
+    {
+        "pk": "BM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bermuda"
+        }
+    },
+    {
+        "pk": "BT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bhutan"
+        }
+    },
+    {
+        "pk": "BO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bolivia, Plurinational State Of"
+        }
+    },
+    {
+        "pk": "BQ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bonaire, Sint Eustatius And Saba"
+        }
+    },
+    {
+        "pk": "BA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bosnia And Herzegovina"
+        }
+    },
+    {
+        "pk": "BW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Botswana"
+        }
+    },
+    {
+        "pk": "BV",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bouvet Island"
+        }
+    },
+    {
+        "pk": "BR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Brazil"
+        }
+    },
+    {
+        "pk": "IO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "British Indian Ocean Territory"
+        }
+    },
+    {
+        "pk": "BN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Brunei Darussalam"
+        }
+    },
+    {
+        "pk": "BG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Bulgaria"
+        }
+    },
+    {
+        "pk": "BF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Burkina Faso"
+        }
+    },
+    {
+        "pk": "BI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Burundi"
+        }
+    },
+    {
+        "pk": "KH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cambodia"
+        }
+    },
+    {
+        "pk": "CM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cameroon"
+        }
+    },
+    {
+        "pk": "CA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Canada"
+        }
+    },
+    {
+        "pk": "CV",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cape Verde"
+        }
+    },
+    {
+        "pk": "KY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cayman Islands"
+        }
+    },
+    {
+        "pk": "CF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Central African Republic"
+        }
+    },
+    {
+        "pk": "TD",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Chad"
+        }
+    },
+    {
+        "pk": "CL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Chile"
+        }
+    },
+    {
+        "pk": "CN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "China"
+        }
+    },
+    {
+        "pk": "CX",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Christmas Island"
+        }
+    },
+    {
+        "pk": "CC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cocos (Keeling) Islands"
+        }
+    },
+    {
+        "pk": "CO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Colombia"
+        }
+    },
+    {
+        "pk": "KM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Comoros"
+        }
+    },
+    {
+        "pk": "CG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Congo"
+        }
+    },
+    {
+        "pk": "CD",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Congo, The Democratic Republic Of The"
+        }
+    },
+    {
+        "pk": "CK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cook Islands"
+        }
+    },
+    {
+        "pk": "CR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Costa Rica"
+        }
+    },
+    {
+        "pk": "HR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Croatia"
+        }
+    },
+    {
+        "pk": "CU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cuba"
+        }
+    },
+    {
+        "pk": "CW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cura\u00e7ao"
+        }
+    },
+    {
+        "pk": "CY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Cyprus"
+        }
+    },
+    {
+        "pk": "CZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Czech Republic"
+        }
+    },
+    {
+        "pk": "CI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "C\u00f4te D'Ivoire"
+        }
+    },
+    {
+        "pk": "DK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Denmark"
+        }
+    },
+    {
+        "pk": "DJ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Djibouti"
+        }
+    },
+    {
+        "pk": "DM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Dominica"
+        }
+    },
+    {
+        "pk": "DO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Dominican Republic"
+        }
+    },
+    {
+        "pk": "EC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Ecuador"
+        }
+    },
+    {
+        "pk": "EG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Egypt"
+        }
+    },
+    {
+        "pk": "SV",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "El Salvador"
+        }
+    },
+    {
+        "pk": "GQ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Equatorial Guinea"
+        }
+    },
+    {
+        "pk": "ER",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Eritrea"
+        }
+    },
+    {
+        "pk": "EE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Estonia"
+        }
+    },
+    {
+        "pk": "ET",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Ethiopia"
+        }
+    },
+    {
+        "pk": "FK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Falkland Islands (Malvinas)"
+        }
+    },
+    {
+        "pk": "FO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Faroe Islands"
+        }
+    },
+    {
+        "pk": "FJ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Fiji"
+        }
+    },
+    {
+        "pk": "FI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Finland"
+        }
+    },
+    {
+        "pk": "FR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "France"
+        }
+    },
+    {
+        "pk": "GF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "French Guiana"
+        }
+    },
+    {
+        "pk": "PF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "French Polynesia"
+        }
+    },
+    {
+        "pk": "TF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "French Southern Territories"
+        }
+    },
+    {
+        "pk": "GA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Gabon"
+        }
+    },
+    {
+        "pk": "GM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Gambia"
+        }
+    },
+    {
+        "pk": "GE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Georgia"
+        }
+    },
+    {
+        "pk": "DE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Germany"
+        }
+    },
+    {
+        "pk": "GH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Ghana"
+        }
+    },
+    {
+        "pk": "GI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Gibraltar"
+        }
+    },
+    {
+        "pk": "GR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Greece"
+        }
+    },
+    {
+        "pk": "GL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Greenland"
+        }
+    },
+    {
+        "pk": "GD",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Grenada"
+        }
+    },
+    {
+        "pk": "GP",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Guadeloupe"
+        }
+    },
+    {
+        "pk": "GU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Guam"
+        }
+    },
+    {
+        "pk": "GT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Guatemala"
+        }
+    },
+    {
+        "pk": "GG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Guernsey"
+        }
+    },
+    {
+        "pk": "GN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Guinea"
+        }
+    },
+    {
+        "pk": "GW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Guinea-Bissau"
+        }
+    },
+    {
+        "pk": "GY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Guyana"
+        }
+    },
+    {
+        "pk": "HT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Haiti"
+        }
+    },
+    {
+        "pk": "HM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Heard Island And Mcdonald Islands"
+        }
+    },
+    {
+        "pk": "VA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Holy See (Vatican City State)"
+        }
+    },
+    {
+        "pk": "HN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Honduras"
+        }
+    },
+    {
+        "pk": "HK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Hong Kong"
+        }
+    },
+    {
+        "pk": "HU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Hungary"
+        }
+    },
+    {
+        "pk": "IS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Iceland"
+        }
+    },
+    {
+        "pk": "IN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "India"
+        }
+    },
+    {
+        "pk": "ID",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Indonesia"
+        }
+    },
+    {
+        "pk": "IR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Iran, Islamic Republic Of"
+        }
+    },
+    {
+        "pk": "IQ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Iraq"
+        }
+    },
+    {
+        "pk": "IE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Ireland"
+        }
+    },
+    {
+        "pk": "IM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Isle Of Man"
+        }
+    },
+    {
+        "pk": "IL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Israel"
+        }
+    },
+    {
+        "pk": "IT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Italy"
+        }
+    },
+    {
+        "pk": "JM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Jamaica"
+        }
+    },
+    {
+        "pk": "JP",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Japan"
+        }
+    },
+    {
+        "pk": "JE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Jersey"
+        }
+    },
+    {
+        "pk": "JO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Jordan"
+        }
+    },
+    {
+        "pk": "KZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Kazakhstan"
+        }
+    },
+    {
+        "pk": "KE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Kenya"
+        }
+    },
+    {
+        "pk": "KI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Kiribati"
+        }
+    },
+    {
+        "pk": "KP",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Korea, Democratic People's Republic Of"
+        }
+    },
+    {
+        "pk": "KR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Korea, Republic Of"
+        }
+    },
+    {
+        "pk": "KW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Kuwait"
+        }
+    },
+    {
+        "pk": "KG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Kyrgyzstan"
+        }
+    },
+    {
+        "pk": "LA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Lao People's Democratic Republic"
+        }
+    },
+    {
+        "pk": "LV",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Latvia"
+        }
+    },
+    {
+        "pk": "LB",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Lebanon"
+        }
+    },
+    {
+        "pk": "LS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Lesotho"
+        }
+    },
+    {
+        "pk": "LR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Liberia"
+        }
+    },
+    {
+        "pk": "LY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Libya"
+        }
+    },
+    {
+        "pk": "LI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Liechtenstein"
+        }
+    },
+    {
+        "pk": "LT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Lithuania"
+        }
+    },
+    {
+        "pk": "LU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Luxembourg"
+        }
+    },
+    {
+        "pk": "MO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Macao"
+        }
+    },
+    {
+        "pk": "MK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Macedonia, The Former Yugoslav Republic Of"
+        }
+    },
+    {
+        "pk": "MG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Madagascar"
+        }
+    },
+    {
+        "pk": "MW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Malawi"
+        }
+    },
+    {
+        "pk": "MY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Malaysia"
+        }
+    },
+    {
+        "pk": "MV",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Maldives"
+        }
+    },
+    {
+        "pk": "ML",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Mali"
+        }
+    },
+    {
+        "pk": "MT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Malta"
+        }
+    },
+    {
+        "pk": "MH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Marshall Islands"
+        }
+    },
+    {
+        "pk": "MQ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Martinique"
+        }
+    },
+    {
+        "pk": "MR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Mauritania"
+        }
+    },
+    {
+        "pk": "MU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Mauritius"
+        }
+    },
+    {
+        "pk": "YT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Mayotte"
+        }
+    },
+    {
+        "pk": "MX",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Mexico"
+        }
+    },
+    {
+        "pk": "FM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Micronesia, Federated States Of"
+        }
+    },
+    {
+        "pk": "MD",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Moldova, Republic Of"
+        }
+    },
+    {
+        "pk": "MC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Monaco"
+        }
+    },
+    {
+        "pk": "MN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Mongolia"
+        }
+    },
+    {
+        "pk": "ME",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Montenegro"
+        }
+    },
+    {
+        "pk": "MS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Montserrat"
+        }
+    },
+    {
+        "pk": "MA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Morocco"
+        }
+    },
+    {
+        "pk": "MZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Mozambique"
+        }
+    },
+    {
+        "pk": "MM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Myanmar"
+        }
+    },
+    {
+        "pk": "NA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Namibia"
+        }
+    },
+    {
+        "pk": "NR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Nauru"
+        }
+    },
+    {
+        "pk": "NP",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Nepal"
+        }
+    },
+    {
+        "pk": "NL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Netherlands"
+        }
+    },
+    {
+        "pk": "NC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "New Caledonia"
+        }
+    },
+    {
+        "pk": "NZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "New Zealand"
+        }
+    },
+    {
+        "pk": "NI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Nicaragua"
+        }
+    },
+    {
+        "pk": "NE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Niger"
+        }
+    },
+    {
+        "pk": "NG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Nigeria"
+        }
+    },
+    {
+        "pk": "NU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Niue"
+        }
+    },
+    {
+        "pk": "NF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Norfolk Island"
+        }
+    },
+    {
+        "pk": "MP",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Northern Mariana Islands"
+        }
+    },
+    {
+        "pk": "NO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Norway"
+        }
+    },
+    {
+        "pk": "OM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Oman"
+        }
+    },
+    {
+        "pk": "PK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Pakistan"
+        }
+    },
+    {
+        "pk": "PW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Palau"
+        }
+    },
+    {
+        "pk": "PS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Palestinian Territory, Occupied"
+        }
+    },
+    {
+        "pk": "PA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Panama"
+        }
+    },
+    {
+        "pk": "PG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Papua New Guinea"
+        }
+    },
+    {
+        "pk": "PY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Paraguay"
+        }
+    },
+    {
+        "pk": "PE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Peru"
+        }
+    },
+    {
+        "pk": "PH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Philippines"
+        }
+    },
+    {
+        "pk": "PN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Pitcairn"
+        }
+    },
+    {
+        "pk": "PL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Poland"
+        }
+    },
+    {
+        "pk": "PT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Portugal"
+        }
+    },
+    {
+        "pk": "PR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Puerto Rico"
+        }
+    },
+    {
+        "pk": "QA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Qatar"
+        }
+    },
+    {
+        "pk": "RO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Romania"
+        }
+    },
+    {
+        "pk": "RU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Russian Federation"
+        }
+    },
+    {
+        "pk": "RW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Rwanda"
+        }
+    },
+    {
+        "pk": "RE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "R\u00e9union"
+        }
+    },
+    {
+        "pk": "BL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saint Barth\u00c9Lemy"
+        }
+    },
+    {
+        "pk": "SH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saint Helena, Ascension And Tristan Da Cunha"
+        }
+    },
+    {
+        "pk": "KN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saint Kitts And Nevis"
+        }
+    },
+    {
+        "pk": "LC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saint Lucia"
+        }
+    },
+    {
+        "pk": "MF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saint Martin (French Part)"
+        }
+    },
+    {
+        "pk": "PM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saint Pierre And Miquelon"
+        }
+    },
+    {
+        "pk": "VC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saint Vincent And The Grenadines"
+        }
+    },
+    {
+        "pk": "WS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Samoa"
+        }
+    },
+    {
+        "pk": "SM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "San Marino"
+        }
+    },
+    {
+        "pk": "ST",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Sao Tome And Principe"
+        }
+    },
+    {
+        "pk": "SA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Saudi Arabia"
+        }
+    },
+    {
+        "pk": "SN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Senegal"
+        }
+    },
+    {
+        "pk": "RS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Serbia"
+        }
+    },
+    {
+        "pk": "SC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Seychelles"
+        }
+    },
+    {
+        "pk": "SL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Sierra Leone"
+        }
+    },
+    {
+        "pk": "SG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Singapore"
+        }
+    },
+    {
+        "pk": "SX",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Sint Maarten (Dutch Part)"
+        }
+    },
+    {
+        "pk": "SK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Slovakia"
+        }
+    },
+    {
+        "pk": "SI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Slovenia"
+        }
+    },
+    {
+        "pk": "SB",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Solomon Islands"
+        }
+    },
+    {
+        "pk": "SO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Somalia"
+        }
+    },
+    {
+        "pk": "ZA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "South Africa"
+        }
+    },
+    {
+        "pk": "GS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "South Georgia And The South Sandwich Islands"
+        }
+    },
+    {
+        "pk": "SS",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "South Sudan"
+        }
+    },
+    {
+        "pk": "ES",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Spain"
+        }
+    },
+    {
+        "pk": "LK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Sri Lanka"
+        }
+    },
+    {
+        "pk": "SD",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Sudan"
+        }
+    },
+    {
+        "pk": "SR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Suriname"
+        }
+    },
+    {
+        "pk": "SJ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Svalbard And Jan Mayen"
+        }
+    },
+    {
+        "pk": "SZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Swaziland"
+        }
+    },
+    {
+        "pk": "SE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Sweden"
+        }
+    },
+    {
+        "pk": "CH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Switzerland"
+        }
+    },
+    {
+        "pk": "SY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Syrian Arab Republic"
+        }
+    },
+    {
+        "pk": "TW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Taiwan, Province Of China"
+        }
+    },
+    {
+        "pk": "TJ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Tajikistan"
+        }
+    },
+    {
+        "pk": "TZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Tanzania, United Republic Of"
+        }
+    },
+    {
+        "pk": "TH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Thailand"
+        }
+    },
+    {
+        "pk": "TL",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Timor-Leste"
+        }
+    },
+    {
+        "pk": "TG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Togo"
+        }
+    },
+    {
+        "pk": "TK",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Tokelau"
+        }
+    },
+    {
+        "pk": "TO",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Tonga"
+        }
+    },
+    {
+        "pk": "TT",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Trinidad And Tobago"
+        }
+    },
+    {
+        "pk": "TN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Tunisia"
+        }
+    },
+    {
+        "pk": "TR",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Turkey"
+        }
+    },
+    {
+        "pk": "TM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Turkmenistan"
+        }
+    },
+    {
+        "pk": "TC",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Turks And Caicos Islands"
+        }
+    },
+    {
+        "pk": "TV",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Tuvalu"
+        }
+    },
+    {
+        "pk": "UG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Uganda"
+        }
+    },
+    {
+        "pk": "UA",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Ukraine"
+        }
+    },
+    {
+        "pk": "AE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "United Arab Emirates"
+        }
+    },
+    {
+        "pk": "GB",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "United Kingdom"
+        }
+    },
+    {
+        "pk": "US",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "United States"
+        }
+    },
+    {
+        "pk": "UM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "United States Minor Outlying Islands"
+        }
+    },
+    {
+        "pk": "UY",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Uruguay"
+        }
+    },
+    {
+        "pk": "UZ",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Uzbekistan"
+        }
+    },
+    {
+        "pk": "VU",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Vanuatu"
+        }
+    },
+    {
+        "pk": "VE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Venezuela, Bolivarian Republic Of"
+        }
+    },
+    {
+        "pk": "VN",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Viet Nam"
+        }
+    },
+    {
+        "pk": "VG",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Virgin Islands, British"
+        }
+    },
+    {
+        "pk": "VI",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Virgin Islands, U.S."
+        }
+    },
+    {
+        "pk": "WF",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Wallis And Futuna"
+        }
+    },
+    {
+        "pk": "EH",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Western Sahara"
+        }
+    },
+    {
+        "pk": "YE",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Yemen"
+        }
+    },
+    {
+        "pk": "ZM",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Zambia"
+        }
+    },
+    {
+        "pk": "ZW",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "Zimbabwe"
+        }
+    },
+    {
+        "pk": "AX",
+        "model": "albumizer.country",
+        "fields": {
+            "name": "\u00c5land Islands"
+        }
+    }
+]

@@ -20,6 +20,9 @@ SIMPLE_PAYMENT_SERVICE_SECRET = "a76562ae5654109c5c349d45a6e24d16"
 FACEBOOK_APPID = ""
 
 
+AUTH_PROFILE_MODULE = "albumizer.models.UserProfile"
+
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
     ('Aleksi Lukkarinen', 'aleksi.lukkarinen@aalto.fi'),
@@ -33,7 +36,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(os.path.dirname(__file__), 'albumizer_'+os.environ["USERNAME"]+'.db').replace('\\', '/'), # Or path to database file if using sqlite3.
+        'NAME': os.path.join(os.path.dirname(__file__), 'albumizer_' + os.environ["USERNAME"] + '.db').replace('\\', '/'), # Or path to database file if using sqlite3.
         'USER': '', # Not used with sqlite3.
         'PASSWORD': '', # Not used with sqlite3.
         'HOST': '', # Set to empty string for localhost. Not used with sqlite3.

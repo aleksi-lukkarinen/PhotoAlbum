@@ -9,7 +9,11 @@
 {% block page_scripts_after %}
 
   $(function() {
-    $("#id_cmdRegister").button();
+    $("#id_cmdRegister").button({
+      icons: {
+        primary: 'ui-icon-check'
+      }
+    });
     $("input").addClass("text ui-widget-content");
     $("#radio").buttonset();
   });
@@ -22,7 +26,7 @@
 
   <h1>Register</h1>
 
-  <p>If you want to register into the service, please enter the necessary information below.</p>
+  <p>If you want to register into the service, please enter the necessary information below. The fields with a star next to their label are required.</p>
 
   {% if form.errors or form.non_field_errors %}
     <table id="formErrorList" class="ui-state-highlight ui-corner-all">
@@ -31,7 +35,7 @@
           <td><span class="ui-icon ui-icon-info"></span></td>
           <td>
             <span class="errorMessage">
-            <strong>To be accepted, the form below requires to be adjusted as follows:</strong>
+            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
             <ul>
 				      {% for field in form %}
 				        {% for error in field.errors %}
@@ -55,7 +59,7 @@
     
     <div class="formSectionTitle ui-widget-header">Account Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-		  <div class="fieldRow"><label for="id_{{ form.txtUserId.name }}">{{ form.txtUserId.label }}</label>{{ form.txtUserId }}</div>
+		  <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtUserId.name }}">{{ form.txtUserId.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtUserId }}</div>
 		  <div class="helpRow">{{ form.txtUserId.help_text }}</div>
 		  {% if form.txtUserId.errors %}
 			  <div class="errorRow">
@@ -65,7 +69,7 @@
 	      </div>
       {% endif %}
 
-      <div class="fieldRow"><label for="id_{{ form.txtPassword.name }}">{{ form.txtPassword.label }}</label>{{ form.txtPassword }}</div>
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtPassword.name }}">{{ form.txtPassword.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtPassword }}</div>
       <div class="helpRow">{{ form.txtPassword.help_text }}</div>
       {% if form.txtPassword.errors %}
 	      <div class="errorRow">
@@ -75,7 +79,7 @@
 	      </div>
       {% endif %}
       
-      <div class="fieldRow"><label for="id_{{ form.txtPasswordAgain.name }}">{{ form.txtPasswordAgain.label }}</label>{{ form.txtPasswordAgain }}</div>
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtPasswordAgain.name }}">{{ form.txtPasswordAgain.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtPasswordAgain }}</div>
       <div class="helpRow">{{ form.txtPasswordAgain.help_text }}</div>
       {% if form.txtPasswordAgain.errors %}
 	      <div class="errorRow">
@@ -88,7 +92,7 @@
       
     <div class="formSectionTitle ui-widget-header">Personal Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-      <div class="fieldRow"><label for="id_{{ form.txtFirstName.name }}">{{ form.txtFirstName.label }}</label>{{ form.txtFirstName }}</div>
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtFirstName.name }}">{{ form.txtFirstName.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtFirstName }}</div>
       <div class="helpRow">{{ form.txtFirstName.help_text }}</div>
       {% if form.txtFirstName.errors %}
 	      <div class="errorRow">
@@ -98,7 +102,7 @@
 	      </div>
       {% endif %}
       
-      <div class="fieldRow"><label for="id_{{ form.txtLastName.name }}">{{ form.txtLastName.label }}</label>{{ form.txtLastName }}</div>
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtLastName.name }}">{{ form.txtLastName.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtLastName }}</div>
       <div class="helpRow">{{ form.txtLastName.help_text }}</div>
       {% if form.txtLastName.errors %}
 	      <div class="errorRow">
@@ -108,7 +112,7 @@
 	      </div>
       {% endif %}
       
-      <div class="fieldRow"><label for="id_{{ form.radGender.name }}">{{ form.radGender.label }}</label>{{ form.radGender }}</div>
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.radGender.name }}">{{ form.radGender.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.radGender }}</div>
       <div class="helpRow">{{ form.radGender.help_text }}</div>
       {% if form.radGender.errors %}
 	      <div class="errorRow">
@@ -118,7 +122,7 @@
 	      </div>
       {% endif %}
       
-      <div class="fieldRow"><label for="id_{{ form.txtEmail.name }}">{{ form.txtEmail.label }}</label>{{ form.txtEmail }}</div>
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtEmail.name }}">{{ form.txtEmail.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtEmail }}</div>
       <div class="helpRow">{{ form.txtEmail.help_text }}</div>
       {% if form.txtEmail.errors %}
 	      <div class="errorRow">
@@ -128,7 +132,7 @@
 	      </div>
       {% endif %}
       
-      <div class="fieldRow"><label for="id_{{ form.txtEmailAgain.name }}">{{ form.txtEmailAgain.label }}</label>{{ form.txtEmailAgain }}</div>
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtEmailAgain.name }}">{{ form.txtEmailAgain.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtEmailAgain }}</div>
       <div class="helpRow">{{ form.txtEmailAgain.help_text }}</div>
       {% if form.txtEmailAgain.errors %}
 	      <div class="errorRow">
@@ -138,6 +142,19 @@
 	      </div>
       {% endif %}
       
+      <div class="fieldRow"><label for="id_{{ form.txtHomePhone.name }}">{{ form.txtHomePhone.label }}</label>{{ form.txtHomePhone }}</div>
+      <div class="helpRow">{{ form.txtHomePhone.help_text }}</div>
+      {% if form.txtHomePhone.errors %}
+        <div id="errorRowHomePhone">
+          {% for error in form.txtHomePhone.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </fieldset>
+
+    <div class="formSectionTitle ui-widget-header">Delivery Address</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
       <div class="fieldRow"><label for="id_{{ form.txtPostAddress1.name }}">{{ form.txtPostAddress1.label }}</label>{{ form.txtPostAddress1 }}</div>
       <div class="helpRow">{{ form.txtPostAddress1.help_text }}</div>
       {% if form.txtPostAddress1.errors %}
@@ -177,22 +194,22 @@
 	        {% endfor %}
 	      </div>
       {% endif %}
-      
-      <div class="fieldRow"><label for="id_{{ form.txtCountry.name }}">{{ form.txtCountry.label }}</label>{{ form.txtCountry }}</div>
-      <div class="helpRow">{{ form.txtCountry.help_text }}</div>
-      {% if form.txtCountry.errors %}
-	      <div class="errorRow">
-	        {% for error in form.txtCountry.errors %}
-	          <div class="errorMessage">{{ error }}</div>
-	        {% endfor %}
-	      </div>
+
+      <div class="fieldRow"><label for="id_{{ form.cmbState.name }}">{{ form.cmbState.label }}</label>{{ form.cmbState }}</div>
+      <div class="helpRow">{{ form.cmbState.help_text }}</div>
+      {% if form.cmbState.errors %}
+        <div class="errorRow">
+          {% for error in form.cmbState.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
       {% endif %}
       
-      <div class="fieldRow"><label for="id_{{ form.txtHomePhone.name }}">{{ form.txtHomePhone.label }}</label>{{ form.txtHomePhone }}</div>
-      <div class="helpRow">{{ form.txtHomePhone.help_text }}</div>
-      {% if form.txtHomePhone.errors %}
-	      <div id="errorRowHomePhone">
-	        {% for error in form.txtHomePhone.errors %}
+      <div class="fieldRow"><label for="id_{{ form.cmbCountry.name }}">{{ form.cmbCountry.label }}</label>{{ form.cmbCountry }}</div>
+      <div class="helpRow">{{ form.cmbCountry.help_text }}</div>
+      {% if form.cmbCountry.errors %}
+	      <div class="errorRow">
+	        {% for error in form.cmbCountry.errors %}
 	          <div class="errorMessage">{{ error }}</div>
 	        {% endfor %}
 	      </div>
@@ -207,7 +224,7 @@
         the information you give to the Service is handled. These documents must be read, fully understood and
         accepted before using this Service.
       </div>
-      <div class="fieldRow">{{ form.chkServiceConditionsAccepted }}<label id="lblServiceConditionsAccepted" for="id_{{ form.chkServiceConditionsAccepted.name }}">{{ form.chkServiceConditionsAccepted.label }}</label></div>
+      <div class="fieldRow">{{ form.chkServiceConditionsAccepted }}<label id="lblServiceConditionsAccepted" class="requiredLabel" for="id_{{ form.chkServiceConditionsAccepted.name }}">{{ form.chkServiceConditionsAccepted.label }}<span class="ui-icon ui-icon-star"></span></label></div>
       <div class="helpRow">{{ form.chkServiceConditionsAccepted.help_text }}</div>
       {% if form.chkServiceConditionsAccepted.errors %}
 	      <div id="errorRowServiceConditions">
