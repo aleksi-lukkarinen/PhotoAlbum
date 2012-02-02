@@ -74,6 +74,12 @@ class Album(models.Model):
         verbose_name = "is public",
         help_text = "If album is declared as a public one, it will be visible for everybody to browse"
     )
+    creationDate = models.DateTimeField(
+        auto_now_add = True,
+        blank = True,
+        null = True,
+        verbose_name = "creation date"
+    )
 
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.owner)
