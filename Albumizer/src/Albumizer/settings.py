@@ -23,6 +23,10 @@ FACEBOOK_APPID = ""
 AUTH_PROFILE_MODULE = "albumizer.models.UserProfile"
 
 
+# for the Django debug toolbar
+INTERNAL_IPS = ('127.0.0.1',)
+
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
     ('Aleksi Lukkarinen', 'aleksi.lukkarinen@aalto.fi'),
@@ -122,6 +126,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'Albumizer.urls'
@@ -145,6 +150,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'albumizer',
     'south',
+    'debug_toolbar',
 )
 
 # A sample logging configuration. The only tangible logging
