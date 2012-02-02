@@ -9,12 +9,10 @@
 {% block page_scripts_after %}
 
   $(function() {
-    $("#id_cmdRegister").button({
-      icons: {
-        primary: 'ui-icon-check'
-      }
-    });
-    $("input").addClass("text ui-widget-content");
+    $("#id_cmdRegister").button();
+  });
+  $(window).load(function() {
+    $("#id_txtUserId").focus();
   });
 
 {% endblock %}
