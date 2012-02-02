@@ -143,7 +143,8 @@ class Country(models.Model):
     code = models.CharField(
         primary_key = True,
         max_length = 10,
-        help_text = "see <a href=\"http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm\" target=\"_new\">ISO 3166</a> " +
+        help_text = "see <a href=\"http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm\" " +
+                    "target=\"_new\">ISO 3166</a> " +
                     "for a list of countries and their codes"
     )
     name = models.CharField(
