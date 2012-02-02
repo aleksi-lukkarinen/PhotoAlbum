@@ -2,12 +2,17 @@
 
 
 
-{% block page_title %}Album{% endblock %}
+{% block page_title %}Album "{{ album.title }}"{% endblock %}
 
 
 
 {% block page_content %}
 
-  <h1>Album </h1>
+  <h1>{{ album.title }}</h1>
+  {% if album.description %}
+  <p>
+    {{ album.description }}
+  </p>
+  {% endif %}
 
 {% endblock %}

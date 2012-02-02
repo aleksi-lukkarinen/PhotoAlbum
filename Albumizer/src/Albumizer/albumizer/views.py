@@ -1,13 +1,12 @@
 # This Python file uses the following encoding: utf-8
 
-import datetime
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
-from forms import RegistrationForm
+from forms import AlbumCreationForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, HttpResponseForbidden
 
 
@@ -33,6 +32,40 @@ def show_single_album(request, album_id):
     """ Allows user to browse a single album """
     album = get_object_or_404(Album, pk = album_id)
     return render_to_response('album/show-single.html', RequestContext(request, {'album': album}))
+
+
+
+
+@login_required
+def create_albums(request):
+    """ Allows user to create new albums """
+    if request.method == "GET":
+        form = AlbumCreationForm(request)
+        return render_to_response("album/create.html",
+                                  RequestContext(request, {"form": form}))
+
+    elif request.method == "POST":
+        form = AlbumCreationForm(request, request.POST)
+        if form.is_valid():
+            album_title = form.cleaned_data.get("txtAlbumTitle")
+            album_description = form.cleaned_data.get("txtAlbumDescription") or ""
+            album_publicity = form.cleaned_data.get("chkPublicAlbum")
+
+            new_album = Album(
+                owner = request.user,
+                title = album_title,
+                description = album_description,
+                isPublic = album_publicity
+            )
+            new_album.save()
+
+            return HttpResponseRedirect("/album/" + str(new_album.id) + "/")
+
+        else:
+            return render_to_response("album/create.html", RequestContext(request, {"form": form}))
+
+    else:
+        return HttpResponseBadRequest()
 
 
 

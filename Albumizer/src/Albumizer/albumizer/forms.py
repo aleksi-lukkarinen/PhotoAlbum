@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList
-from models import UserProfile, Country, State
+from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
 
 
 ERR_USERID_MISSING = u'Please enter a user id you would like to use.'
@@ -13,6 +13,8 @@ ERR_FIRST_NAME_MISSING = u'Please enter your first name.'
 ERR_LAST_NAME_MISSING = u'Please enter your last name.'
 ERR_GENDER_MISSING = u'Please enter your gender.'
 ERR_EMAIL_MISSING = u'Please enter a real email address you are using.'
+
+ERR_ALBUM_TITLE_MISSING = u'Please enter a title for the new album.'
 
 
 RE_VALID_USER_ID = re.compile("^[A-Za-z0-9_]*[A-Za-z0-9][A-Za-z0-9_]*$")
@@ -152,7 +154,11 @@ class RegistrationForm(forms.Form):
         if not firstname:
             raise ValidationError(ERR_FIRST_NAME_MISSING)
 
-        return firstname.strip()
+        firstname = firstname.strip()
+        if not firstname:
+            raise ValidationError(ERR_FIRST_NAME_MISSING)
+
+        return
 
 
     def clean_txtLastName(self):
@@ -161,7 +167,11 @@ class RegistrationForm(forms.Form):
         if not lastname:
             raise ValidationError(ERR_LAST_NAME_MISSING)
 
-        return lastname.strip()
+        lastname = lastname.strip()
+        if not lastname:
+            raise ValidationError(ERR_LAST_NAME_MISSING)
+
+        return lastname
 
 
     def clean_radGender(self):
@@ -181,7 +191,11 @@ class RegistrationForm(forms.Form):
         if not email:
             raise ValidationError(ERR_EMAIL_MISSING)
 
-        return email.strip()
+        email = email.strip()
+        if not email:
+            raise ValidationError(ERR_EMAIL_MISSING)
+
+        return email
 
 
     def clean_txtEmailAgain(self):
@@ -244,3 +258,57 @@ class RegistrationForm(forms.Form):
 
         self._errors = errors
         return cleaned_data
+
+
+
+
+
+
+class AlbumCreationForm(forms.Form):
+    """ Form class representing album creation form used to add new albums to database """
+    txtAlbumTitle = forms.CharField(
+        max_length = 255,
+        label = "Title",
+        widget = forms.TextInput(attrs = {'size':'50'}),
+        error_messages = {'required': (ERR_ALBUM_TITLE_MISSING)},
+        help_text = "e.g. \"Holiday Memories\" or \"Dad's Birthday\" (max. 255 characters)"
+    )
+    txtAlbumDescription = forms.CharField(
+        required = False,
+        max_length = 255,
+        label = "Description",
+        widget = forms.Textarea(attrs = {'cols':'80', 'rows': '4'}),
+        help_text = "Please descripbe the content of your new album (max. 255 characters)"
+    )
+    chkPublicAlbum = forms.BooleanField(
+        required = False,
+        label = "Album is Public",
+        help_text = "If album is declared as a public one, it will be visible for everybody to browse"
+    )
+
+    def __init__(self, request, *args, **kwargs):
+        self.request = request
+        super(AlbumCreationForm, self).__init__(*args, **kwargs)
+
+    def clean_txtAlbumTitle(self):
+        """ 
+            Trim the album name and ensure that there is no album
+            with the same name and owned by the current user.
+        """
+        album_title = self.cleaned_data.get("txtAlbumTitle")
+        if not album_title:
+            raise ValidationError(ERR_ALBUM_TITLE_MISSING)
+
+        album_title = album_title.strip()
+        if not album_title:
+            raise ValidationError(ERR_ALBUM_TITLE_MISSING)
+
+        current_user = self.request.user
+        if Album.objects.filter(owner = current_user, title = album_title):
+            raise ValidationError("You cannot have two albums with the same name. Please change the name to something different.")
+
+        return album_title
+
+
+
+

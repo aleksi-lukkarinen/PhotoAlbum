@@ -62,13 +62,17 @@ class Album(models.Model):
     """ Represents a single album. """
     owner = models.ForeignKey(User)
     title = models.CharField(
-       max_length = 255
+        max_length = 255,
+        help_text = "e.g. \"Holiday Memories\" or \"Dad's Birthday\" (max. 255 characters)"
     )
     description = models.TextField(
-        blank = True
+        max_length = 255,
+        blank = True,
+        help_text = "Please descripbe the content of your new album (max. 255 characters)"
     )
     isPublic = models.BooleanField(
-        verbose_name = "is public"
+        verbose_name = "is public",
+        help_text = "If album is declared as a public one, it will be visible for everybody to browse"
     )
 
     def __unicode__(self):

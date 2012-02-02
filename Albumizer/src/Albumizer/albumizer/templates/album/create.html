@@ -1,0 +1,107 @@
+{% extends "base-template.html" %}
+
+
+
+{% block page_title %}Create New Album{% endblock %}
+
+
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#lblPublicAlbum").css({
+      "position": "relative", 
+      "margin-left": "11.8em",
+      "margin-bottom": "0.5em",
+      "width": "10em"
+    });
+    $("#id_cmdCreateAlbum").css({
+      "margin-left": "11.8em" 
+    });
+    $("#id_chkPublicAlbum").button();
+    $("#id_cmdCreateAlbum").button({
+      icons: {
+        primary: 'ui-icon-check'
+      }
+    });
+    $(window).load(function() {
+      $("#id_txtAlbumName").focus();
+    });
+  });
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+  <h1>Create New Album</h1>
+
+  <p>To create a new album, please fill the form below. At least album title is required.</p>
+
+  {% if form.errors or form.non_field_errors %}
+    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+      {% if form.errors %}
+        <tr>
+          <td><span class="ui-icon ui-icon-info"></span></td>
+          <td>
+            <span class="errorMessage">
+            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
+            <ul>
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+            </span>
+          </td>
+        </tr> 
+      {% endif %}
+          
+      {% for error in form.non_field_errors %}
+        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+  <form id="frmCreateAlbum" class="commonForm" method="post" action="/album/create/">
+    {% csrf_token %}
+    
+    <div class="formSectionTitle ui-widget-header">Album Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtAlbumTitle.name }}">{{ form.txtAlbumTitle.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtAlbumTitle }}</div>
+      <div class="helpRow">{{ form.txtAlbumName.help_text }}</div>
+      {% if form.txtAlbumTitle.errors %}
+        <div class="errorRow">
+          {% for error in form.txtAlbumTitle.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="fieldRow"><label id="lblAlbumDescription" for="id_{{ form.txtAlbumDescription.name }}">{{ form.txtAlbumDescription.label }}</label>{{ form.txtAlbumDescription }}</div>
+      <div class="helpRow">{{ form.txtAlbumDescription.help_text }}</div>
+      {% if form.txtAlbumDescription.errors %}
+        <div class="errorRow">
+          {% for error in form.txtAlbumDescription.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="fieldRow">{{ form.chkPublicAlbum }}<label id="lblPublicAlbum" for="id_{{ form.chkPublicAlbum.name }}">{{ form.chkPublicAlbum.label }}</label></div>
+      <div class="helpRow">{{ form.chkPublicAlbum.help_text }}</div>
+      {% if form.chkPublicAlbum.errors %}
+        <div class="errorRow"> 
+          {% for error in form.chkPublicAlbum.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <input type="submit" name="cmdCreate" id="id_cmdCreateAlbum" value="Create Album" />
+    </fieldset>
+  </form>
+
+{% endblock %}

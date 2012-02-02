@@ -219,27 +219,150 @@ img {
 	color:                     #000000;
 }
 
-#formErrorList {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.commonFormErrorList {
 	padding:                   0.5em 1em;
 	margin-bottom:             2em;
 }
 
-#formErrorList td {
+.commonFormErrorList td {
 	vertical-align:            top;
 }
 
-#formErrorList td li {
+.commonFormErrorList td li {
   margin-left:               2em;
 }
 
-#formErrorList .ui-icon {
+.commonFormErrorList .ui-icon {
   margin-right:              0.5em;
 }
 
-#formErrorList .errorMessage {
+.commonFormErrorList .errorMessage {
   display:                   inline-block;
   margin-top:                0.1em;
 }
+
+.commonForm fieldset {
+  margin-bottom:             2em;
+  padding:                   0em 1em 1em 1em;
+}
+
+.commonForm .formSectionTitle {
+  padding:                   0.5em;
+  background-color:          #777777;
+  font-size:                 120%;
+  font-weight:               bold;
+  color:                     #efefef;
+}
+
+.commonForm fieldset {
+  border:                    none;
+}
+
+.commonForm label {
+  display:                   inline-block;
+  width:                     13em;
+}
+
+.commonForm textarea {
+  width:                     50em;
+  min-width:                 10em;
+  max-width:                 60em;
+  min-height:                3em;
+} 
+
+.commonForm .requiredLabel {
+  font-weight:               bold;
+}
+
+.commonForm .requiredLabel .ui-icon {
+  display:                   inline-block;
+  position:                  absolute;
+  margin:                    -0.2em 0em 0em 0.4em;
+}
+
+.commonForm .infoRow {
+  margin-top:                1em;
+  font-size:                 110%;
+  line-height:               1.5em;
+}
+
+.commonForm .fieldRow {
+	margin-top:                1em;
+  vertical-align:            top;
+}
+
+.commonForm .fieldRow label {
+  float:                     left;
+}
+
+.commonForm .fieldRow ul {
+  display:                   inline;  
+}
+
+.commonForm .fieldRow li {
+  display:                   inline-block;
+  width:                     5em;
+}
+
+.commonForm .helpRow {
+  margin-top:                0.2em;
+  padding-left:              13em;
+  color:                     #888888;
+}
+
+.commonForm .errorRow {
+  margin:                    0.5em 0em 2em 13em;
+}
+
+.commonForm .errorMessage {
+  color:                     #dd0000;
+  font-weight:               bold;
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -277,71 +400,11 @@ img {
 
 
 
-#frmRegister fieldset {
-	margin-bottom:             2em;
-  padding:                   0em 1em 1em 1em;
-}
 
-#frmRegister .formSectionTitle {
-  padding:                   0.5em;
-  background-color:          #777777;
-  font-size:                 120%;
-  font-weight:               bold;
-  color:                     #efefef;
-}
 
-#frmRegister td {
-  vertical-align:            top;
-  horizontal-align:          left;
-}
 
-#frmRegister fieldset {
-  border:                    none;
-}
 
-#frmRegister label {
-  display:                   inline-block;
-  width:                     13em;
-}
 
-#frmRegister .requiredLabel {
-	font-weight:               bold;
-}
-
-#frmRegister .requiredLabel .ui-icon {
-  display:                   inline-block;
-  position:                  absolute;
-  margin:                    -0.2em 0em 0em 0.4em;
-}
-
-#frmRegister .infoRow {
-	margin-top:                1em;
-	font-size:                 110%;
-	line-height:               1.5em;
-}
-
-#frmRegister .fieldRow {
-  margin-top:                1em;
-}
-
-#frmRegister .fieldRow ul {
-  display:                   inline;  
-}
-
-#frmRegister .fieldRow li {
-  display:                   inline-block;
-  width:                     5em;
-}
-
-#frmRegister .helpRow {
-	margin-top:                0.2em;
-	padding-left:              13em;
-	color:                     #888888;
-}
-
-#frmRegister .errorRow {
-  margin:                    0.5em 0em 2em 13em;
-}
 
 #frmRegister #errorRowHomePhone {
   margin:                    0.5em 0em 0em 13em;
@@ -349,11 +412,6 @@ img {
 
 #frmRegister #errorRowServiceConditions {
   margin-top:                0.5em;
-}
-
-#frmRegister .errorMessage {
-  color:                     #dd0000;
-  font-weight:               bold;
 }
 
 #frmRegister #id_txtHomePhone {
@@ -371,6 +429,41 @@ img {
 	margin-top:                2em;
 	width:                     12em;
 }
+
+
+
+
+
+
+
+#frmCreateAlbum #id_chkPublicAlbum {
+  float:                     none;
+  margin-left:               10.4em;
+}
+
+#frmCreateAlbum #lblPublicAlbum {
+  float:                     none;
+  position:                  absolute;
+  margin:                    0em 0em 0em 0.8em;
+}
+
+#frmCreateAlbum #id_cmdCreateAlbum {
+  margin-top:                2em;
+  margin-left:               10.3em;
+  width:                     12em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

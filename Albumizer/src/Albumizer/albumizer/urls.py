@@ -10,6 +10,7 @@ urlpatterns = patterns('albumizer.views',
     (r'^$', 'welcome_page'),
 
     (r'^album/$', 'list_all_visible_albums'),
+    (r'^album/create/$', 'create_albums'),
     (r'^album/(?P<album_id>\d{1,2})/$', 'show_single_album'),
     (r'^album/(?P<album_id>\d{1,2})/edit/$', 'edit_album'),
 
