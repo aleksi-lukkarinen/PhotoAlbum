@@ -25,6 +25,10 @@ AUTH_PROFILE_MODULE = "albumizer.models.UserProfile"
 
 # for the Django debug toolbar
 INTERNAL_IPS = ('127.0.0.1',)
+DEBUG_TOOLBAR_CONFIG = {
+    "INTERCEPT_REDIRECTS": False
+}
+
 
 
 ADMINS = (
