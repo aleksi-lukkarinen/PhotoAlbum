@@ -85,6 +85,22 @@ class Album(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.title, self.owner)
 
+    def is_owned_by(self, user):
+        """ Checks if this album is owner by a given user """
+        return user == self.owner
+
+    def is_editable_to_user(self, user):
+        """ Checks if this album is editable to a given user """
+        return self.is_owned_by(user)
+
+    def is_visible_to_user(self, user):
+        """ Checks if this album is visible to a given user """
+        return self.isPublic or self.is_owned_by(user)
+
+    def is_hidden_from_user(self, user):
+        """ Checks if this album is hidden from a given user """
+        return not self.is_visible_to_user(user)
+
     class Meta():
         unique_together = ("owner", "title")
         ordering = ["owner", "title"]

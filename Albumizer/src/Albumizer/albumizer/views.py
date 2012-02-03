@@ -49,7 +49,11 @@ def show_single_album(request, album_id):
     if not album_resultset:
         return render_to_response('album/not-found.html', RequestContext(request))
 
-    return render_to_response('album/show-single.html', RequestContext(request, {'album': album_resultset[0]}))
+    album = album_resultset[0]
+    if album.is_hidden_from_user(request.user):
+        return render_to_response('album/view-access-denied.html', RequestContext(request))
+
+    return render_to_response('album/show-single.html', RequestContext(request, {'album': album}))
 
 
 
@@ -91,7 +95,14 @@ def create_album_POST(request):
 @login_required
 def edit_album(request, album_id):
     """ Allows user to edit a single album """
-    album = get_object_or_404(Album, pk = album_id)
+    album_resultset = Album.objects.filter(id__exact = album_id)
+    if not album_resultset:
+        return render_to_response('album/not-found.html', RequestContext(request))
+
+    album = album_resultset[0]
+    if not album.is_editable_to_user(request.user):
+        return render_to_response('album/edit-access-denied.html', RequestContext(request))
+
     return render_to_response('album/edit.html', RequestContext(request, {'album': album}))
 
 
