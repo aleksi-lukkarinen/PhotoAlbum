@@ -45,8 +45,11 @@ def list_all_visible_albums(request):
 
 def show_single_album(request, album_id):
     """ Allows user to browse a single album """
-    album = get_object_or_404(Album, pk = album_id)
-    return render_to_response('album/show-single.html', RequestContext(request, {'album': album}))
+    album_resultset = Album.objects.filter(id__exact = album_id)
+    if not album_resultset:
+        return render_to_response('album/not-found.html', RequestContext(request))
+
+    return render_to_response('album/show-single.html', RequestContext(request, {'album': album_resultset[0]}))
 
 
 
