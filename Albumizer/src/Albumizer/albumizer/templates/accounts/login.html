@@ -25,7 +25,7 @@
 
   <p>Please enter your credentials to the fields below.</p>
 
-  {% if form.errors or form.non_field_errors %}
+  {% if form.field_errors or form.non_field_errors %}
     <table class="commonFormErrorList ui-state-highlight ui-corner-all">
       {% if form.field_errors %}
         <tr>
