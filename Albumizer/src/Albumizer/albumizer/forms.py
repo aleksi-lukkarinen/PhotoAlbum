@@ -1,35 +1,57 @@
 # This Python file uses the following encoding: utf-8
-
+import copy
 import re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms.util import ErrorList
+from django.forms.forms import NON_FIELD_ERRORS
+from django.forms.util import ErrorList, ErrorDict
 from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
 
 
-ERR_USERID_MISSING = u'Please enter a user id you would like to use.'
+
+
+class CommonAlbumizerForm(forms.Form):
+    """ Superclass for all Albumizer forms for implementing common features. """
+    def add_common_error(self, error_string):
+        """ Adds an error message, which is not related to any particular field. """
+        if not error_string:
+            return
+
+        error_list = self._errors.get(NON_FIELD_ERRORS, ErrorList())
+        error_list.append(error_string)
+        self._errors[NON_FIELD_ERRORS] = error_list
+
+    def field_errors(self):
+        """ Returns a dictionary containing only field-related errors. """
+        error_dict = copy.copy(self._errors)
+        if not error_dict:
+            error_dict = ErrorDict()
+        if NON_FIELD_ERRORS in error_dict:
+            del error_dict[NON_FIELD_ERRORS]
+        return error_dict
+
+
+
+
+REGISTRATION_FORM_ERR_USERID_MISSING = u'Please enter a user id you would like to use.'
+REGISTRATION_FORM_ERR_PASSWORD_MISSING = u'Please enter a password you would like to use.'
 ERR_FIRST_NAME_MISSING = u'Please enter your first name.'
 ERR_LAST_NAME_MISSING = u'Please enter your last name.'
 ERR_GENDER_MISSING = u'Please enter your gender.'
 ERR_EMAIL_MISSING = u'Please enter a real email address you are using.'
 
-ERR_ALBUM_TITLE_MISSING = u'Please enter a title for the new album.'
-
-
 RE_VALID_USER_ID = re.compile("^[A-Za-z0-9_]*[A-Za-z0-9][A-Za-z0-9_]*$")
 RE_VALID_PHONE_NUMBER = re.compile("^\+?[ 0-9]+$")
 
-
-
-class RegistrationForm(forms.Form):
-    """ Form class representing registration form used to add new users to database """
+class RegistrationForm(CommonAlbumizerForm):
+    """ Form class representing registration form used to add new users to database. """
     txtUserId = forms.CharField(
         min_length = 5,
         max_length = 30,
         label = "User ID",
         widget = forms.TextInput(attrs = {'size':'30'}),
-        error_messages = {'required': (ERR_USERID_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_USERID_MISSING)},
         help_text = "e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
     )
     txtPassword = forms.CharField(
@@ -37,7 +59,7 @@ class RegistrationForm(forms.Form):
         max_length = 50,
         label = "Password",
         widget = forms.PasswordInput(attrs = {'size':'50'}),
-        error_messages = {'required': (u'Please enter a password you would like to use.')},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_PASSWORD_MISSING)},
         help_text = "8 - 50 characters"
     )
     txtPasswordAgain = forms.CharField(
@@ -136,7 +158,7 @@ class RegistrationForm(forms.Form):
         """ Ensure that given userid is valid and that no user with that userid does already exist """
         userid = self.cleaned_data.get("txtUserId")
         if not userid:
-            raise ValidationError(ERR_USERID_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_USERID_MISSING)
 
         userid = userid.strip()
         if not re.match(RE_VALID_USER_ID, userid):
@@ -262,10 +284,10 @@ class RegistrationForm(forms.Form):
 
 
 
+ERR_ALBUM_TITLE_MISSING = u'Please enter a title for the new album.'
 
-
-class AlbumCreationForm(forms.Form):
-    """ Form class representing album creation form used to add new albums to database """
+class AlbumCreationForm(CommonAlbumizerForm):
+    """ Form class representing album creation form used to add new albums to database. """
     txtAlbumTitle = forms.CharField(
         max_length = 255,
         label = "Title",
@@ -287,6 +309,7 @@ class AlbumCreationForm(forms.Form):
     )
 
     def __init__(self, request, *args, **kwargs):
+        """ This makes it possible to pass the request object to this object as a constructor parameter. """
         self.request = request
         super(AlbumCreationForm, self).__init__(*args, **kwargs)
 
@@ -308,6 +331,63 @@ class AlbumCreationForm(forms.Form):
             raise ValidationError("You cannot have two albums with the same name. Please change the name to something different.")
 
         return album_title
+
+
+
+
+LOGIN_FORM_ERR_USERID_MISSING = u'Please enter your user name.'
+
+class LoginForm(CommonAlbumizerForm):
+    """ Form class representing login form. """
+    txtLoginUserName = forms.CharField(
+        label = "User Name",
+        widget = forms.TextInput(attrs = {'size':'50'}),
+        error_messages = {'required': LOGIN_FORM_ERR_USERID_MISSING}
+    )
+    txtLoginPassword = forms.CharField(
+        label = "Password",
+        widget = forms.PasswordInput(attrs = {'size':'50'}),
+        error_messages = {'required': (u'Please enter your password.')}
+    )
+
+    def clean_txtLoginUserName(self):
+        """ Trim the user id. """
+        username = self.cleaned_data.get("txtLoginUserName")
+        if not username:
+            raise ValidationError(LOGIN_FORM_ERR_USERID_MISSING)
+
+        username = username.strip()
+        if not username:
+            raise ValidationError(LOGIN_FORM_ERR_USERID_MISSING)
+
+        return username
+
+    def clean(self):
+        """ Ensure, that there is an user with the given user id and that the password is correct for that user. """
+        username = self.cleaned_data.get("txtLoginUserName")
+        password = self.cleaned_data.get("txtLoginPassword")
+
+        user_candidate = None
+        user_candidate_queryset = User.objects.filter(username__exact = username)
+        if user_candidate_queryset:
+            user_candidate = user_candidate_queryset[0]
+        if not user_candidate or not user_candidate.check_password(password) or not user_candidate.is_active:
+            if not self._errors:
+                raise ValidationError("Wrong user name and/or password. Make sure they are correctly entered. Is your CAPS LOCK accidentally on?")
+
+        return self.cleaned_data
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

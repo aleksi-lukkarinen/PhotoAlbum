@@ -373,39 +373,6 @@ img {
 
 
 
-#frmLogin fieldset {
-	border:                    none;
-}
-
-#frmLogin label {
-  display:                   inline-block;
-  width:                     8em;
-}
-
-#frmLogin #txtLoginPassword {
-  margin-top:                0.5em;
-  margin-bottom:             1em;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #frmRegister #errorRowHomePhone {
   margin:                    0.5em 0em 0em 13em;
 }
@@ -456,6 +423,50 @@ img {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#frmLogin {
+	width:                     45em;
+}
+
+#frmLogin #id_txtLoginUserName,
+#frmLogin #id_txtLoginPassword {
+  width:                     25em;
+}
+
+#frmLogin label {
+  width:                     10em;
+}
+
+#frmLogin .helpRow {
+  margin-top:                0.2em;
+  padding-left:              13em;
+  color:                     #888888;
+}
+
+#frmLogin .errorRow {
+  margin:                    0.5em 0em 2em 10em;
+}
+
+#frmLogin #id_cmdLogIn {
+  margin-top:                1em;
+  margin-left:               9.1em;
+  width:                     12em;
+}
 
 
 

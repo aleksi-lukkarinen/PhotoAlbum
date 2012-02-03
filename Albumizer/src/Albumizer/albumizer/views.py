@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
-from forms import AlbumCreationForm, RegistrationForm
+from forms import AlbumCreationForm, LoginForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, HttpResponseForbidden
 
 
@@ -144,36 +144,34 @@ def get_registration_information(request):
 
 def log_in(request):
     """ Allows user to log in """
-    if request.method == "POST":
-        error_list = []
+    if request.method == "GET":
+        form = LoginForm()
+        next_url = request.GET.get("next")
+        template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
+        return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
-        username = request.POST.get("txtLoginUserName", "").strip()
-        if username == "":
-            error_list.append("Please enter username.")
+    elif request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            # The user information is already validated in the form handling code
+            next_url = request.POST.get("nextURL", "/accounts/profile/")
+            template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
+            username = form.cleaned_data.get("txtLoginUserName")
+            password = form.cleaned_data.get("txtLoginPassword")
 
-        password = request.POST.get("txtLoginPassword", "").strip()
-        if password == "":
-            error_list.append("Please enter password.")
-
-        if not error_list:
             user = auth.authenticate(username = username, password = password)
-            if user is None or not user.is_active:
-                error_list.append("No account was found with the given credentials. " +
-                                 "If the account should exist, at least one of the " +
-                                 "user name and the password is wrong.")
+            if user is None:
+                form.add_common_error("Unknown error: Albumizer was unable to authenticate this username.")
+                return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
-        if not error_list:
             auth.login(request, user)
 
-            next_url = request.POST.get("next_url", "/accounts/profile/")
             return HttpResponseRedirect(next_url)
+
         else:
-            template_parameters = {"is_login_page": True, "username": username, "error_list": error_list}
+            next_url = request.POST.get("nextURL")
+            template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
             return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
-    else:
-        next_url = request.GET.get("next")
-        return render_to_response('accounts/login.html',
-                                  RequestContext(request, {"is_login_page": True, "next_url": next_url}))
 
 
 
