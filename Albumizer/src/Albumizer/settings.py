@@ -20,7 +20,7 @@ SIMPLE_PAYMENT_SERVICE_SECRET = "a76562ae5654109c5c349d45a6e24d16"
 FACEBOOK_APPID = ""
 
 
-AUTH_PROFILE_MODULE = "albumizer.models.UserProfile"
+AUTH_PROFILE_MODULE = "albumizer.UserProfile"
 
 
 # for the Django debug toolbar

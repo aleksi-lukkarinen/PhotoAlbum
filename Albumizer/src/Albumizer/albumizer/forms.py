@@ -180,7 +180,7 @@ class RegistrationForm(CommonAlbumizerForm):
         if not firstname:
             raise ValidationError(ERR_FIRST_NAME_MISSING)
 
-        return
+        return firstname
 
 
     def clean_txtLastName(self):
@@ -240,7 +240,7 @@ class RegistrationForm(CommonAlbumizerForm):
                 raise ValidationError("Phone number can contain only numbers 0-9 and spaces, " +
                                       "and it may begin with a plus character.")
 
-        return
+        return homephone
 
 
     def clean(self):

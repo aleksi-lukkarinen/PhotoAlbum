@@ -7,7 +7,22 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
 from forms import AlbumCreationForm, LoginForm, RegistrationForm
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
+     HttpResponseForbidden, HttpResponseNotFound
+
+
+
+
+def dispatch_by_method(request, *args, **kwargs):
+    get_view = kwargs.pop("GET", None)
+    post_view = kwargs.pop("POST", None)
+
+    if request.method == "GET" and get_view is not None:
+        return get_view(request, *args, **kwargs)
+    elif request.method == "POST" and post_view is not None:
+        return post_view(request, *args, **kwargs)
+    else:
+        return HttpResponseNotFound()
 
 
 
@@ -37,35 +52,35 @@ def show_single_album(request, album_id):
 
 
 @login_required
-def create_albums(request):
-    """ Allows user to create new albums """
-    if request.method == "GET":
-        form = AlbumCreationForm(request)
-        return render_to_response("album/create.html",
-                                  RequestContext(request, {"form": form}))
+def create_album_GET(request):
+    """ Displays a form which allows user to create new photo albums """
+    assert request.method == "GET"
+    form = AlbumCreationForm(request)
+    return render_to_response("album/create.html",
+                              RequestContext(request, {"form": form}))
 
-    elif request.method == "POST":
-        form = AlbumCreationForm(request, request.POST)
-        if form.is_valid():
-            album_title = form.cleaned_data.get("txtAlbumTitle")
-            album_description = form.cleaned_data.get("txtAlbumDescription") or ""
-            album_publicity = form.cleaned_data.get("chkPublicAlbum")
+@login_required
+def create_album_POST(request):
+    """ Creates a new photo album and redirects to its view """
+    assert request.method == "POST"
+    form = AlbumCreationForm(request, request.POST)
+    if form.is_valid():
+        album_title = form.cleaned_data.get("txtAlbumTitle")
+        album_description = form.cleaned_data.get("txtAlbumDescription") or ""
+        album_publicity = form.cleaned_data.get("chkPublicAlbum")
 
-            new_album = Album(
-                owner = request.user,
-                title = album_title,
-                description = album_description,
-                isPublic = album_publicity
-            )
-            new_album.save()
+        new_album = Album(
+            owner = request.user,
+            title = album_title,
+            description = album_description,
+            isPublic = album_publicity
+        )
+        new_album.save()
 
-            return HttpResponseRedirect("/album/" + str(new_album.id) + "/")
-
-        else:
-            return render_to_response("album/create.html", RequestContext(request, {"form": form}))
+        return HttpResponseRedirect("/album/" + str(new_album.id) + "/")
 
     else:
-        return HttpResponseBadRequest()
+        return render_to_response("album/create.html", RequestContext(request, {"form": form}))
 
 
 
@@ -79,99 +94,101 @@ def edit_album(request, album_id):
 
 
 
-def get_registration_information(request):
-    """ Allows user to register himself/herself into this service """
+def get_registration_information_GET(request):
+    """ Displays a form which allows user to register himself/herself into this service """
+    assert request.method == "GET"
+    template_parameters = {
+        "is_registration_page": True,
+        "form": RegistrationForm()
+    }
+    return render_to_response("accounts/register.html",
+                              RequestContext(request, template_parameters))
 
-    if request.method == "GET":
-        form = RegistrationForm()
+def get_registration_information_POST(request):
+    """ Register an user to this service and redirects him/her to his/her profile """
+    assert request.method == "POST"
+    form = RegistrationForm(request.POST)
+    if form.is_valid():
+        # The user information is already validated in the form handling code
+        userid = form.cleaned_data.get("txtUserId")
+        password = form.cleaned_data.get("txtPassword")
+        firstname = form.cleaned_data.get("txtFirstName")
+        lastname = form.cleaned_data.get("txtLastName")
+        gender = form.cleaned_data.get("radGender")
+        email = form.cleaned_data.get("txtEmail")
+        homephone = form.cleaned_data.get("txtHomePhone") or ""
+        postaddressline1 = form.cleaned_data.get("txtPostAddress1") or ""
+        postaddressline2 = form.cleaned_data.get("txtPostAddress2") or ""
+        zipcode = form.cleaned_data.get("txtZipCode") or ""
+        city = form.cleaned_data.get("txtCity") or ""
+        state = form.cleaned_data.get("cmbState")
+        country = form.cleaned_data.get("cmbCountry")
+
+        new_user = User.objects.create_user(userid, email, password)
+        new_user.first_name = firstname
+        new_user.last_name = lastname
+        new_user.save()
+
+        user_profile = new_user.get_profile()
+        user_profile.gender = gender
+        user_profile.homePhone = homephone
+        user_profile.save()
+
+        if postaddressline1 or postaddressline2 or zipcode or city or state or country:
+            new_address = Address(
+                owner = new_user,
+                postAddressLine1 = postaddressline1,
+                postAddressLine2 = postaddressline2,
+                zipCode = zipcode,
+                city = city,
+                state = state,
+                country = country
+            )
+            new_address.save()
+
+        authenticated_user = auth.authenticate(username = userid, password = password)
+        auth.login(request, authenticated_user)
+
+        return HttpResponseRedirect("/accounts/profile/")
+
+    else:
         return render_to_response("accounts/register.html",
                                   RequestContext(request, {"is_registration_page": True, "form": form}))
 
-    elif request.method == "POST":
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            # The user information is already validated in the form handling code
-            userid = form.cleaned_data.get("txtUserId")
-            password = form.cleaned_data.get("txtPassword")
-            firstname = form.cleaned_data.get("txtFirstName")
-            lastname = form.cleaned_data.get("txtLastName")
-            gender = form.cleaned_data.get("radGender")
-            email = form.cleaned_data.get("txtEmail")
-            homephone = form.cleaned_data.get("txtHomePhone") or ""
-            postaddressline1 = form.cleaned_data.get("txtPostAddress1") or ""
-            postaddressline2 = form.cleaned_data.get("txtPostAddress2") or ""
-            zipcode = form.cleaned_data.get("txtZipCode") or ""
-            city = form.cleaned_data.get("txtCity") or ""
-            state = form.cleaned_data.get("cmbState")
-            country = form.cleaned_data.get("cmbCountry")
 
-            new_user = User.objects.create_user(userid, email, password)
-            new_user.first_name = firstname
-            new_user.last_name = lastname
-            new_user.save()
 
-            user_profile = new_user.get_profile()
-            user_profile.gender = gender
-            user_profile.homePhone = homephone
-            user_profile.save()
 
-            if postaddressline1 or postaddressline2 or zipcode or city or state or country:
-                new_address = Address(
-                    owner = new_user,
-                    postAddressLine1 = postaddressline1,
-                    postAddressLine2 = postaddressline2,
-                    zipCode = zipcode,
-                    city = city,
-                    state = state,
-                    country = country
-                )
-                new_address.save()
+def log_in_GET(request):
+    """ Displays a form which allows user to log in """
+    form = LoginForm()
+    next_url = request.GET.get("next")
+    template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
+    return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
-            authenticated_user = auth.authenticate(username = userid, password = password)
-            auth.login(request, authenticated_user)
 
-            return HttpResponseRedirect("/accounts/profile/")
+def log_in_POST(request):
+    """ Logs an user in to the service and redirects him/her to his/her profile page """
+    form = LoginForm(request.POST)
+    if form.is_valid():
+        # The user information is already validated in the form handling code
+        next_url = request.POST.get("nextURL", "/accounts/profile/")
+        template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
+        username = form.cleaned_data.get("txtLoginUserName")
+        password = form.cleaned_data.get("txtLoginPassword")
 
-        else:
-            return render_to_response("accounts/register.html",
-                                      RequestContext(request, {"is_registration_page": True, "form": form}))
+        user = auth.authenticate(username = username, password = password)
+        if user is None:
+            form.add_common_error("Unknown error: Albumizer was unable to authenticate this username.")
+            return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
+
+        auth.login(request, user)
+
+        return HttpResponseRedirect(next_url)
 
     else:
-        return HttpResponseBadRequest()
-
-
-
-
-def log_in(request):
-    """ Allows user to log in """
-    if request.method == "GET":
-        form = LoginForm()
-        next_url = request.GET.get("next")
+        next_url = request.POST.get("nextURL")
         template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
         return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
-
-    elif request.method == "POST":
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            # The user information is already validated in the form handling code
-            next_url = request.POST.get("nextURL", "/accounts/profile/")
-            template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
-            username = form.cleaned_data.get("txtLoginUserName")
-            password = form.cleaned_data.get("txtLoginPassword")
-
-            user = auth.authenticate(username = username, password = password)
-            if user is None:
-                form.add_common_error("Unknown error: Albumizer was unable to authenticate this username.")
-                return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
-
-            auth.login(request, user)
-
-            return HttpResponseRedirect(next_url)
-
-        else:
-            next_url = request.POST.get("nextURL")
-            template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
-            return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
 
 
