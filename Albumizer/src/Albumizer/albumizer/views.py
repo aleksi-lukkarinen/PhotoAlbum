@@ -14,6 +14,13 @@ from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpRespon
 
 
 def dispatch_by_method(request, *args, **kwargs):
+    """
+        This pseudo-view is meant to be used to dispatch requests to view
+        functions according to the http method used in the request. This is
+        useful for views requiring use of multiple http methods, because
+        this way the code can be structured better and thus becomes clearer
+        and a bit shorter. 
+    """
     get_view = kwargs.pop("GET", None)
     post_view = kwargs.pop("POST", None)
 
