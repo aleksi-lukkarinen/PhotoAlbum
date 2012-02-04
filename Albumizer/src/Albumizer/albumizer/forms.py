@@ -34,7 +34,7 @@ class CommonAlbumizerForm(forms.Form):
 
 
 
-REGISTRATION_FORM_ERR_USERID_MISSING = u'Please enter a user id you would like to use.'
+REGISTRATION_FORM_ERR_USERNAME_MISSING = u'Please enter a username you would like to use.'
 REGISTRATION_FORM_ERR_PASSWORD_MISSING = u'Please enter a password you would like to use.'
 ERR_FIRST_NAME_MISSING = u'Please enter your first name.'
 ERR_LAST_NAME_MISSING = u'Please enter your last name.'
@@ -46,12 +46,12 @@ RE_VALID_PHONE_NUMBER = re.compile("^\+?[ 0-9]+$")
 
 class RegistrationForm(CommonAlbumizerForm):
     """ Form class representing registration form used to add new users to database. """
-    txtUserId = forms.CharField(
+    txtUserName = forms.CharField(
         min_length = 5,
         max_length = 30,
-        label = "User ID",
+        label = "Username",
         widget = forms.TextInput(attrs = {'size':'30'}),
-        error_messages = {'required': (REGISTRATION_FORM_ERR_USERID_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_USERNAME_MISSING)},
         help_text = "e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
     )
     txtPassword = forms.CharField(
@@ -154,18 +154,18 @@ class RegistrationForm(CommonAlbumizerForm):
     )
 
 
-    def clean_txtUserId(self):
+    def clean_txtUserName(self):
         """ Ensure that given userid is valid and that no user with that userid does already exist """
-        userid = self.cleaned_data.get("txtUserId")
+        userid = self.cleaned_data.get("txtUserName")
         if not userid:
-            raise ValidationError(REGISTRATION_FORM_ERR_USERID_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_USERNAME_MISSING)
 
         userid = userid.strip()
         if not re.match(RE_VALID_USER_ID, userid):
-            raise ValidationError("User id can contain only letters A-Z, numbers 0-9 and underscores.")
+            raise ValidationError("User name can contain only letters A-Z, numbers 0-9 and underscores.")
 
         if User.objects.filter(username__exact = userid):
-            raise ValidationError("This user id is already reserved. Please try another one.")
+            raise ValidationError("This user name is already reserved. Please try another one.")
 
         return userid
 
@@ -335,14 +335,14 @@ class AlbumCreationForm(CommonAlbumizerForm):
 
 
 
-LOGIN_FORM_ERR_USERID_MISSING = u'Please enter your user name.'
+LOGIN_FORM_ERR_USERNAME_MISSING = u'Please enter your username.'
 
 class LoginForm(CommonAlbumizerForm):
     """ Form class representing login form. """
     txtLoginUserName = forms.CharField(
-        label = "User Name",
+        label = "Username",
         widget = forms.TextInput(attrs = {'size':'50'}),
-        error_messages = {'required': LOGIN_FORM_ERR_USERID_MISSING}
+        error_messages = {'required': LOGIN_FORM_ERR_USERNAME_MISSING}
     )
     txtLoginPassword = forms.CharField(
         label = "Password",
@@ -351,14 +351,14 @@ class LoginForm(CommonAlbumizerForm):
     )
 
     def clean_txtLoginUserName(self):
-        """ Trim the user id. """
+        """ Trim the username. """
         username = self.cleaned_data.get("txtLoginUserName")
         if not username:
-            raise ValidationError(LOGIN_FORM_ERR_USERID_MISSING)
+            raise ValidationError(LOGIN_FORM_ERR_USERNAME_MISSING)
 
         username = username.strip()
         if not username:
-            raise ValidationError(LOGIN_FORM_ERR_USERID_MISSING)
+            raise ValidationError(LOGIN_FORM_ERR_USERNAME_MISSING)
 
         return username
 

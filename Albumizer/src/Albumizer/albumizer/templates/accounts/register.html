@@ -56,11 +56,11 @@
     
     <div class="formSectionTitle ui-widget-header">Account Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-		  <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtUserId.name }}">{{ form.txtUserId.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtUserId }}</div>
-		  <div class="helpRow">{{ form.txtUserId.help_text }}</div>
-		  {% if form.txtUserId.errors %}
+		  <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtUserName.name }}">{{ form.txtUserName.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtUserName }}</div>
+		  <div class="helpRow">{{ form.txtUserName.help_text }}</div>
+		  {% if form.txtUserName.errors %}
 			  <div class="errorRow">
-		      {% for error in form.txtUserId.errors %}
+		      {% for error in form.txtUserName.errors %}
 		        <div class="errorMessage">{{ error }}</div>
 		      {% endfor %}
 	      </div>
