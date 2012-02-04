@@ -24,9 +24,12 @@
         primary: 'ui-icon-check'
       }
     });
-    $(window).load(function() {
-      $("#id_txtAlbumName").focus();
-    });
+  });
+  $(window).load(function() {
+    $("#id_txtAlbumName").focus();
+    $("#id_cmdCreateAlbum").click(function() {
+      $("#id_cmdCreateAlbum").button("option", "disabled", true);  
+    })
   });
 
 {% endblock %}

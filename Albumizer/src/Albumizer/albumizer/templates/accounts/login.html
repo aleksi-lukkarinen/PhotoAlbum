@@ -13,6 +13,9 @@
   });
   $(window).load(function() {
     $("#id_txtLoginUserName").focus();
+    $("#id_cmdLogIn").click(function() {
+      $("#id_cmdLogIn").button("option", "disabled", true);  
+    })
   });
 
 {% endblock %}
