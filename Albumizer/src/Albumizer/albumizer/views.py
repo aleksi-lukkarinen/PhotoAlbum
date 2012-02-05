@@ -200,7 +200,7 @@ def log_in_POST(request):
 
     user = auth.authenticate(username = username, password = password)
     if user is None:
-        form.add_common_error("Unknown error: Albumizer was unable to authenticate this username.")
+        form.add_common_error(u"Unknown error: Albumizer was unable to authenticate this username.")
         return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
     auth.login(request, user)

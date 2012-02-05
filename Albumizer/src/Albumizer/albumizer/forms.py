@@ -49,107 +49,107 @@ class RegistrationForm(CommonAlbumizerForm):
     txtUserName = forms.CharField(
         min_length = 5,
         max_length = 30,
-        label = "Username",
+        label = u"Username",
         widget = forms.TextInput(attrs = {'size':'30'}),
         error_messages = {'required': (REGISTRATION_FORM_ERR_USERNAME_MISSING)},
-        help_text = "e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
+        help_text = u"e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
     )
     txtPassword = forms.CharField(
         min_length = 8,
         max_length = 50,
-        label = "Password",
+        label = u"Password",
         widget = forms.PasswordInput(attrs = {'size':'50'}),
         error_messages = {'required': (REGISTRATION_FORM_ERR_PASSWORD_MISSING)},
-        help_text = "8 - 50 characters"
+        help_text = u"8 - 50 characters"
     )
     txtPasswordAgain = forms.CharField(
         required = False,
-        label = "Re-Enter Password",
+        label = u"Re-Enter Password",
         widget = forms.PasswordInput(attrs = {'size':'50'})
     )
 
     txtFirstName = forms.CharField(
         max_length = 30,
-        label = "First Name",
+        label = u"First Name",
         widget = forms.TextInput(attrs = {'size':'30'}),
         error_messages = {'required': (ERR_FIRST_NAME_MISSING)},
-        help_text = "e.g. \"Terhi-Anneli\" or \"Derek\" (max. 30 characters)"
+        help_text = u"e.g. \"Terhi-Anneli\" or \"Derek\" (max. 30 characters)"
     )
     txtLastName = forms.CharField(
         max_length = 30,
-        label = "Last Name",
+        label = u"Last Name",
         error_messages = {'required': (ERR_LAST_NAME_MISSING)},
-        help_text = "e.g. \"Virtanen-Kulmala\" or \"Smith\" (max. 30 characters)"
+        help_text = u"e.g. \"Virtanen-Kulmala\" or \"Smith\" (max. 30 characters)"
     )
     radGender = forms.ChoiceField(
-        label = "Gender",
+        label = u"Gender",
         choices = UserProfile.GENDER_CHOICES,
         error_messages = {'required': (ERR_GENDER_MISSING)},
         widget = forms.RadioSelect
     )
     txtEmail = forms.EmailField(
         max_length = 100,
-        label = "Email",
+        label = u"Email",
         widget = forms.TextInput(attrs = {'size':'50'}),
         error_messages = {'required': (ERR_EMAIL_MISSING)},
-        help_text = "real address like \"matti.virtanen@company.com\" (max. 100 characters)"
+        help_text = u"real address like \"matti.virtanen@company.com\" (max. 100 characters)"
     )
     txtEmailAgain = forms.CharField(
         required = False,
-        label = "Re-Enter Email",
+        label = u"Re-Enter Email",
         widget = forms.TextInput(attrs = {'size':'50'})
     )
     txtHomePhone = forms.CharField(
         required = False,
         max_length = 20,
         widget = forms.TextInput(attrs = {'size':'20'}),
-        label = "Home Phone",
-        help_text = "e.g. \"+358 44 123 4567\" (max. 20 characters)"
+        label = u"Home Phone",
+        help_text = u"e.g. \"+358 44 123 4567\" (max. 20 characters)"
     )
 
     txtPostAddress1 = forms.CharField(
         required = False,
         max_length = 100,
         widget = forms.TextInput(attrs = {'size':'50'}),
-        label = "Postal Address, Line 1",
-        help_text = "e.g. \"Kaislapolku 5 A 24\" (max. 100 characters)"
+        label = u"Postal Address, Line 1",
+        help_text = u"e.g. \"Kaislapolku 5 A 24\" (max. 100 characters)"
     )
     txtPostAddress2 = forms.CharField(
         required = False,
         max_length = 100,
         widget = forms.TextInput(attrs = {'size':'50'}),
-        label = "Postal Address, Line 2"
+        label = u"Postal Address, Line 2"
     )
     txtZipCode = forms.CharField(
         required = False,
         max_length = 10,
         widget = forms.TextInput(attrs = {'size':'10'}),
-        label = "ZIP Code",
-        help_text = "e.g. \"05100\" (max. 10 characters)"
+        label = u"ZIP Code",
+        help_text = u"e.g. \"05100\" (max. 10 characters)"
     )
     txtCity = forms.CharField(
         required = False,
         max_length = 50,
         widget = forms.TextInput(attrs = {'size':'30'}),
-        label = "City",
-        help_text = "e.g. \"Tampere\" or \"Stockholm\" (max. 50 characters)"
+        label = u"City",
+        help_text = u"e.g. \"Tampere\" or \"Stockholm\" (max. 50 characters)"
     )
     cmbState = forms.ModelChoiceField(
         required = False,
         queryset = State.objects.all(),
         widget = forms.Select(),
-        label = "State",
-        help_text = "only for customers from USA, Australia and Brazil"
+        label = u"State",
+        help_text = u"only for customers from USA, Australia and Brazil"
     )
     cmbCountry = forms.ModelChoiceField(
         required = False,
         queryset = Country.objects.all(),
         widget = forms.Select(),
-        label = "Country"
+        label = u"Country"
     )
 
     chkServiceConditionsAccepted = forms.BooleanField(
-        label = "I Hereby Accept the Terms and Conditions and the Privacy Policy of the Albumizer Service",
+        label = u"I Hereby Accept the Terms and Conditions and the Privacy Policy of the Albumizer Service",
         error_messages = {'required': (u'This service cannot be used without accepting the Terms and Conditions.')}
     )
 
@@ -162,10 +162,10 @@ class RegistrationForm(CommonAlbumizerForm):
 
         userid = userid.strip()
         if not re.match(RE_VALID_USER_ID, userid):
-            raise ValidationError("User name can contain only letters A-Z, numbers 0-9 and underscores.")
+            raise ValidationError(u"User name can contain only letters A-Z, numbers 0-9 and underscores.")
 
         if User.objects.filter(username__exact = userid):
-            raise ValidationError("This user name is already reserved. Please try another one.")
+            raise ValidationError(u"This user name is already reserved. Please try another one.")
 
         return userid
 
@@ -202,7 +202,7 @@ class RegistrationForm(CommonAlbumizerForm):
             raise ValidationError(ERR_GENDER_MISSING)
 
         if not gender in ('M', 'F'):
-            raise ValidationError("Unknown value as a gender.")
+            raise ValidationError(u"Unknown value as a gender.")
 
         return gender
 
@@ -237,8 +237,8 @@ class RegistrationForm(CommonAlbumizerForm):
         if homephone:
             homephone = homephone.strip()
             if not re.match(RE_VALID_PHONE_NUMBER, homephone):
-                raise ValidationError("Phone number can contain only numbers 0-9 and spaces, " +
-                                      "and it may begin with a plus character.")
+                raise ValidationError(u"Phone number can contain only numbers 0-9 and spaces, " +
+                                      u"and it may begin with a plus character.")
 
         return homephone
 
@@ -253,8 +253,8 @@ class RegistrationForm(CommonAlbumizerForm):
             email2 = cleaned_data.get("txtEmailAgain")
 
             if email1 != email2:
-                error_message = ("The email fields did not contain the same address. " +
-                                "Make sure the address is written correctly.")
+                error_message = (u"The email fields did not contain the same address. " +
+                                 u"Make sure the address is written correctly.")
 
                 error_list = errors.get("txtEmailAgain")
                 if not error_list:
@@ -268,8 +268,8 @@ class RegistrationForm(CommonAlbumizerForm):
             password2 = cleaned_data.get("txtPasswordAgain")
 
             if password1 != password2:
-                error_message = ("The password fields did not contain the same password. " +
-                                "Make sure the password is written correctly.")
+                error_message = (u"The password fields did not contain the same password. " +
+                                 u"Make sure the password is written correctly.")
 
                 error_list = errors.get("txtPasswordAgain")
                 if not error_list:
@@ -290,22 +290,22 @@ class AlbumCreationForm(CommonAlbumizerForm):
     """ Form class representing album creation form used to add new albums to database. """
     txtAlbumTitle = forms.CharField(
         max_length = 255,
-        label = "Title",
+        label = u"Title",
         widget = forms.TextInput(attrs = {'size':'50'}),
         error_messages = {'required': (ERR_ALBUM_TITLE_MISSING)},
-        help_text = "e.g. \"Holiday Memories\" or \"Dad's Birthday\" (max. 255 characters)"
+        help_text = u"e.g. \"Holiday Memories\" or \"Dad's Birthday\" (max. 255 characters)"
     )
     txtAlbumDescription = forms.CharField(
         required = False,
         max_length = 255,
-        label = "Description",
+        label = u"Description",
         widget = forms.Textarea(attrs = {'cols':'80', 'rows': '4'}),
-        help_text = "Please descripbe the content of your new album (max. 255 characters)"
+        help_text = u"Please descripbe the content of your new album (max. 255 characters)"
     )
     chkPublicAlbum = forms.BooleanField(
         required = False,
-        label = "Album is Public",
-        help_text = "If album is declared as a public one, it will be visible for everybody to browse"
+        label = u"Album is Public",
+        help_text = u"If album is declared as a public one, it will be visible for everybody to browse"
     )
 
     def __init__(self, request, *args, **kwargs):
@@ -328,7 +328,8 @@ class AlbumCreationForm(CommonAlbumizerForm):
 
         current_user = self.request.user
         if Album.objects.filter(owner = current_user, title = album_title):
-            raise ValidationError("You cannot have two albums with the same name. Please change the name to something different.")
+            raise ValidationError(u"You cannot have two albums with the same name. " +
+                                  u"Please change the name to something different.")
 
         return album_title
 
@@ -340,12 +341,12 @@ LOGIN_FORM_ERR_USERNAME_MISSING = u'Please enter your username.'
 class LoginForm(CommonAlbumizerForm):
     """ Form class representing login form. """
     txtLoginUserName = forms.CharField(
-        label = "Username",
+        label = u"Username",
         widget = forms.TextInput(attrs = {'size':'50'}),
         error_messages = {'required': LOGIN_FORM_ERR_USERNAME_MISSING}
     )
     txtLoginPassword = forms.CharField(
-        label = "Password",
+        label = u"Password",
         widget = forms.PasswordInput(attrs = {'size':'50'}),
         error_messages = {'required': (u'Please enter your password.')}
     )
@@ -373,7 +374,8 @@ class LoginForm(CommonAlbumizerForm):
             user_candidate = user_candidate_queryset[0]
         if not user_candidate or not user_candidate.check_password(password) or not user_candidate.is_active:
             if not self._errors:
-                raise ValidationError("Wrong user name and/or password. Make sure they are correctly entered. Is your CAPS LOCK accidentally on?")
+                raise ValidationError(u"Wrong user name and/or password. Make sure they are correctly entered. " +
+                                      u"Is your CAPS LOCK accidentally on?")
 
         return self.cleaned_data
 

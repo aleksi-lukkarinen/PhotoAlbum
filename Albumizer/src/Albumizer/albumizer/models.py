@@ -22,27 +22,27 @@ class UserProfile(models.Model):
     )
     serviceConditionsAccepted = models.DateTimeField(
         auto_now_add = True,
-        verbose_name = "date and time when service conditions were accepted"
+        verbose_name = u"date and time when service conditions were accepted"
     )
     homePhone = models.CharField(
         max_length = 20,
         blank = True,
-        verbose_name = "home phone",
-        help_text = "e.g. \"+358 44 123 4567\" (max. 20 characters)"
+        verbose_name = u"home phone",
+        help_text = u"e.g. \"+358 44 123 4567\" (max. 20 characters)"
     )
     facebookID = models.CharField(
         max_length = 255,
         blank = True,
-        verbose_name = "Facebook id"
+        verbose_name = u"Facebook id"
     )
 
     def __unicode__(self):
-        return "%s %s (%s)" % (self.user.first_name, self.user.last_name, self.user.username)
+        return u"%s %s (%s)" % (self.user.first_name, self.user.last_name, self.user.username)
 
     class Meta():
         ordering = ["user"]
-        verbose_name = "user profile"
-        verbose_name_plural = "user profiles"
+        verbose_name = u"user profile"
+        verbose_name_plural = u"user profiles"
 
 
 def create_user_profile(sender, instance, created, **kwargs):
@@ -64,26 +64,26 @@ class Album(models.Model):
     owner = models.ForeignKey(User)
     title = models.CharField(
         max_length = 255,
-        help_text = "e.g. \"Holiday Memories\" or \"Dad's Birthday\" (max. 255 characters)"
+        help_text = u"e.g. \"Holiday Memories\" or \"Dad's Birthday\" (max. 255 characters)"
     )
     description = models.TextField(
         max_length = 255,
         blank = True,
-        help_text = "Please descripbe the content of your new album (max. 255 characters)"
+        help_text = u"Please descripbe the content of your new album (max. 255 characters)"
     )
     isPublic = models.BooleanField(
-        verbose_name = "is public",
-        help_text = "If album is declared as a public one, it will be visible for everybody to browse"
+        verbose_name = u"is public",
+        help_text = u"If album is declared as a public one, it will be visible for everybody to browse"
     )
     creationDate = models.DateTimeField(
         auto_now_add = True,
         blank = True,
         null = True,
-        verbose_name = "creation date"
+        verbose_name = u"creation date"
     )
 
     def __unicode__(self):
-        return "%s (%s)" % (self.title, self.owner)
+        return u"%s (%s)" % (self.title, self.owner)
 
     def is_owned_by(self, user):
         """ Checks if this album is owner by a given user """
@@ -104,8 +104,8 @@ class Album(models.Model):
     class Meta():
         unique_together = ("owner", "title")
         ordering = ["owner", "title"]
-        verbose_name = "album"
-        verbose_name_plural = "albums"
+        verbose_name = u"album"
+        verbose_name_plural = u"albums"
 
 
 
@@ -114,21 +114,21 @@ class Page(models.Model):
     """ Represents a single page. """
     album = models.ForeignKey(Album)
     pageNumber = models.IntegerField(
-        verbose_name = "page number"
+        verbose_name = u"page number"
     )
     layoutID = models.CharField(
         max_length = 255,
-        verbose_name = "layout id"
+        verbose_name = u"layout id"
     )
 
     def __unicode__(self):
-        return "%s, %s" % (self.album, self.pageNumber)
+        return u"%s, %s" % (self.album, self.pageNumber)
 
     class Meta():
         unique_together = ("album", "pageNumber")
         ordering = ["album", "pageNumber"]
-        verbose_name = "page"
-        verbose_name_plural = "pages"
+        verbose_name = u"page"
+        verbose_name_plural = u"pages"
 
 
 
@@ -138,7 +138,7 @@ class PageContent(models.Model):
     page = models.ForeignKey(Page)
     placeHolderID = models.CharField(
         max_length = 255,
-        verbose_name = "placeholder id"
+        verbose_name = u"placeholder id"
     )
     content = models.CharField(
         max_length = 255
@@ -160,9 +160,9 @@ class Country(models.Model):
     code = models.CharField(
         primary_key = True,
         max_length = 10,
-        help_text = "see <a href=\"http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm\" " +
-                    "target=\"_new\">ISO 3166</a> " +
-                    "for a list of countries and their codes"
+        help_text = u"see <a href=\"http://www.iso.org/iso/country_codes/iso_3166_code_lists.htm\" " +
+                    u"target=\"_new\">ISO 3166</a> " +
+                    u"for a list of countries and their codes"
     )
     name = models.CharField(
         unique = True,
@@ -174,8 +174,8 @@ class Country(models.Model):
 
     class Meta():
         ordering = ["name"]
-        verbose_name = "country"
-        verbose_name_plural = "countries"
+        verbose_name = u"country"
+        verbose_name_plural = u"countries"
 
 
 
@@ -192,8 +192,8 @@ class State(models.Model):
 
     class Meta():
         ordering = ["name"]
-        verbose_name = "state"
-        verbose_name_plural = "states"
+        verbose_name = u"state"
+        verbose_name_plural = u"states"
 
 
 
@@ -204,31 +204,31 @@ class Address(models.Model):
     postAddressLine1 = models.CharField(
         max_length = 100,
         blank = True,
-        verbose_name = "post address, line 1",
-        help_text = "e.g. \"Kaislapolku 5 A 24\" (max. 100 characters)"
+        verbose_name = u"post address, line 1",
+        help_text = u"e.g. \"Kaislapolku 5 A 24\" (max. 100 characters)"
     )
     postAddressLine2 = models.CharField(
         max_length = 100,
         blank = True,
-        verbose_name = "post address, line 2"
+        verbose_name = u"post address, line 2"
     )
     zipCode = models.CharField(
         # 10 digits is the maximum length for post codes globally according to Wikipedia
         max_length = 10,
         blank = True,
-        verbose_name = "zip code",
-        help_text = "e.g. \"05100\" (max. 10 characters)"
+        verbose_name = u"zip code",
+        help_text = u"e.g. \"05100\" (max. 10 characters)"
     )
     city = models.CharField(
         max_length = 50,
         blank = True,
-        help_text = "e.g. \"Tampere\" or \"Stockholm\" (max. 50 characters)"
+        help_text = u"e.g. \"Tampere\" or \"Stockholm\" (max. 50 characters)"
     )
     state = models.ForeignKey(
         State,
         blank = True,
         null = True,
-        help_text = "only for customers from USA, Australia and Brazil"
+        help_text = u"only for customers from USA, Australia and Brazil"
     )
     country = models.ForeignKey(
         Country,
@@ -241,27 +241,27 @@ class Address(models.Model):
 
         if self.postAddressLine1:
             if output:
-                output += ", "
+                output += u", "
             output += self.postAddressLine1
         if self.city:
             if output:
-                output += ", "
+                output += u", "
             output += self.city
         if self.state:
             if output:
-                output += ", "
+                output += u", "
             output += self.state.name
         if self.country:
             if output:
-                output += ", "
+                output += u", "
             output += self.country.name
 
         return output
 
     class Meta():
         ordering = ["owner", "postAddressLine1"]
-        verbose_name = "address"
-        verbose_name_plural = "addresses"
+        verbose_name = u"address"
+        verbose_name_plural = u"addresses"
 
 
 
@@ -271,18 +271,18 @@ class Order(models.Model):
     orderer = models.ForeignKey(User)
     purchaseDate = models.DateTimeField(
         auto_now_add = True,
-        verbose_name = "purchase date"
+        verbose_name = u"purchase date"
     )
     status = models.IntegerField()
 
     def __unicode__(self):
-        return "%s, %s" % (self.orderer, self.purchaseDate)
+        return u"%s, %s" % (self.orderer, self.purchaseDate)
 
     class Meta():
         unique_together = ("orderer", "purchaseDate")
         ordering = ["orderer", "purchaseDate", "status"]
-        verbose_name = "order"
-        verbose_name_plural = "orders"
+        verbose_name = u"order"
+        verbose_name_plural = u"orders"
 
 
 
@@ -294,18 +294,18 @@ class OrderItem(models.Model):
     count = models.IntegerField()
     deliveryAddress = models.ForeignKey(
         Address,
-        verbose_name = "delivery address"
+        verbose_name = u"delivery address"
     )
 
     def __unicode__(self):
-        return "%s, %s, %s, %d piece(s)" % (self.order.orderer, self.order.purchaseDate,
-                                            self.album.title, self.count)
+        return u"%s, %s, %s, %d piece(s)" % (self.order.orderer, self.order.purchaseDate,
+                                             self.album.title, self.count)
 
     class Meta():
         unique_together = ("order", "album")
         ordering = ["order", "album"]
-        verbose_name = "order item"
-        verbose_name_plural = "order items"
+        verbose_name = u"order item"
+        verbose_name_plural = u"order items"
 
 
 
