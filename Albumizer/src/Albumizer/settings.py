@@ -67,6 +67,15 @@ LANGUAGE_CODE = 'en'
 
 SITE_ID = 1
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.core.context_processors.auth",
+    "django.core.context_processors.debug",
+    # "django.core.context_processors.i18n",
+    "django.core.context_processors.request",
+    "Albumizer.albumizer.context_processors.common_variables",
+)
+
+
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = False
