@@ -98,20 +98,17 @@
   </div>
 
   <div id="welcomePageRightColumn">
-    <div id="welcomePageAlbumList" class="ui-widget-content">
-      <div id="welcomePageAlbumListHeading" class="ui-widget-header">The Latest Published Albums</div>
-      
-      <div class="welcomePageAlbumListItem"><a href="/album/34/">ergk</a></div>
-      <div class="welcomePageAlbumListItem">ephok</div>
-      <div class="welcomePageAlbumListItem">eorkhp</div>
-      <div class="welcomePageAlbumListItem">aerkohp</div>
-      <div class="welcomePageAlbumListItem">aerkho</div>
-      <div class="welcomePageAlbumListItem">aerkhop</div>
-      <div class="welcomePageAlbumListItem">aekrop</div>
-      <div class="welcomePageAlbumListItem">aerhkop</div>
-      <div class="welcomePageAlbumListItem">earhkop</div>
-      <div class="welcomePageAlbumListItem">aerhkop</div>
-    </div>
+    {% if latest_albums %}
+	    <div id="welcomePageAlbumList" class="ui-widget-content">
+	      <div id="welcomePageAlbumListHeading" class="ui-widget-header">The Latest Published Albums</div>
+	      
+	      {% for album in latest_albums %}
+		      <div class="welcomePageAlbumListItem"><a 
+		              href="/album/{{ album.id }}/">{{ album.title }}</a><span 
+		                    class="creationDate">{{ album.creationDate|date:"j.n.Y G.i" }}</span></div>
+		    {% endfor %}
+	    </div>
+    {% endif %}
   </div>
 
 {% endblock %}

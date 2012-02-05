@@ -27,6 +27,8 @@ urlpatterns = patterns('albumizer.views',
     (r'^order/$', redirect_to, {'url': '/order/information/'}),
     (r'^order/information/$', 'get_ordering_information'),
     (r'^order/successful/$', 'report_order_as_succesful'),
+
+    (r'^api/json/album/latest$', 'api_json_get_latest_albums'),
 )
 
 

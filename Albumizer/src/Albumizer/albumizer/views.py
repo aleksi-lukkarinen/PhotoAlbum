@@ -3,12 +3,13 @@
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render_to_response
+from django.core import serializers
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
 from forms import AlbumCreationForm, LoginForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
-     HttpResponseForbidden, HttpResponseNotFound
+     HttpResponseForbidden, HttpResponseNotFound, HttpResponse
 
 
 
@@ -36,7 +37,10 @@ def dispatch_by_method(request, *args, **kwargs):
 
 def welcome_page(request):
     """ The first view of this application """
-    return render_to_response("welcome.html", RequestContext(request))
+    template_parameters = {
+        'latest_albums': Album.get_latest_public()
+    }
+    return render_to_response("welcome.html", RequestContext(request, template_parameters))
 
 
 
@@ -256,4 +260,26 @@ def get_ordering_information(request):
 def report_order_as_succesful(request):
     """ Acknowledges user about a successful order """
     return render_to_response('order/successful.html', RequestContext(request))
+
+
+
+
+def api_json_get_latest_albums(request):
+    """ Returns a json representation of data of the latest publicly visible albums """
+    response = HttpResponse()
+    response["Content-Type"] = "text/javascript"
+    response.write(serializers.serialize("json", Album.get_latest_public()))
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
 

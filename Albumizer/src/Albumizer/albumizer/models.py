@@ -101,6 +101,12 @@ class Album(models.Model):
         """ Checks if this album is hidden from a given user """
         return not self.is_visible_to_user(user)
 
+    @staticmethod
+    def get_latest_public():
+        """ Returns 20 latest publicly visible albums """
+        return Album.objects.filter(isPublic__exact = True).order_by("-creationDate")[:20]
+
+
     class Meta():
         unique_together = ("owner", "title")
         ordering = ["owner", "title"]
