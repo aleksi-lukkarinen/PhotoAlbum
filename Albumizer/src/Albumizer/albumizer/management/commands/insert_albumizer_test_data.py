@@ -320,14 +320,14 @@ class Command(BaseCommand):
                 new_order.save()
 
                 if verbosity >= 2:
-                    message = u"  - order: %s\n" % new_order.purchaseDate
+                    message = u"  - order: %s, %d\n" % (new_order.purchaseDate, new_order.status)
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
                 elif verbosity == 1:
                     self.stdout.write(u"o ")
 
 
                 number_of_order_items = self._orderRandomizer.randrange(1, 10)
-                for order_item_number in range(0, number_of_order_items):
+                for order_item_number in range(1, number_of_order_items + 1):
                     order_item_data = self.generate_order_item_data(new_user, new_order)
 
                     if order_item_data["no_more_albums"]:
