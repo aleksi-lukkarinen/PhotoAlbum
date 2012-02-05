@@ -148,7 +148,6 @@ class Command(BaseCommand):
 
 
         self.stdout.write(u"Initializing data structures...\n\n");
-        time.sleep(0.001)
 
         self._men_first_names = self._read_data_file(DATAFILE_MEN_FIRST_NAMES)
         self._women_first_names = self._read_data_file(DATAFILE_WOMEN_FIRST_NAMES)
@@ -189,8 +188,13 @@ class Command(BaseCommand):
 
         self.stdout.write(u"\n\n")
 
-
+        length_of_pause_in_seconds = 5
         for user_number in range(1, number_of_users + 1):
+            if user_number % 6 == 0:
+                message = u"Pausing for %d seconds...\n\n" % length_of_pause_in_seconds
+                self.stdout.write(message.encode("ascii", "backslashreplace"))
+                time.sleep(length_of_pause_in_seconds)
+
             user_data = self.generate_user_data()
 
             username = user_data["username"]
