@@ -46,6 +46,24 @@
       </div>
 		</div>
 
+    <div id="twitter-buttons">
+      <a href="https://twitter.com/aaltowsd2012s" 
+         class="twitter-follow-button" 
+         data-show-count="false">Follow @aaltowsd2012s</a>
+      <script>
+        !function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          
+          if (!d.getElementById(id)){
+            js=d.createElement(s);
+            js.id=id;
+            js.src="//platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+          }
+        }(document, "script", "twitter-wjs");
+      </script>
+    </div>
+
     <div id="welcomePageRandomAlbums">
       <div id="welcomePageRandomAlbumsHeader">
 	      <div id="welcomePageRandomAlbumsTitle">Some Random Picks From Our Users</div>
@@ -88,7 +106,7 @@
       <div class="welcomePageAlbumListItem">aerhkop</div>
       <div class="welcomePageAlbumListItem">earhkop</div>
       <div class="welcomePageAlbumListItem">aerhkop</div>
-    </div>    
+    </div>
   </div>
 
 {% endblock %}

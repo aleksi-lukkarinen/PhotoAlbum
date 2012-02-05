@@ -219,7 +219,9 @@ img {
 	color:                     #000000;
 }
 
-
+#welcomePageMainContent #twitter-buttons {
+	margin-top:                1em;
+}
 
 
 
