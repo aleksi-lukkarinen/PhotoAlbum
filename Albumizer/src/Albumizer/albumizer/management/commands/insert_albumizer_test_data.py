@@ -319,7 +319,6 @@ class Command(BaseCommand):
                 new_order.purchaseDate = order_data["purchase_date"]
                 new_order.save()
 
-
                 if verbosity >= 2:
                     message = u"  - order: %s\n" % new_order.purchaseDate
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
@@ -327,7 +326,7 @@ class Command(BaseCommand):
                     self.stdout.write(u"o ")
 
 
-                number_of_order_items = self._orderRandomizer.randrange(0, 10)
+                number_of_order_items = self._orderRandomizer.randrange(1, 10)
                 for order_item_number in range(0, number_of_order_items):
                     order_item_data = self.generate_order_item_data(new_user, new_order)
 
@@ -723,7 +722,7 @@ class Command(BaseCommand):
 
     def generate_order_item_data(self, user, order):
         """ Generates information related to a single line of an order """
-        count = self._orderRandomizer.randrange(0, 5)
+        count = self._orderRandomizer.randrange(1, 6)
 
         valid_addresses_qs = Address.objects.filter(owner__exact = user)
         address = valid_addresses_qs[self._orderRandomizer.randrange(0, valid_addresses_qs.count())]
@@ -753,12 +752,12 @@ class Command(BaseCommand):
         """ Generates information related to a single postal address """
 
         postAddressLine1 = self._street_names[self._addressRandomizer.randrange(0, len(self._street_names))] + u" "
-        postAddressLine1 += unicode(self._addressRandomizer.randrange(0, 150))
+        postAddressLine1 += unicode(self._addressRandomizer.randrange(1, 150))
 
         if self._addressRandomizer.randrange(0, 100) > 70:
             postAddressLine1 += \
                 u" " + self._address_letters[self._addressRandomizer.randrange(0, len(self._address_letters))] + \
-                u" " + unicode(self._addressRandomizer.randrange(0, 100))
+                u" " + unicode(self._addressRandomizer.randrange(1, 100))
 
         zipcode = ""
         for i in range(0, 5):
