@@ -466,6 +466,11 @@ class Command(BaseCommand):
                 previous_title = title
                 title = title.replace(u"{noun}", self._common_nouns[
                             self._albumRandomizer.randrange(0, len(self._common_nouns))], 1)
+            previous_title = u""
+            while (title != previous_title):
+                previous_title = title
+                title = title.replace(u"{verb}", self._common_verbs[
+                            self._albumRandomizer.randrange(0, len(self._common_verbs))], 1)
         elif album_type_factor < 15:
             if self._albumRandomizer.randrange(0, 100) < 30:
                 title = u"the "
