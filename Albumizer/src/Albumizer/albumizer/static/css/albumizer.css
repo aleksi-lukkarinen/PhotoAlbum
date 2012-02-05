@@ -223,7 +223,10 @@ img {
 	margin-top:                1em;
 }
 
-
+#welcomePageMainContent #twitter-tweets {
+  margin-top:                6em;
+  margin-bottom:             3em;
+}
 
 
 
