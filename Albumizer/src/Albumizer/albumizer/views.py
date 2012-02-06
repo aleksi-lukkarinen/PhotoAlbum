@@ -238,7 +238,10 @@ def log_out(request):
 @login_required
 def show_profile(request):
     """ Shows user his/her profile page """
-    return render_to_response('accounts/profile.html', RequestContext(request))
+    albums = Album.objects.filter(owner=request.user).order_by('title')
+
+    template_parameters = {'albums': albums}
+    return render_to_response('accounts/profile.html', RequestContext(request, template_parameters))
 
 
 
