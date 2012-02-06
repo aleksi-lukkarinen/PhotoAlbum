@@ -13,10 +13,10 @@
   <div class="albumList">
     {% if albums %}
     {% for album in albums %}
-    {% if forloop.counter|divisibleby:"6" %}
+    <a href="album/{{ album.id }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}"><img src="" alt="" class="albumListItemImage" /><p class="albumListItemTitle">{{ album.title }}</p></a>
+    {% if forloop.counter|divisibleby:"5" %}
     <div class="clear"></div>
     {% endif %}
-    <a href="album/{{ album.id }}" class="albumListItem"><img src="" alt="" class="albumListItemImage" /><p class="albumListItemTitle">{{ album.title }}</p></a>
     {% endfor %}
     {% else %}
     <p>There are no public albums.</p>
