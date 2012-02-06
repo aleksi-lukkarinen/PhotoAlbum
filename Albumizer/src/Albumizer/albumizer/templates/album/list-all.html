@@ -10,4 +10,18 @@
 
   <h1>Album List</h1>
 
+  <div class="albumList">
+    {% if albums %}
+    {% for album in albums %}
+    {% if forloop.counter|divisibleby:"6" %}
+    <div class="clear"></div>
+    {% endif %}
+    <a href="album/{{ album.id }}" class="albumListItem"><img src="" alt="" class="albumListItemImage" /><p class="albumListItemTitle">{{ album.title }}</p></a>
+    {% endfor %}
+    {% else %}
+    <p>There are no public albums.</p>
+    {% endif %}
+  </div>
+
+  <div class="clear"></div>
 {% endblock %}
