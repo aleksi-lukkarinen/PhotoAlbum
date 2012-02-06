@@ -16,6 +16,7 @@ urlpatterns = patterns('albumizer.views',
     (r'^album/$', 'list_all_visible_albums'),
     (r'^album/(?P<album_id>\d{1,})/$', 'show_single_album'),
     (r'^album/(?P<album_id>\d{1,})/edit/$', 'edit_album'),
+    (r'^album/(?P<album_id>\d{1,})/add_to_cart/$', 'add_album_to_shopping_cart'),
 
     (r'^accounts/$', redirect_to, {'url': '/accounts/profile/'}),
     (r'^accounts/logout/$', 'log_out'),

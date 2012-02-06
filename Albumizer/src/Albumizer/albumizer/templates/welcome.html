@@ -1,5 +1,4 @@
 {% extends "base-template.html" %}
-{% load albumizer_common %}
 
 
 
@@ -21,7 +20,7 @@
 
   <div id="welcomePageSplash"></div>
 
-  <div id="welcomePageMainContent">
+  <div id="welcomePageMainContent" {% if latest_albums %}class="hasWidth"{% endif %}>
   
 		<div id="welcomePageIntroductionTabs">
 		  <ul>
@@ -78,7 +77,7 @@
 	            <a href="/album/{{ album.id }}/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of {{ album.title }}" /></a>
 	            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/{{ album.id }}/">{{ album.title }}</a></div>
 	          </td>
-	          {% if forloop.counter|mod:4 %} 
+	          {% if forloop.counter|divisibleby:4 %} 
 	            </tr><tr>
 	          {% endif %}
 	        {% endfor %}
@@ -93,18 +92,18 @@
     </div>
   </div>
 
-  <div id="welcomePageRightColumn">
-    {% if latest_albums %}
-	    <div id="welcomePageAlbumList" class="ui-widget-content">
-	      <div id="welcomePageAlbumListHeading" class="ui-widget-header">The Latest Published Albums</div>
-	      
-	      {% for album in latest_albums %}
+  {% if latest_albums %}
+		<div id="welcomePageRightColumn">
+		   <div id="welcomePageAlbumList" class="ui-widget-content">
+		     <div id="welcomePageAlbumListHeading" class="ui-widget-header">The Latest Published Albums</div>
+		     
+		     {% for album in latest_albums %}
 		      <div class="welcomePageAlbumListItem"><a 
 		              href="/album/{{ album.id }}/">{{ album.title }}</a><span 
 		                    class="creationDate">{{ album.creationDate|date:"j.n.Y G.i" }}</span></div>
 		    {% endfor %}
-	    </div>
-    {% endif %}
-  </div>
+		   </div>
+		</div>
+  {% endif %}
 
 {% endblock %}

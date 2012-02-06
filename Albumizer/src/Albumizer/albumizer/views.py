@@ -131,6 +131,17 @@ def edit_album(request, album_id):
 
 
 
+@login_required
+def add_album_to_shopping_cart(request):
+    """ Allows user to add items into his/her shopping cart """
+    if request.method != "POST":
+        return HttpResponseNotFound()
+
+
+
+
+
+
 def get_registration_information_GET(request):
     """ Displays a form which allows user to register himself/herself into this service """
     assert request.method == "GET"

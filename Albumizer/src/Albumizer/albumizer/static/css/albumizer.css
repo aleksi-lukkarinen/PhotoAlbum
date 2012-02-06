@@ -140,8 +140,11 @@ img {
 
 #welcomePageMainContent {
   float:                     left;
-  width:                     68em;
   margin-bottom:             1em;
+}
+
+#welcomePageMainContent.hasWidth {
+  width:                     68em;
 }
 
 .welcomePageIntroductionTabHeading {
@@ -216,6 +219,7 @@ img {
 
 #welcomePageRandomAlbumsTable td {
 	vertical-align:            top;
+	text-align:                center;
 	padding-bottom:            2em;
 }
 

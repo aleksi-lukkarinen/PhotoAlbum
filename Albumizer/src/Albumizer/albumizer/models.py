@@ -164,6 +164,10 @@ class Album(models.Model):
             how_many = 9
 
         max_album_id = Album.objects.aggregate(Max("id")).values()[0]
+        print max_album_id
+        if not max_album_id:
+            return []
+
         albums = []
         album_ids = []
         missed_tries = 0
