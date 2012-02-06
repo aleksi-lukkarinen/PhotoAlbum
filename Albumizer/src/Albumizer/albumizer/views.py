@@ -35,6 +35,17 @@ def dispatch_by_method(request, *args, **kwargs):
 
 
 
+def return_json(content):
+    """ A shortcut function for returning a json string as a response from view functions """
+    response = HttpResponse()
+    response["Content-Type"] = "text/javascript"
+    response.write(content)
+    return response
+
+
+
+
+
 def welcome_page(request):
     """ The first view of this application """
     template_parameters = {
@@ -97,7 +108,7 @@ def create_album_POST(request):
     )
     new_album.save()
 
-    return HttpResponseRedirect("/album/" + str(new_album.id) + "/")
+    return HttpResponseRedirect("/album/" + unicode(new_album.id) + "/")
 
 
 
@@ -245,6 +256,7 @@ def edit_shopping_cart(request):
 
 
 
+
 @login_required
 def get_ordering_information(request):
     """ 
@@ -264,22 +276,14 @@ def report_order_as_succesful(request):
 
 
 
-def api_json_get_latest_albums(request):
+def api_json_get_latest_albums(request, how_many):
     """ Returns a json representation of data of the latest publicly visible albums """
-    response = HttpResponse()
-    response["Content-Type"] = "text/javascript"
-    response.write(serializers.serialize("json", Album.get_latest_public()))
-    return response
+    return return_json(Album.get_latest_public_as_json(int(how_many)))
 
 
 
 
-
-
-
-
-
-
-
-
+def api_json_get_random_albums(request, how_many):
+    """ Returns a json representation of data of random publicly visible albums """
+    return return_json(Album.get_pseudo_random_public_as_json(int(how_many)))
 

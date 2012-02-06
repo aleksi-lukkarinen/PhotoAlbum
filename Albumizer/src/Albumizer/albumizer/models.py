@@ -1,9 +1,23 @@
 # This Python file uses the following encoding: utf-8
 
+import json
+from random import Random
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Max
 from django.db.models.signals import post_save
 
+
+
+def json_serialization_handler(obj):
+    if hasattr(obj, 'isoformat'):
+        return obj.isoformat()
+    else:
+        raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj))
+
+
+def serialize_into_json(object):
+    return json.dumps(object, sort_keys = True, indent = 4, default = json_serialization_handler)
 
 
 
@@ -82,6 +96,8 @@ class Album(models.Model):
         verbose_name = u"creation date"
     )
 
+    _randomizer = Random()
+
     def __unicode__(self):
         return u"%s (%s)" % (self.title, self.owner)
 
@@ -101,11 +117,61 @@ class Album(models.Model):
         """ Checks if this album is hidden from a given user """
         return not self.is_visible_to_user(user)
 
-    @staticmethod
-    def get_latest_public():
-        """ Returns 20 latest publicly visible albums """
-        return Album.objects.filter(isPublic__exact = True).order_by("-creationDate")[:20]
+    def as_api_dict(self):
+        """ Returns this album as an dictionary containing values wanted to be exposed in the public api """
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "creationDate": self.creationDate
+        }
 
+    @staticmethod
+    def list_as_api_dict(album_list):
+        """ Returns a list of albums as an dictionary containing values wanted to be exposed in the public api """
+        return [album.as_api_dict() for album in album_list]
+
+    @staticmethod
+    def get_latest_public(how_many):
+        """ Returns some latest publicly visible albums """
+        if how_many < 1:
+            how_many = 1
+        if how_many > 99:
+            how_many = 99
+        return Album.objects.filter(isPublic__exact = True).order_by("-creationDate")[:how_many]
+
+    @classmethod
+    def get_latest_public_as_json(cls, how_many):
+        """ Returns some latest publicly visible albums as json """
+        return serialize_into_json(cls.list_as_api_dict(cls.get_latest_public(how_many)))
+
+    @classmethod
+    def get_pseudo_random_public(cls, how_many):
+        """ Returns some pseudo-random publicly visible albums """
+        if how_many < 1:
+            how_many = 1
+        if how_many > 9:
+            how_many = 9
+
+        max_album_id = Album.objects.aggregate(Max("id")).values()[0]
+        albums = []
+        album_ids = []
+        missed_tries = 0
+        while len(albums) < how_many and missed_tries < 10:
+            base_album_id = cls._randomizer.randrange(0, max_album_id)
+            album = Album.objects.filter(id__gte = base_album_id)[0]
+            if not album.id in album_ids:
+                albums.append(album)
+                album_ids.append(album.id)
+            else:
+                missed_tries += 1
+
+        return albums
+
+    @classmethod
+    def get_pseudo_random_public_as_json(cls, how_many):
+        """ Returns some pseudo-random publicly visible albums as json """
+        return serialize_into_json(cls.list_as_api_dict(cls.get_pseudo_random_public(how_many)))
 
     class Meta():
         unique_together = ("owner", "title")
@@ -243,7 +309,7 @@ class Address(models.Model):
     )
 
     def __unicode__(self):
-        output = str(self.owner)
+        output = unicode(self.owner)
 
         if self.postAddressLine1:
             if output:
