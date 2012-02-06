@@ -12,8 +12,13 @@
     <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
 
-    <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
-    <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.min.js"></script>
+    {% if debug %}
+      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
+      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.js"></script>
+    {% else %}
+      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.min.js"></script>
+      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.min.js"></script>
+    {% endif %}
   
     <script type="text/javascript">
 	    {% block page_scripts_before %}
@@ -64,6 +69,8 @@
               {{ user.username }}
             {% endif %}
             </a>
+            <a href="/cart/" id="headerLinkShoppingCart" class="header-link">Shopping Cart</a>
+            <a href="/album/create/" id="headerLinkAddAlbum" class="header-link">Create Album</a>
 	        {% else %}
 	          {% if not is_registration_page %}
               <a href="/accounts/register/" id="headerLinkRegister" class="header-link">Register</a>
@@ -98,7 +105,7 @@
 		  <form id="frmLoginDialog" method="post" action="/accounts/login/">
 			  <fieldset>
 			    {% csrf_token %}
-			    <label for="txtLoginUserName">User Name</label>
+			    <label for="txtLoginUserName">Username</label>
 			    <input type="text" name="txtLoginUserName" id="txtLoginUserName" class="text ui-widget-content" />
 			    <label for="txtLoginPassword">Password</label>
 			    <input type="password" name="txtLoginPassword" id="txtLoginPassword" value="" class="text ui-widget-content" />

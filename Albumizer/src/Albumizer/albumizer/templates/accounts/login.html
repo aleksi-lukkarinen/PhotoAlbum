@@ -9,7 +9,13 @@
 {% block page_scripts_after %}
 
   $(function() {
-    $("#cmdLogIn").button();
+    $("#id_cmdLogIn").button();
+  });
+  $(window).load(function() {
+    $("#id_txtLoginUserName").focus();
+    $("#id_cmdLogIn").click(function() {
+      $("#id_cmdLogIn").button("option", "disabled", true);  
+    })
   });
 
 {% endblock %}
@@ -22,21 +28,59 @@
 
   <p>Please enter your credentials to the fields below.</p>
 
-  {% if error_list %}
-    <table id="formErrorList" class="ui-state-highlight ui-corner-all">
-        {% for error in error_list %}
-          <tr><td valign="top"><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
-        {% endfor %}
+  {% if form.field_errors or form.non_field_errors %}
+    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+      {% if form.field_errors %}
+        <tr>
+          <td><span class="ui-icon ui-icon-info"></span></td>
+          <td>
+            <span class="errorMessage">
+            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
+            <ul>
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+            </span>
+          </td>
+        </tr> 
+      {% endif %}
+
+      {% for error in form.non_field_errors %}
+        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+      {% endfor %}
     </table>
   {% endif %}
 
-  <form id="frmLogin" method="post" action="/accounts/login/">
-    <fieldset>
-      {% csrf_token %}
-      {% if nextURL %}<input type="hidden" name="nextURL" value="{{ nextURL }}" />{% endif %}
-	    <label for="txtLoginUserName">User Name</label><input type="text" name="txtLoginUserName" id="txtLoginUserName" class="text ui-widget-content" value="{{ username }}" /><br />
-	    <label for="txtLoginPassword">Password</label><input type="password" name="txtLoginPassword" id="txtLoginPassword" value="" class="text ui-widget-content" /><br />
-	    <input type="submit" name="cmdLogIn" id="cmdLogIn" value="   Log In   " />
+  <form id="frmLogin" class="commonForm" method="post" action="/accounts/login/">
+    {% csrf_token %}
+    {% if nextURL %}<input type="hidden" name="nextURL" value="{{ nextURL }}" />{% endif %}
+
+    <div class="formSectionTitle ui-widget-header">Login Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtLoginUserName.name }}">{{ form.txtLoginUserName.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtLoginUserName }}</div>
+      <div class="helpRow">{{ form.txtLoginUserName.help_text }}</div>
+      {% if form.txtLoginUserName.errors %}
+        <div class="errorRow">
+          {% for error in form.txtLoginUserName.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtLoginPassword.name }}">{{ form.txtLoginPassword.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtLoginPassword }}</div>
+      <div class="helpRow">{{ form.txtLoginPassword.help_text }}</div>
+      {% if form.txtLoginPassword.errors %}
+        <div class="errorRow">
+          {% for error in form.txtLoginPassword.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <input type="submit" name="cmdLogIn" id="id_cmdLogIn" value="Log In" />
     </fieldset>
   </form>
 

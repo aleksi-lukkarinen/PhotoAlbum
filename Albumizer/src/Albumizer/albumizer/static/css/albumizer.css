@@ -172,6 +172,17 @@ img {
 
 .welcomePageAlbumListItem A {
   text-decoration:           none;
+  font-weight:               bold;
+}
+
+.welcomePageAlbumListItem A:hover {
+	color:                     blue;
+}
+
+#welcomePageAlbumList .creationDate {
+	display:                   block;
+	margin-bottom:             0.4em;
+	font-size:                 95%;
 }
 
 #welcomePageRandomAlbums {
@@ -203,6 +214,11 @@ img {
 	width:                     100%;
 }
 
+#welcomePageRandomAlbumsTable td {
+	vertical-align:            top;
+	padding-bottom:            2em;
+}
+
 #welcomePageRandomAlbumsTable a {
   text-decoration:           none;
 }
@@ -215,10 +231,12 @@ img {
 }
 
 .welcomePageRandomAlbumsItemTitle {
+  width:                     15em;
 	margin-top:                0.5em;
 	color:                     #000000;
 }
 
+<<<<<<< HEAD
 
 
 
@@ -268,66 +286,77 @@ clear:both;
 	padding:                   0.5em 1em;
 	margin-bottom:             2em;
 }
+=======
+#welcomePageMainContent #twitter-buttons {
+	margin-top:                1em;
+>>>>>>> upstream/master
+}
 
-#formErrorList td {
+#welcomePageMainContent #twitter-tweets {
+  margin-top:                6em;
+  margin-bottom:             3em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.commonFormErrorList {
+	padding:                   0.5em 1em;
+	margin-bottom:             2em;
+}
+
+.commonFormErrorList td {
 	vertical-align:            top;
 }
 
-#formErrorList td li {
+.commonFormErrorList td li {
   margin-left:               2em;
 }
 
-#formErrorList .ui-icon {
+.commonFormErrorList .ui-icon {
   margin-right:              0.5em;
 }
 
-#formErrorList .errorMessage {
+.commonFormErrorList .errorMessage {
   display:                   inline-block;
   margin-top:                0.1em;
 }
 
-
-
-
-
-
-
-
-
-
-#frmLogin fieldset {
-	border:                    none;
-}
-
-#frmLogin label {
-  display:                   inline-block;
-  width:                     8em;
-}
-
-#frmLogin #txtLoginPassword {
-  margin-top:                0.5em;
-  margin-bottom:             1em;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#frmRegister fieldset {
-	margin-bottom:             2em;
+.commonForm fieldset {
+  margin-bottom:             2em;
   padding:                   0em 1em 1em 1em;
 }
 
-#frmRegister .formSectionTitle {
+.commonForm .formSectionTitle {
   padding:                   0.5em;
   background-color:          #777777;
   font-size:                 120%;
@@ -335,58 +364,88 @@ clear:both;
   color:                     #efefef;
 }
 
-#frmRegister td {
-  vertical-align:            top;
-  horizontal-align:          left;
-}
-
-#frmRegister fieldset {
+.commonForm fieldset {
   border:                    none;
 }
 
-#frmRegister label {
+.commonForm label {
   display:                   inline-block;
   width:                     13em;
 }
 
-#frmRegister .requiredLabel {
-	font-weight:               bold;
+.commonForm textarea {
+  width:                     50em;
+  min-width:                 10em;
+  max-width:                 60em;
+  min-height:                3em;
+} 
+
+.commonForm .requiredLabel {
+  font-weight:               bold;
 }
 
-#frmRegister .requiredLabel .ui-icon {
+.commonForm .requiredLabel .ui-icon {
   display:                   inline-block;
   position:                  absolute;
   margin:                    -0.2em 0em 0em 0.4em;
 }
 
-#frmRegister .infoRow {
-	margin-top:                1em;
-	font-size:                 110%;
-	line-height:               1.5em;
-}
-
-#frmRegister .fieldRow {
+.commonForm .infoRow {
   margin-top:                1em;
+  font-size:                 110%;
+  line-height:               1.5em;
 }
 
-#frmRegister .fieldRow ul {
+.commonForm .fieldRow {
+	margin-top:                1em;
+  vertical-align:            top;
+}
+
+.commonForm .fieldRow label {
+  float:                     left;
+}
+
+.commonForm .fieldRow ul {
   display:                   inline;  
 }
 
-#frmRegister .fieldRow li {
+.commonForm .fieldRow li {
   display:                   inline-block;
   width:                     5em;
 }
 
-#frmRegister .helpRow {
-	margin-top:                0.2em;
-	padding-left:              13em;
-	color:                     #888888;
+.commonForm .helpRow {
+  margin-top:                0.2em;
+  padding-left:              13em;
+  color:                     #888888;
 }
 
-#frmRegister .errorRow {
+.commonForm .errorRow {
   margin:                    0.5em 0em 2em 13em;
 }
+
+.commonForm .errorMessage {
+  color:                     #dd0000;
+  font-weight:               bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #frmRegister #errorRowHomePhone {
   margin:                    0.5em 0em 0em 13em;
@@ -394,11 +453,6 @@ clear:both;
 
 #frmRegister #errorRowServiceConditions {
   margin-top:                0.5em;
-}
-
-#frmRegister .errorMessage {
-  color:                     #dd0000;
-  font-weight:               bold;
 }
 
 #frmRegister #id_txtHomePhone {
@@ -416,6 +470,85 @@ clear:both;
 	margin-top:                2em;
 	width:                     12em;
 }
+
+
+
+
+
+
+
+#frmCreateAlbum #id_chkPublicAlbum {
+  float:                     none;
+  margin-left:               10.4em;
+}
+
+#frmCreateAlbum #lblPublicAlbum {
+  float:                     none;
+  position:                  absolute;
+  margin:                    0em 0em 0em 0.8em;
+}
+
+#frmCreateAlbum #id_cmdCreateAlbum {
+  margin-top:                2em;
+  margin-left:               10.3em;
+  width:                     12em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#frmLogin {
+	width:                     45em;
+}
+
+#frmLogin #id_txtLoginUserName,
+#frmLogin #id_txtLoginPassword {
+  width:                     25em;
+}
+
+#frmLogin label {
+  width:                     10em;
+}
+
+#frmLogin .helpRow {
+  margin-top:                0.2em;
+  padding-left:              13em;
+  color:                     #888888;
+}
+
+#frmLogin .errorRow {
+  margin:                    0.5em 0em 2em 10em;
+}
+
+#frmLogin #id_cmdLogIn {
+  margin-top:                1em;
+  margin-left:               9.1em;
+  width:                     12em;
+}
+
+
+
+
+
+
+
+
 
 
 

@@ -1,13 +1,35 @@
 {% extends "base-template.html" %}
+{% load url from future %}
 
 
-
-{% block page_title %}Album{% endblock %}
+{% block page_title %}Album "{{ album.title }}"{% endblock %}
 
 
 
 {% block page_content %}
 
-  <h1>Album </h1>
+  <h1>{{ album.title }}</h1>
+  {% if album.description %}
+  <p>
+    {{ album.description }}
+  </p>
+  {% endif %}
+
+  <a href="https://twitter.com/intent/tweet?button_hashtag=Albumizer&text=Hey!%20Some%20cool%20photos:%20{{ album.title|urlencode }}" 
+     class="twitter-hashtag-button" 
+     data-related="aaltowsd2012" 
+     data-url="http://{{ site_domain }}{% url 'albumizer.views.show_single_album' album.id %}">Tweet #Albumizer</a>
+  <script>
+    !function(d, s, id) {
+    	var js, fjs = d.getElementsByTagName(s)[0];
+    	
+    	if (!d.getElementById(id)){
+    		js=d.createElement(s);
+    		js.id=id;
+    		js.src="//platform.twitter.com/widgets.js";
+    		fjs.parentNode.insertBefore(js, fjs);
+    	}
+    }(document, "script", "twitter-wjs");
+  </script>
 
 {% endblock %}
