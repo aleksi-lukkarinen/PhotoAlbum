@@ -22,8 +22,9 @@ def welcome_page(request):
 
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not) """
-    album_list = Album.objects.order_by('title')
-    template_parameters = {'albums': album_list, 'is_album_list_page': True}
+    albums = Album.objects.filter(isPublic=True).order_by('title')
+
+    template_parameters = {'albums': albums, 'is_album_list_page': True}
     return render_to_response('album/list-all.html', RequestContext(request, template_parameters))
 
 

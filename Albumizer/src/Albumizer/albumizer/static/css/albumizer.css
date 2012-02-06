@@ -219,6 +219,51 @@ img {
 	color:                     #000000;
 }
 
+
+
+
+
+
+
+a.albumListItem {
+float:left;
+text-decoration:none;
+margin:0.5em 1.125em;
+width:16.2em;
+}
+
+.albumList a:first-child, .albumList a:nth-child(6) {
+margin-left:0em;
+}
+
+.albumList a:nth-child(5) {
+margin-right:0em;
+}
+
+.albumListItemTitle {
+display:block;
+font-size:1.3em;
+text-align:center;
+}
+
+.albumListItemImage {
+display:block;
+width:16em;
+height:16em;
+border:0.1em solid #eeeeee;
+}
+
+.clear {
+clear:both;
+}
+
+
+
+
+
+
+
+
 #formErrorList {
 	padding:                   0.5em 1em;
 	margin-bottom:             2em;
