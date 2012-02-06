@@ -240,7 +240,6 @@ img {
 	color:                     #000000;
 }
 
-<<<<<<< HEAD
 
 
 
@@ -254,18 +253,18 @@ margin:0.5em 1.125em;
 width:16.2em;
 }
 
-.albumList a:first-child, .albumList a:nth-child(6) {
+.albumList a:first-child, .albumList a.firstOnRow {
 margin-left:0em;
 }
 
-.albumList a:nth-child(5) {
+.albumList a.lastOnRow {
 margin-right:0em;
 }
 
 .albumListItemTitle {
-display:block;
-font-size:1.3em;
+font-size:1em;
 text-align:center;
+word-wrap:break-word;
 }
 
 .albumListItemImage {
@@ -290,10 +289,9 @@ clear:both;
 	padding:                   0.5em 1em;
 	margin-bottom:             2em;
 }
-=======
+
 #welcomePageMainContent #twitter-buttons {
 	margin-top:                1em;
->>>>>>> upstream/master
 }
 
 #welcomePageMainContent #twitter-tweets {
