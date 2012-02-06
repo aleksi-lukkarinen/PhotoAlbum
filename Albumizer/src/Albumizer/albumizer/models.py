@@ -142,7 +142,7 @@ class Album(models.Model):
         return [album.as_api_dict() for album in album_list]
 
     @staticmethod
-    def get_latest_public(how_many):
+    def get_latest_public(how_many = 20):
         """ Returns some latest publicly visible albums """
         if how_many < 1:
             how_many = 1
@@ -151,12 +151,12 @@ class Album(models.Model):
         return Album.objects.filter(isPublic__exact = True).order_by("-creationDate")[:how_many]
 
     @classmethod
-    def get_latest_public_as_json(cls, how_many):
+    def get_latest_public_as_json(cls, how_many = 20):
         """ Returns some latest publicly visible albums as json """
         return serialize_into_json(cls.list_as_api_dict(cls.get_latest_public(how_many)))
 
     @classmethod
-    def get_pseudo_random_public(cls, how_many):
+    def get_pseudo_random_public(cls, how_many = 4):
         """ Returns some pseudo-random publicly visible albums """
         if how_many < 1:
             how_many = 1
@@ -179,7 +179,7 @@ class Album(models.Model):
         return albums
 
     @classmethod
-    def get_pseudo_random_public_as_json(cls, how_many):
+    def get_pseudo_random_public_as_json(cls, how_many = 4):
         """ Returns some pseudo-random publicly visible albums as json """
         return serialize_into_json(cls.list_as_api_dict(cls.get_pseudo_random_public(how_many)))
 

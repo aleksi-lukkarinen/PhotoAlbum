@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 
 
 
@@ -64,33 +65,28 @@
       </script>
     </div>
 
-    <div id="welcomePageRandomAlbums">
-      <div id="welcomePageRandomAlbumsHeader">
-	      <div id="welcomePageRandomAlbumsTitle">Some Random Picks From Our Users</div>
-	      <a id="welcomePageRandomAlbumsSeeMoreLink" href="/album/">See more</a>
+    {% if random_albums %}
+	    <div id="welcomePageRandomAlbums">
+	      <div id="welcomePageRandomAlbumsHeader">
+		      <div id="welcomePageRandomAlbumsTitle">Some Random Picks From Our Users</div>
+		      <a id="welcomePageRandomAlbumsSeeMoreLink" href="/album/">See more</a>
+		    </div>
+	      <table id="welcomePageRandomAlbumsTable">
+	        <tr>
+          {% for album in random_albums %}
+	          <td>
+	            <a href="/album/{{ album.id }}/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of {{ album.title }}" /></a>
+	            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/{{ album.id }}/">{{ album.title }}</a></div>
+	          </td>
+	          {% if forloop.counter|mod:4 %} 
+	            </tr><tr>
+	          {% endif %}
+	        {% endfor %}
+	        </tr>
+	      </table>
 	    </div>
-      <table id="welcomePageRandomAlbumsTable">
-        <tr>
-          <td>
-            <a href="/album/22/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of Tropical Vacation" /></a>
-            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/22/">Tropical Vacation</a></div>
-          </td>
-          <td>
-            <a href="/album/73/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of My New Ferrari" /></a>
-            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/73/">My New Ferrari</a></div>
-          </td>
-          <td>
-            <a href="/album/18/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of Ida's Birthday" /></a>
-            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/18/">Ida's Birthday</a></div>
-          </td>
-          <td>
-            <a href="/album/94/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of Nature's Call" /></a>
-            <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/94/">Nature's Call</a></div>
-          </td>
-        </tr>
-      </table>
-    </div>
-
+    {% endif %}
+    
     <div id="twitter-tweets">
       <blockquote class="twitter-tweet tw-align-center" lang="en"><p>The Albumizer team is excited about this new web site and hopes to see you all here making albums! <a href="http://t.co/0EONiQee" title="http://www.albumizer.com/">albumizer.com</a> <a href="https://twitter.com/search/%2523Albumizer">#Albumizer</a></p>&mdash; aaltowsd2012s (@aaltowsd2012s) <a href="https://twitter.com/aaltowsd2012s/status/166281721048866816" data-datetime="2012-02-05T22:07:06+00:00">helmikuu 5, 2012</a></blockquote>
       <script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>

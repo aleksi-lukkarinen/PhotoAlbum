@@ -214,6 +214,11 @@ img {
 	width:                     100%;
 }
 
+#welcomePageRandomAlbumsTable td {
+	vertical-align:            top;
+	padding-bottom:            2em;
+}
+
 #welcomePageRandomAlbumsTable a {
   text-decoration:           none;
 }
@@ -226,6 +231,7 @@ img {
 }
 
 .welcomePageRandomAlbumsItemTitle {
+  width:                     15em;
 	margin-top:                0.5em;
 	color:                     #000000;
 }

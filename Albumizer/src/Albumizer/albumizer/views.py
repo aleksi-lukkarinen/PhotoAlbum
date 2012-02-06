@@ -49,7 +49,8 @@ def return_json(content):
 def welcome_page(request):
     """ The first view of this application """
     template_parameters = {
-        'latest_albums': Album.get_latest_public()
+        'latest_albums': Album.get_latest_public(),
+        'random_albums': Album.get_pseudo_random_public(8)
     }
     return render_to_response("welcome.html", RequestContext(request, template_parameters))
 
