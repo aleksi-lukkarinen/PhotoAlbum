@@ -1,6 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 import json
+import Albumizer.settings
 from random import Random
 from django.contrib.auth.models import User
 from django.db import models
@@ -9,15 +10,24 @@ from django.db.models.signals import post_save
 
 
 
-def json_serialization_handler(obj):
-    if hasattr(obj, 'isoformat'):
-        return obj.isoformat()
+def json_serialization_handler(object_to_serialize):
+    """ Serializes objects, which are not supported by the Python's json package """
+    if hasattr(object_to_serialize, 'isoformat'):    # for datetimes: serialize them into a standard format
+        return object_to_serialize.isoformat()
     else:
-        raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj))
+        raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % \
+                                (type(object_to_serialize), repr(object_to_serialize))
 
 
-def serialize_into_json(object):
-    return json.dumps(object, sort_keys = True, indent = 4, default = json_serialization_handler)
+def serialize_into_json(object_to_serialize):
+    """ 
+        Serializes objects into json using Python's json package. In debug mode, the format is clearer,
+        but in production, unnecessary line breaks and indenting is left out. 
+    """
+    if Albumizer.settings.DEBUG:
+        return json.dumps(object_to_serialize, sort_keys = True, indent = 4, default = json_serialization_handler)
+    else:
+        return json.dumps(object_to_serialize, default = json_serialization_handler)
 
 
 
