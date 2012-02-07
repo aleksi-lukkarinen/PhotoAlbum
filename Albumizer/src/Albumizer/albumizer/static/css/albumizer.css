@@ -220,7 +220,16 @@ img {
 #welcomePageRandomAlbumsTable td {
 	vertical-align:            top;
 	text-align:                center;
-	padding-bottom:            2em;
+	padding-bottom:            0.5em;
+}
+
+.welcomePageRandomAlbumsItemContainer {
+  width:                     15.1em;
+  height:                    19.5em;
+}
+
+.welcomePageRandomAlbumsItemWrapperHidden {
+	display:                   none;
 }
 
 #welcomePageRandomAlbumsTable a {
@@ -299,11 +308,22 @@ clear:both;
   margin-bottom:             3em;
 }
 
+#welcomePageUsageNotice {
+	margin-top:                2em;
+	text-align:                center;
+}
 
+#welcomePageUsageNotice #firstLine {
+  font-size:                 120%;
+  font-weight:               bold;
+  margin-bottom:             0.3em;
+  color:                     #cc11dd;  
+}
 
-
-
-
+#welcomePageUsageNotice #secondLine {
+  font-size:                 110%;
+  color:                     #333333;
+}
 
 
 

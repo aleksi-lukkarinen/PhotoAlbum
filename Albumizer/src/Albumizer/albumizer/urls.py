@@ -33,6 +33,8 @@ urlpatterns = patterns('albumizer.views',
     (r'^api/json/album/latest/(?P<how_many>\d{1,2})/$', 'api_json_get_latest_albums'),
     (r'^api/json/album/random/$', redirect_to, {'url': '/api/json/album/random/4/'}),
     (r'^api/json/album/random/(?P<how_many>\d)/$', 'api_json_get_random_albums'),
+    (r'^api/json/album/count/$', 'api_json_get_album_count'),
+    (r'^api/json/user/count/$', 'api_json_get_user_count'),
 )
 
 

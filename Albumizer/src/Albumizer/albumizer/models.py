@@ -164,7 +164,6 @@ class Album(models.Model):
             how_many = 9
 
         max_album_id = Album.objects.aggregate(Max("id")).values()[0]
-        print max_album_id
         if not max_album_id:
             return []
 
@@ -173,7 +172,7 @@ class Album(models.Model):
         missed_tries = 0
         while len(albums) < how_many and missed_tries < 10:
             base_album_id = cls._randomizer.randrange(0, max_album_id)
-            album = Album.objects.filter(id__gte = base_album_id)[0]
+            album = Album.objects.filter(id__gte = base_album_id).order_by("id")[0]
             if not album.id in album_ids:
                 albums.append(album)
                 album_ids.append(album.id)

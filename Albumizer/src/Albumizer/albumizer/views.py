@@ -39,6 +39,7 @@ def return_json(content):
     """ A shortcut function for returning a json string as a response from view functions """
     response = HttpResponse()
     response["Content-Type"] = "text/javascript"
+    response["Cache-Control"] = "no-cache"
     response.write(content)
     return response
 
@@ -48,9 +49,17 @@ def return_json(content):
 
 def welcome_page(request):
     """ The first view of this application """
+    random_albums = Album.get_pseudo_random_public(8)
+    if len(random_albums) < 3:
+        random_albums = None
+    elif len(random_albums) > 4:
+        random_albums = random_albums[0:(len(random_albums) / 4) * 4]
+
     template_parameters = {
         'latest_albums': Album.get_latest_public(),
-        'random_albums': Album.get_pseudo_random_public(8)
+        'random_albums': random_albums,
+        'album_count': Album.objects.count(),
+        'user_count': User.objects.count()
     }
     return render_to_response("welcome.html", RequestContext(request, template_parameters))
 
@@ -59,7 +68,7 @@ def welcome_page(request):
 
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not) """
-    albums = Album.objects.filter(isPublic=True).order_by('title')
+    albums = Album.objects.filter(isPublic = True).order_by('title')
 
     template_parameters = {'albums': albums, 'is_album_list_page': True}
     return render_to_response('album/list-all.html', RequestContext(request, template_parameters))
@@ -299,4 +308,26 @@ def api_json_get_latest_albums(request, how_many):
 def api_json_get_random_albums(request, how_many):
     """ Returns a json representation of data of random publicly visible albums """
     return return_json(Album.get_pseudo_random_public_as_json(int(how_many)))
+
+
+
+
+def api_json_get_album_count(request):
+    """ Returns the number of albums currently registered """
+    return return_json(Album.objects.count())
+
+
+
+
+def api_json_get_user_count(request):
+    """ Returns the number of users currently registered """
+    return return_json(User.objects.count())
+
+
+
+
+
+
+
+
 
