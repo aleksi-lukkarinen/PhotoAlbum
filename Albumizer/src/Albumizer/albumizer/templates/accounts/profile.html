@@ -8,6 +8,24 @@
 
 {% block page_content %}
 
-  <h1>Personal Profile</h1>
+<h1>Personal Profile</h1>
+
+<div class="albumList">
+  {% if albums %}
+  {% for album in albums %}
+  <a href="/album/{{ album.id }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+    <img src="" alt="" class="albumListItemImage" />
+    <p class="albumListItemTitle">{{ album.title }}</p>
+  </a>
+  {% if forloop.counter|divisibleby:"5" %}
+  <div class="clear"></div>
+  {% endif %}
+  {% endfor %}
+  {% else %}
+  <p>You haven't created an album yet.</p>
+  {% endif %}
+</div>
+
+<div class="clear"></div>
 
 {% endblock %}
