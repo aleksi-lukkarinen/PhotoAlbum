@@ -161,6 +161,7 @@ img {
 #welcomePageAlbumList {
   padding:                   0.7em;
   margin:                    0em 0em 0.5em 0.5em;
+  overflow:                  hidden;
 }
 
 #welcomePageAlbumListHeading {

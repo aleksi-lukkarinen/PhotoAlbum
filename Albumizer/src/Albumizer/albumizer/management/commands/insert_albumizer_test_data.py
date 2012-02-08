@@ -27,6 +27,7 @@ DATAFILE_COUNTRIES = DATAFILE_PATH + "countries.txt"
 DATAFILE_CITIES_REGIONS = DATAFILE_PATH + "cities-and-regions.txt"
 DATAFILE_PARAGRAPHS = DATAFILE_PATH + "paragraphs.txt"
 DATAFILE_FINNISH_REGIONS = DATAFILE_PATH + "finnish-regions.txt"
+DATAFILE_HTML_TAGS = DATAFILE_PATH + "html-tags.txt"
 
 
 
@@ -83,6 +84,7 @@ class Command(BaseCommand):
     _cities_regions = []
     _paragraphs = []
     _finnish_regions = []
+    _html_tags = []
     _genderRandomizer = Random()
     _nameRandomizer = Random()
     _emailRandomizer = Random()
@@ -98,9 +100,12 @@ class Command(BaseCommand):
     _trans_tbl_email_username = {}
     _generated_users = []
 
+
+
     def _read_data_file(self, filename):
         """ Reads lines of a file to a list and trims them """
         return [unicode(line.strip(), encoding = "utf-8") for line in fileinput.input(filename)]
+
 
 
     def handle(self, *args, **options):
@@ -164,6 +169,7 @@ class Command(BaseCommand):
         self._cities_regions = self._read_data_file(DATAFILE_CITIES_REGIONS)
         self._paragraphs = self._read_data_file(DATAFILE_PARAGRAPHS)
         self._finnish_regions = self._read_data_file(DATAFILE_FINNISH_REGIONS)
+        self._html_tags = self._read_data_file(DATAFILE_HTML_TAGS)
 
         for i in range(1, len(self._trans_tbl_email_username_src)):
             self._trans_tbl_email_username[ord(self._trans_tbl_email_username_src[i])] = \
@@ -188,19 +194,22 @@ class Command(BaseCommand):
 
         self.stdout.write(u"\n\n")
 
-        length_of_pause_in_seconds = 5
+        length_of_pause_in_seconds = 10
         for user_number in range(1, number_of_users + 1):
-            if user_number % 6 == 0:
-                message = u"Pausing for %d seconds...\n\n" % length_of_pause_in_seconds
+            if user_number % 15 == 0:
+                message = u"Pausing for %d seconds:  " % length_of_pause_in_seconds
                 self.stdout.write(message.encode("ascii", "backslashreplace"))
-                time.sleep(length_of_pause_in_seconds)
+                for i in range(length_of_pause_in_seconds):
+                    time.sleep(1)
+                    self.stdout.write("* ".encode("ascii", "backslashreplace"))
+                self.stdout.write("\n\n".encode("ascii", "backslashreplace"))
 
             user_data = self.generate_user_data()
 
             username = user_data["username"]
             unique_username = username
             postfix_counter = 2
-            while (User.objects.filter(username__exact = unique_username)):
+            while (User.objects.filter(username__exact = unique_username).exists()):
                 unique_username = unicode(username + unicode(postfix_counter))
                 postfix_counter += 1
 
@@ -261,7 +270,7 @@ class Command(BaseCommand):
                 album_title = album_data["title"]
                 unique_album_title = album_title
                 postfix_counter = 2
-                while (Album.objects.filter(owner__exact = new_user, title__exact = unique_album_title)):
+                while (Album.objects.filter(owner__exact = new_user, title__exact = unique_album_title).exists()):
                     unique_album_title = unicode(album_title + u" " + unicode(postfix_counter))
                     postfix_counter += 1
 
@@ -308,6 +317,8 @@ class Command(BaseCommand):
 
 
 
+            most_recent_order = None
+            most_recent_order_purchasedate = datetime(1900, 1, 1, 0, 0, 0)
             number_of_orders = self._orderRandomizer.randrange(min_number_of_orders, max_number_of_orders + 1)
             for order_number in range(0, number_of_orders):
                 order_data = self.generate_order_data(new_user)
@@ -323,30 +334,30 @@ class Command(BaseCommand):
                 new_order.purchaseDate = order_data["purchase_date"]
                 new_order.save()
 
+                if new_order.purchaseDate > most_recent_order_purchasedate:
+                    most_recent_order_purchasedate = new_order.purchaseDate
+                    most_recent_order = new_order
+
                 if verbosity >= 2:
-                    message = u"  - order: %s, %d\n" % (new_order.purchaseDate, new_order.status)
+                    message = u"  - order: %s\n" % new_order.purchaseDate
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
                 elif verbosity == 1:
                     self.stdout.write(u"o ")
 
-
-                number_of_order_items = self._orderRandomizer.randrange(1, 10)
-                for order_item_number in range(1, number_of_order_items + 1):
-                    order_item_data = self.generate_order_item_data(new_user, new_order)
-
-                    if order_item_data["no_more_albums"]:
-                        break;
+                order_item_counter = 0;
+                for item in order_data["items"]:
+                    order_item_counter += 1
 
                     new_order_item = OrderItem()
                     new_order_item.order = new_order
-                    new_order_item.album = order_item_data["album"]
-                    new_order_item.count = order_item_data["count"]
-                    new_order_item.deliveryAddress = order_item_data["address"]
+                    new_order_item.album = item["album"]
+                    new_order_item.count = item["count"]
+                    new_order_item.deliveryAddress = item["address"]
                     new_order_item.save()
 
                     if verbosity >= 2:
                         message = u"            (%d) %s, %d, %s\n" % \
-                                        (order_item_number, new_order_item.album, new_order_item.count,
+                                        (order_item_counter, new_order_item.album, new_order_item.count,
                                          unicode(new_order_item.deliveryAddress))
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     elif verbosity == 1:
@@ -355,6 +366,15 @@ class Command(BaseCommand):
                 if verbosity >= 2:
                     self.stdout.write(u"\n")
 
+
+            if most_recent_order and self._orderRandomizer.randrange(0, 100) > 50:
+                most_recent_order.status = 0
+                most_recent_order.save()
+
+                if verbosity >= 2:
+                    message = u"\n  - the most recent order (%s) is still in the shopping cart (status = %d)\n" % \
+                                            (most_recent_order.purchaseDate, most_recent_order.status)
+                    self.stdout.write(message.encode("ascii", "backslashreplace"))
 
 
             if verbosity >= 1:
@@ -369,6 +389,7 @@ class Command(BaseCommand):
                 self.stdout.write(u" and " +
                         self._generated_users[number_of_users - 1].username.encode("ascii", "backslashreplace"))
             self.stdout.write(u"\n")
+
 
 
     def generate_user_data(self):
@@ -450,6 +471,7 @@ class Command(BaseCommand):
             "phone" : phone,
             "serviceConditionsAccepted": sa_datetime
         }
+
 
 
     def generate_album_data(self, user):
@@ -638,6 +660,7 @@ class Command(BaseCommand):
 
         title = self.decorate_album_title(title)
 
+
         description = u""
         for i in range(0, self._albumRandomizer.randrange(1, 4)):
             description_words = self._paragraphs[self._albumRandomizer.randrange(0, len(self._paragraphs))].split()
@@ -650,6 +673,10 @@ class Command(BaseCommand):
             description += u" ".join(description_words[description_start: description_end]) + u"\n"
         description = description[:-1]
         description = description[0:255]
+
+        if self._albumRandomizer.randrange(0, 99) < 30:
+            description = self.decorate_with_html(description)
+
 
         is_public = True
         if self._albumRandomizer.randrange(0, 100) > 70:
@@ -668,8 +695,12 @@ class Command(BaseCommand):
         }
 
 
+
     def decorate_album_title(self, title):
         """ May insert some decorations to given title """
+        if self._albumRandomizer.randrange(0, 99) < 5:
+            title = self.decorate_with_html(title)
+
         decoration_type_factor = self._albumRandomizer.randrange(0, 99)
         if decoration_type_factor < 90:
             return title                    # no decoration
@@ -685,6 +716,7 @@ class Command(BaseCommand):
                 return self.compose_heart_string() + u" " + title + u" " + self.compose_heart_string()
 
 
+
     def compose_heart_string(self):
         """ Compose a string of hearts (like <3) to be used in titles """
         hearts = "<3"
@@ -693,61 +725,82 @@ class Command(BaseCommand):
         return hearts
 
 
-    def generate_order_data(self, user):
-        """ Generates information related to a single order as a whole"""
-        status = self._orderRandomizer.randrange(0, 4)
 
-        valid_addresses_found = False
-        orderable_albums_found = False
+    def decorate_with_html(self, text):
+        """ Inserts a pair of html tags to the given text """
+        text_length = len(text)
+
+        if text_length < 4:
+            return text
+
+        tag = self._html_tags[self._albumRandomizer.randrange(0, len(self._html_tags))]
+        closing_position = self._albumRandomizer.randrange(len(text) / 2, text_length)
+        opening_position = self._albumRandomizer.randrange(0, closing_position)
+
+        while closing_position < text_length and text[closing_position] != " ":
+            closing_position += 1
+
+        while opening_position > 0 and text[opening_position - 1] != " ":
+            opening_position -= 1
+
+        return text[0:opening_position] + "<" + tag + ">" + \
+               text[opening_position: closing_position] + "</" + tag + ">" + \
+               text[closing_position: text_length]
+
+
+
+    def generate_order_data(self, user):
+        """ Generates information related to a single order """
+        status = 3
+
+        orderable_albums_qs = Album.objects.filter(id__lt = 0)
         purchase_date_calculation_counter = 0
         o_maxtimdelta = datetime.now() - user.date_joined
         o_deltaseconds = int(o_maxtimdelta.total_seconds())
-        while not orderable_albums_found and purchase_date_calculation_counter < 10:
+        while orderable_albums_qs.count() < 1 and purchase_date_calculation_counter < 10:
             purchase_date_calculation_counter += 1;
-            o_randomdeltaseconds = self._nameRandomizer.randrange(0, o_deltaseconds)
+            o_randomdeltaseconds = self._orderRandomizer.randrange(0, o_deltaseconds)
             o_datetime = user.date_joined + timedelta(seconds = o_randomdeltaseconds)
 
-            if Album.objects.filter(Q(creationDate__lt = o_datetime), Q(isPublic = True) | Q(owner = user)):
-                orderable_albums_found = True
+            orderable_albums_qs = Album.objects.filter(
+                    Q(creationDate__lt = o_datetime),
+                    Q(isPublic = True) | Q(owner = user))
 
-        if orderable_albums_found:
-            while Order.objects.filter(orderer__exact = user, purchaseDate__exact = o_datetime):
-                o_datetime = o_datetime + timedelta(milliseconds = 1)
-
-            if Address.objects.filter(owner__exact = user):
-                valid_addresses_found = True
-
-        return {
-            "success": (orderable_albums_found and valid_addresses_found),
-            "purchase_date": o_datetime,
-            "status": status
-        }
-
-
-    def generate_order_item_data(self, user, order):
-        """ Generates information related to a single line of an order """
-        count = self._orderRandomizer.randrange(1, 6)
+        if not orderable_albums_qs:
+            return {"success": False}
 
         valid_addresses_qs = Address.objects.filter(owner__exact = user)
-        address = valid_addresses_qs[self._orderRandomizer.randrange(0, valid_addresses_qs.count())]
+        if not valid_addresses_qs:
+            return {"success": False}
 
-        album = None
-        no_more_albums = False
-        ids_of_albums_in_order = OrderItem.objects.filter(order = order).values_list('album', flat = True)
-        orderable_albums_qs = Album.objects.filter(
-                Q(creationDate__lt = order.purchaseDate),
-                Q(isPublic = True) | Q(owner = user),
-                ~ Q(id__in = ids_of_albums_in_order))
-        if orderable_albums_qs.count() < 1:
-            no_more_albums = True
-        else:
-            album = orderable_albums_qs[self._orderRandomizer.randrange(0, orderable_albums_qs.count())]
+        while Order.objects.filter(orderer__exact = user, purchaseDate__exact = o_datetime).exists():
+            o_datetime = o_datetime + timedelta(minutes = self._orderRandomizer.randrange(5, 15))
+
+        album_infos = []
+        number_of_valid_addresses = valid_addresses_qs.count()
+        ids_of_orderable_albums = [id for id in orderable_albums_qs.values_list('id', flat = True)]
+
+        number_of_order_items = self._orderRandomizer.randrange(1, 10)
+        if number_of_order_items > orderable_albums_qs.count():
+            number_of_order_items = orderable_albums_qs.count()
+
+        for order_item_number in range(1, number_of_order_items + 1):
+            album_id = ids_of_orderable_albums[self._orderRandomizer.randrange(0, len(ids_of_orderable_albums))]
+            album = orderable_albums_qs.get(id__exact = album_id)
+            ids_of_orderable_albums.remove(album_id)
+            count = self._orderRandomizer.randrange(1, 6)
+            address = valid_addresses_qs[self._orderRandomizer.randrange(0, number_of_valid_addresses)]
+            album_infos.append({
+                "album": album,
+                "count": count,
+                "address": address
+            })
 
         return {
-            "no_more_albums": no_more_albums,
-            "album": album,
-            "count": count,
-            "address": address
+            "success": True,
+            "purchase_date": o_datetime,
+            "status": status,
+            "items": album_infos
         }
 
 
