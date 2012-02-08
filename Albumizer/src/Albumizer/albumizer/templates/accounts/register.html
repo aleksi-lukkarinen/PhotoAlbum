@@ -9,13 +9,13 @@
 {% block page_scripts_after %}
 
   $(function() {
-    $("#id_cmdRegister").button({
-      icons: {
-        primary: 'ui-icon-check'
-      }
-    });
-    $("input").addClass("text ui-widget-content");
-    $("#radio").buttonset();
+    $("#id_cmdRegister").button();
+  });
+  $(window).load(function() {
+    $("#id_txtUserId").focus();
+	  $("#id_cmdRegister").click(function() {
+	    $("#id_cmdRegister").button("option", "disabled", true);  
+	  })
   });
 
 {% endblock %}
@@ -28,9 +28,9 @@
 
   <p>If you want to register into the service, please enter the necessary information below. The fields with a star next to their label are required.</p>
 
-  {% if form.errors or form.non_field_errors %}
-    <table id="formErrorList" class="ui-state-highlight ui-corner-all">
-      {% if form.errors %}
+  {% if form.field_errors or form.non_field_errors %}
+    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+      {% if form.field_errors %}
         <tr>
           <td><span class="ui-icon ui-icon-info"></span></td>
           <td>
@@ -54,16 +54,16 @@
     </table>
   {% endif %}
 
-  <form id="frmRegister" method="post" action="/accounts/register/">
+  <form id="frmRegister" class="commonForm" method="post" action="/accounts/register/">
     {% csrf_token %}
     
     <div class="formSectionTitle ui-widget-header">Account Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-		  <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtUserId.name }}">{{ form.txtUserId.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtUserId }}</div>
-		  <div class="helpRow">{{ form.txtUserId.help_text }}</div>
-		  {% if form.txtUserId.errors %}
+		  <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtUserName.name }}">{{ form.txtUserName.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtUserName }}</div>
+		  <div class="helpRow">{{ form.txtUserName.help_text }}</div>
+		  {% if form.txtUserName.errors %}
 			  <div class="errorRow">
-		      {% for error in form.txtUserId.errors %}
+		      {% for error in form.txtUserName.errors %}
 		        <div class="errorMessage">{{ error }}</div>
 		      {% endfor %}
 	      </div>

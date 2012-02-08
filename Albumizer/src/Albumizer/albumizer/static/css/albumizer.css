@@ -14,7 +14,7 @@ body {
 
 #pageContainer {
   margin:                    0em auto;
-  width:                     90em;
+  width:                     902px;
   background:                #ffffff;
 }
 
@@ -140,8 +140,11 @@ img {
 
 #welcomePageMainContent {
   float:                     left;
-  width:                     68em;
   margin-bottom:             1em;
+}
+
+#welcomePageMainContent.hasWidth {
+  width:                     63em;
 }
 
 .welcomePageIntroductionTabHeading {
@@ -158,6 +161,7 @@ img {
 #welcomePageAlbumList {
   padding:                   0.7em;
   margin:                    0em 0em 0.5em 0.5em;
+  overflow:                  hidden;
 }
 
 #welcomePageAlbumListHeading {
@@ -172,6 +176,17 @@ img {
 
 .welcomePageAlbumListItem A {
   text-decoration:           none;
+  font-weight:               bold;
+}
+
+.welcomePageAlbumListItem A:hover {
+	color:                     blue;
+}
+
+#welcomePageAlbumList .creationDate {
+	display:                   block;
+	margin-bottom:             0.4em;
+	font-size:                 95%;
 }
 
 #welcomePageRandomAlbums {
@@ -203,6 +218,21 @@ img {
 	width:                     100%;
 }
 
+#welcomePageRandomAlbumsTable td {
+	vertical-align:            top;
+	text-align:                center;
+	padding-bottom:            0.5em;
+}
+
+.welcomePageRandomAlbumsItemContainer {
+  width:                     15.1em;
+  height:                    19.5em;
+}
+
+.welcomePageRandomAlbumsItemWrapperHidden {
+	display:                   none;
+}
+
 #welcomePageRandomAlbumsTable a {
   text-decoration:           none;
 }
@@ -215,74 +245,141 @@ img {
 }
 
 .welcomePageRandomAlbumsItemTitle {
+  width:                     15em;
 	margin-top:                0.5em;
 	color:                     #000000;
 }
+
+
+
+
+
+
+
+a.albumListItem {
+float:left;
+text-decoration:none;
+margin:10px 4px;
+width:174px;
+}
+
+.albumList a:first-child, .albumList a.firstOnRow {
+margin-left:0em;
+}
+
+.albumList a.lastOnRow {
+margin-right:0em;
+}
+
+.albumListItemTitle {
+font-size:1em;
+text-align:center;
+word-wrap:break-word;
+}
+
+.albumListItemImage {
+display:block;
+width:172px;
+height:172px;
+border:1px solid #eeeeee;
+}
+
+.clear {
+clear:both;
+}
+
+
+
+
+
+
+
 
 #formErrorList {
 	padding:                   0.5em 1em;
 	margin-bottom:             2em;
 }
 
-#formErrorList td {
+#welcomePageMainContent #twitter-buttons {
+	margin-top:                1em;
+}
+
+#welcomePageMainContent #twitter-tweets {
+  margin-top:                6em;
+  margin-bottom:             3em;
+}
+
+#welcomePageUsageNotice {
+	margin-top:                2em;
+	text-align:                center;
+}
+
+#welcomePageUsageNotice #firstLine {
+  font-size:                 120%;
+  font-weight:               bold;
+  margin-bottom:             0.3em;
+  color:                     #cc11dd;  
+}
+
+#welcomePageUsageNotice #secondLine {
+  font-size:                 110%;
+  color:                     #333333;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.commonFormErrorList {
+	padding:                   0.5em 1em;
+	margin-bottom:             2em;
+}
+
+.commonFormErrorList td {
 	vertical-align:            top;
 }
 
-#formErrorList td li {
+.commonFormErrorList td li {
   margin-left:               2em;
 }
 
-#formErrorList .ui-icon {
+.commonFormErrorList .ui-icon {
   margin-right:              0.5em;
 }
 
-#formErrorList .errorMessage {
+.commonFormErrorList .errorMessage {
   display:                   inline-block;
   margin-top:                0.1em;
 }
 
-
-
-
-
-
-
-
-
-
-#frmLogin fieldset {
-	border:                    none;
-}
-
-#frmLogin label {
-  display:                   inline-block;
-  width:                     8em;
-}
-
-#frmLogin #txtLoginPassword {
-  margin-top:                0.5em;
-  margin-bottom:             1em;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#frmRegister fieldset {
-	margin-bottom:             2em;
+.commonForm fieldset {
+  margin-bottom:             2em;
   padding:                   0em 1em 1em 1em;
 }
 
-#frmRegister .formSectionTitle {
+.commonForm .formSectionTitle {
   padding:                   0.5em;
   background-color:          #777777;
   font-size:                 120%;
@@ -290,58 +387,88 @@ img {
   color:                     #efefef;
 }
 
-#frmRegister td {
-  vertical-align:            top;
-  horizontal-align:          left;
-}
-
-#frmRegister fieldset {
+.commonForm fieldset {
   border:                    none;
 }
 
-#frmRegister label {
+.commonForm label {
   display:                   inline-block;
   width:                     13em;
 }
 
-#frmRegister .requiredLabel {
-	font-weight:               bold;
+.commonForm textarea {
+  width:                     50em;
+  min-width:                 10em;
+  max-width:                 60em;
+  min-height:                3em;
+} 
+
+.commonForm .requiredLabel {
+  font-weight:               bold;
 }
 
-#frmRegister .requiredLabel .ui-icon {
+.commonForm .requiredLabel .ui-icon {
   display:                   inline-block;
   position:                  absolute;
   margin:                    -0.2em 0em 0em 0.4em;
 }
 
-#frmRegister .infoRow {
-	margin-top:                1em;
-	font-size:                 110%;
-	line-height:               1.5em;
-}
-
-#frmRegister .fieldRow {
+.commonForm .infoRow {
   margin-top:                1em;
+  font-size:                 110%;
+  line-height:               1.5em;
 }
 
-#frmRegister .fieldRow ul {
+.commonForm .fieldRow {
+	margin-top:                1em;
+  vertical-align:            top;
+}
+
+.commonForm .fieldRow label {
+  float:                     left;
+}
+
+.commonForm .fieldRow ul {
   display:                   inline;  
 }
 
-#frmRegister .fieldRow li {
+.commonForm .fieldRow li {
   display:                   inline-block;
   width:                     5em;
 }
 
-#frmRegister .helpRow {
-	margin-top:                0.2em;
-	padding-left:              13em;
-	color:                     #888888;
+.commonForm .helpRow {
+  margin-top:                0.2em;
+  padding-left:              13em;
+  color:                     #888888;
 }
 
-#frmRegister .errorRow {
+.commonForm .errorRow {
   margin:                    0.5em 0em 2em 13em;
 }
+
+.commonForm .errorMessage {
+  color:                     #dd0000;
+  font-weight:               bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #frmRegister #errorRowHomePhone {
   margin:                    0.5em 0em 0em 13em;
@@ -349,11 +476,6 @@ img {
 
 #frmRegister #errorRowServiceConditions {
   margin-top:                0.5em;
-}
-
-#frmRegister .errorMessage {
-  color:                     #dd0000;
-  font-weight:               bold;
 }
 
 #frmRegister #id_txtHomePhone {
@@ -371,6 +493,85 @@ img {
 	margin-top:                2em;
 	width:                     12em;
 }
+
+
+
+
+
+
+
+#frmCreateAlbum #id_chkPublicAlbum {
+  float:                     none;
+  margin-left:               10.4em;
+}
+
+#frmCreateAlbum #lblPublicAlbum {
+  float:                     none;
+  position:                  absolute;
+  margin:                    0em 0em 0em 0.8em;
+}
+
+#frmCreateAlbum #id_cmdCreateAlbum {
+  margin-top:                2em;
+  margin-left:               10.3em;
+  width:                     12em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#frmLogin {
+	width:                     45em;
+}
+
+#frmLogin #id_txtLoginUserName,
+#frmLogin #id_txtLoginPassword {
+  width:                     25em;
+}
+
+#frmLogin label {
+  width:                     10em;
+}
+
+#frmLogin .helpRow {
+  margin-top:                0.2em;
+  padding-left:              13em;
+  color:                     #888888;
+}
+
+#frmLogin .errorRow {
+  margin:                    0.5em 0em 2em 10em;
+}
+
+#frmLogin #id_cmdLogIn {
+  margin-top:                1em;
+  margin-left:               9.1em;
+  width:                     12em;
+}
+
+
+
+
+
+
+
+
 
 
 

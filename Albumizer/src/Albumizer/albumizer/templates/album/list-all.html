@@ -1,4 +1,4 @@
-{% extends "base-template.html" %}
+{% extends "album/album-list.html" %}
 
 
 
@@ -6,8 +6,15 @@
 
 
 
-{% block page_content %}
+{% block page_heading %}
 
-  <h1>Album List</h1>
+<h1>Album List</h1>
+
+{% endblock %}
+
+
+{% block no_albums %}
+
+<p>There are no public albums yet.</p>
 
 {% endblock %}

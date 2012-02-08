@@ -1,4 +1,4 @@
-{% extends "base-template.html" %}
+{% extends "album/album-list.html" %}
 
 
 
@@ -6,8 +6,14 @@
 
 
 
-{% block page_content %}
+{% block page_heading %}
 
-  <h1>Personal Profile</h1>
+<h1>Personal Profile</h1>
+
+{% endblock %}
+
+{% block no_albums %}
+
+<p>You haven't created any albums yet.</p>
 
 {% endblock %}

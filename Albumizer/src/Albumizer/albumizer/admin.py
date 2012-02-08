@@ -8,7 +8,7 @@ from models import UserProfile, Album, Page, PageContent, Country, State, Addres
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'gender', 'serviceConditionsAccepted')
+    list_display = ('user', 'gender', 'homePhone', 'serviceConditionsAccepted')
     list_filter = ('gender', 'serviceConditionsAccepted')
     search_fields = ('user__username', 'user__first_name', 'user__last_name')
     date_hierarchy = 'serviceConditionsAccepted'
@@ -17,9 +17,10 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 class AlbumAdmin(admin.ModelAdmin):
-    list_display = ('title', 'owning_customer', 'isPublic', 'description')
+    list_display = ('title', 'owning_customer', 'creationDate', 'isPublic', 'description')
     list_filter = ('isPublic',)
-    search_fields = ('title', 'owner__djangoUserId', 'description')
+    search_fields = ('title', 'owner__username', 'owner__first_name', 'owner__last_name', 'description')
+    date_hierarchy = 'creationDate'
 
     def owning_customer(self, obj):
         return obj.owner
@@ -69,7 +70,7 @@ class AddressAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('orderer', 'purchaseDate', 'status')
     list_filter = ('status',)
-    search_fields = ('customer__djangoUserId',)
+    search_fields = ('customer__username',)
     date_hierarchy = 'purchaseDate'
 
 
