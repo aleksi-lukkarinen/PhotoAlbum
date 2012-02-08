@@ -14,7 +14,7 @@ body {
 
 #pageContainer {
   margin:                    0em auto;
-  width:                     90em;
+  width:                     902px;
   background:                #ffffff;
 }
 
@@ -144,7 +144,7 @@ img {
 }
 
 #welcomePageMainContent.hasWidth {
-  width:                     68em;
+  width:                     63em;
 }
 
 .welcomePageIntroductionTabHeading {
