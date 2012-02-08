@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+﻿# This Python file uses the following encoding: utf-8
 
 import json
 import Albumizer.settings
@@ -17,7 +17,6 @@ def json_serialization_handler(object_to_serialize):
     else:
         raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % \
                                 (type(object_to_serialize), repr(object_to_serialize))
-
 
 def serialize_into_json(object_to_serialize):
     """ 
@@ -53,6 +52,7 @@ class UserProfile(models.Model):
         blank = True,
         verbose_name = u"home phone",
         help_text = u"e.g. \"+358 44 123 4567\" (max. 20 characters)"
+
     )
 
     def __unicode__(self):
@@ -120,13 +120,15 @@ class Album(models.Model):
     isPublic = models.BooleanField(
         verbose_name = u"is public",
         help_text = u"If album is declared as a public one, it will be visible for everybody to browse"
-    )
+
     creationDate = models.DateTimeField(
         auto_now_add = True,
         blank = True,
         null = True,
         verbose_name = u"creation date"
     )
+
+    _randomizer = Random()
 
     _randomizer = Random()
 

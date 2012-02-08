@@ -1,6 +1,4 @@
-# This Python file uses the following encoding: utf-8
-
-from datetime import datetime
+﻿# This Python file uses the following encoding: utf-8
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -8,12 +6,13 @@ from django.core import serializers
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.utils import simplejson as json 
+from Albumizer.albumizer import facebook_api
 from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State, FacebookProfile
 from forms import AlbumCreationForm, LoginForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
      HttpResponseForbidden, HttpResponseNotFound, HttpResponse
-from django.utils import simplejson as json 
-from Albumizer.albumizer import facebook_api
+from datetime import datetime
 
 
 
@@ -34,8 +33,6 @@ def dispatch_by_method(request, *args, **kwargs):
         return post_view(request, *args, **kwargs)
     else:
         return HttpResponseNotFound()
-
-
 
 
 def return_json(content):
@@ -163,9 +160,6 @@ def add_album_to_shopping_cart(request):
     """ Allows user to add items into his/her shopping cart """
     if request.method != "POST":
         return HttpResponseNotFound()
-
-
-
 
 
 

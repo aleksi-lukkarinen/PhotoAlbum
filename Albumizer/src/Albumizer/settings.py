@@ -17,13 +17,14 @@ SIMPLE_PAYMENT_SERVICE_SELLER_ID = "wsdTLAs2012"
 SIMPLE_PAYMENT_SERVICE_SECRET = "a76562ae5654109c5c349d45a6e24d16"
 
 
-AUTH_PROFILE_MODULE = "albumizer.UserProfile"
 AUTHENTICATION_BACKENDS = (
     #basic username-password authentication backend
     'django.contrib.auth.backends.ModelBackend',
     #facebook authentication backend
     'albumizer.facebook_backend.FacebookBackend',
 )
+
+AUTH_PROFILE_MODULE = "albumizer.UserProfile"
 
 # for the Django debug toolbar
 INTERNAL_IPS = ('127.0.0.1',)

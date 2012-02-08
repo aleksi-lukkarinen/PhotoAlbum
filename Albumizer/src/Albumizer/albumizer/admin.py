@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+﻿# This Python file uses the following encoding: utf-8
 
 from django.contrib import admin
 from django.contrib.auth.models import User

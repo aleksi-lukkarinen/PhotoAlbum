@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 
 <!DOCTYPE html>
 
@@ -11,7 +11,6 @@
     
     <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
-
     {% if debug %}
       <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
       <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.js"></script>
@@ -21,7 +20,6 @@
     {% endif %}
   
     <script type="text/javascript" src="{% get_static_prefix %}scripts/utils.js"></script>
-  
     <script type="text/javascript">
     //<![CDATA[
 	    {% block page_scripts_before %}
