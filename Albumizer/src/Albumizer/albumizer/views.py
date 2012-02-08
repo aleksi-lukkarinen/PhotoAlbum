@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
@@ -69,6 +70,20 @@ def welcome_page(request):
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not) """
     albums = Album.objects.filter(isPublic = True).order_by('title')
+
+    paginator = Paginator(albums, 20) # Show 20 albums per page
+
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+      page = int(request.GET.get('page', '1'))
+    except ValueError:
+      page = 1
+
+    # If page request (9999) is out of range, deliver last page of results.
+    try:
+      albums = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+      albums = paginator.page(paginator.num_pages)
 
     template_parameters = {'albums': albums, 'is_album_list_page': True}
     return render_to_response('album/list-all.html', RequestContext(request, template_parameters))
@@ -259,6 +274,20 @@ def log_out(request):
 def show_profile(request):
     """ Shows user his/her profile page """
     albums = Album.objects.filter(owner=request.user).order_by('title')
+
+    paginator = Paginator(albums, 10) # Show 10 albums per page
+
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+      page = int(request.GET.get('page', '1'))
+    except ValueError:
+      page = 1
+
+    # If page request (9999) is out of range, deliver last page of results.
+    try:
+      albums = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+      albums = paginator.page(paginator.num_pages)
 
     template_parameters = {'albums': albums}
     return render_to_response('accounts/profile.html', RequestContext(request, template_parameters))
