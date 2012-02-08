@@ -8,9 +8,9 @@ from models import UserProfile, Album, Page, PageContent, Country, State, Addres
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'facebookID', 'gender', 'serviceConditionsAccepted')
+    list_display = ('user', 'gender', 'serviceConditionsAccepted')
     list_filter = ('gender', 'serviceConditionsAccepted')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'facebookID')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name')
     date_hierarchy = 'serviceConditionsAccepted'
 
 

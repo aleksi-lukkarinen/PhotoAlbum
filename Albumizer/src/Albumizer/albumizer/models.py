@@ -4,9 +4,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 
-
-
-
 class UserProfile(models.Model):
     """ Represents additional information about a single user. """
 
@@ -30,11 +27,6 @@ class UserProfile(models.Model):
         verbose_name = "home phone",
         help_text = "e.g. \"+358 44 123 4567\" (max. 20 characters)"
     )
-    facebookID = models.CharField(
-        max_length = 255,
-        blank = True,
-        verbose_name = "Facebook id"
-    )
 
     def __unicode__(self):
         return "%s %s (%s)" % (self.user.first_name, self.user.last_name, self.user.username)
@@ -43,7 +35,6 @@ class UserProfile(models.Model):
         ordering = ["user"]
         verbose_name = "user profile"
         verbose_name_plural = "user profiles"
-
 
 def create_user_profile(sender, instance, created, **kwargs):
     """
@@ -55,9 +46,37 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_user_profile, sender = User)
 
-
-
-
+class FacebookProfile(models.Model):
+    userProfile=models.OneToOneField(
+        UserProfile,
+        related_name="facebookProfile"
+    )
+    
+    facebookID = models.BigIntegerField(
+        unique=True,
+        verbose_name = "Facebook id"
+    )
+    
+    token= models.TextField(
+        blank=True,
+        verbose_name="Facebook authentication token"
+    )
+    
+    profileUrl=models.URLField(
+        blank=True
+    )
+    
+    lastQueryTime=models.DateTimeField(
+        null=True
+    )
+    rawResponse=models.TextField(
+        blank=True,
+        verbose_name="raw response from facebook"
+    )
+    
+    def __unicode__(self):
+        return self.userProfile.__unicode__()
+    
 class Album(models.Model):
     """ Represents a single album. """
     owner = models.ForeignKey(User)

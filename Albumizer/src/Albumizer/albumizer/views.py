@@ -1,16 +1,16 @@
 # This Python file uses the following encoding: utf-8
 
-import datetime
+from datetime import datetime
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
+from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State,FacebookProfile
 from forms import RegistrationForm
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, HttpResponseForbidden
-
-
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, HttpResponseForbidden, HttpResponse
+from django.utils import simplejson as json 
+from Albumizer.albumizer import facebook_api
 
 
 def welcome_page(request):
@@ -150,7 +150,109 @@ def log_out(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
 
-
+def validateFbToken(request, fbProfile, aToken):
+    """ connects facebook to validate token
+    userprofile is updated with values from facebook
+    """
+    response=facebook_api.getGraph(request, aToken)
+    fbProfile.rawResponse=response;
+    fbProfile.token=aToken
+    fbProfile.lastQueryTime=datetime.now()
+    fbProfile.save()
+    data=json.loads(response)
+    
+    #sanity check
+    if data["id"]<>str(fbProfile.facebookID):
+        raise (RuntimeError, 
+               "response has data for some other facebook id than expected({0}<>{1})".format(data["id"], fbProfile.facebookID)
+       )
+                                                                                             
+    
+    #then collect data
+    for key, value in data.iteritems():
+        if key=="first_name":
+            fbProfile.userProfile.user.first_name=value
+        elif key=="last_name":
+            fbProfile.userProfile.user.last_name=value
+        elif key=="link":
+            fbProfile.profileUrl=value
+        elif key=="email":
+            fbProfile.userProfile.user.email=value
+        elif key=="gender":
+            if value=="male":        
+                fbProfile.userProfile.gender="M"
+            elif value=="female":
+                fbProfile.userProfile.gender="F"
+    fbProfile.userProfile.user.save()
+    fbProfile.userProfile.save()
+    fbProfile.save()
+    
+def checkfb(request,aToken, userid):
+    """ Validates the authentication token, logs in the user.
+        Return value is an empty string when authentication is successful.
+        If authentication fails, the reason is returned in plain text.
+        Some rare error situations will generate exceptions.
+        """
+    fbProfile=None
+    
+    #if user is already authenticated, just update the token
+    if request.user.is_authenticated():
+        #TODO handle a situation where user is authenticated with some the username+password-backend
+        fbProfile=request.user.get_profile().facebookProfile
+        if fbProfile.token==aToken:
+            return ""
+        validateFbToken(request, fbProfile, aToken)
+    else:
+        #check if user exists (using the facebook authentication backend        
+        user=auth.authenticate(facebookID=userid)
+    
+        #create user if not yet found
+        if user is None:
+            fbProfile= FacebookProfile(facebookID=userid)
+            #create new user
+            fbusername="facebook_"+userid
+            
+            #check if user has already been created but lacks a link to facebookprofile (invalid data but let's fix it)
+            query=User.objects.filter(username=fbusername)        
+            userProf=None
+            if query.exists():
+                new_user=query[0]
+                userProf=new_user.get_profile()
+            else:
+                new_user = User.objects.create_user(fbusername, "", "")    
+                userProf = new_user.get_profile()
+            fbProfile.userProfile=userProf
+            #validate token before creating the user
+            validateFbToken(request, fbProfile, aToken)
+            user=auth.authenticate(facebookID=userid)
+            if user is None:
+                raise RuntimeError(value="facebook profile created, but authentication still failed")
+        else:
+            fbProfile=user.get_profile().facebookProfile
+            validateFbToken(request, fbProfile, aToken)
+            #we need to get the user again because validateFbToken saves through fbProfile and the user object here is 
+            #not same object as the one found through fbProfile.userProfile.user 
+            user=auth.authenticate(facebookID=userid)
+            if user is None:
+                raise RuntimeError(value="facebook profile created, but authentication still failed")
+        #user found and authenticated, let's login    
+        auth.login(request,user)
+    
+    return ""
+    
+def facebook_login(request):
+    #for testing purposes, you can check the urlpattern is working by entering the correct url to browser
+    if request.method=="GET" :
+        return HttpResponse("<div>You made a get request. Hooray!</div>")
+                            
+    aToken=request.POST.get("accessToken", "")
+    userid=request.POST.get("userID","");
+        
+    reason=checkfb(request,aToken,userid)
+        
+    responsedata={"success": len(reason)==0, "reason":reason}
+    return HttpResponse(json.dumps(responsedata), mimetype="application/json");
+    
 
 
 @login_required

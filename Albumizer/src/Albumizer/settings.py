@@ -17,11 +17,14 @@ SIMPLE_PAYMENT_SERVICE_SELLER_ID = "wsdTLAs2012"
 SIMPLE_PAYMENT_SERVICE_SECRET = "a76562ae5654109c5c349d45a6e24d16"
 
 
-FACEBOOK_APPID = ""
 
-
-AUTH_PROFILE_MODULE = "albumizer.models.UserProfile"
-
+AUTH_PROFILE_MODULE = "albumizer.UserProfile"
+AUTHENTICATION_BACKENDS = (
+    #basic username-password authentication backend
+    'django.contrib.auth.backends.ModelBackend',
+    #facebook authentication backend
+    'albumizer.facebook_backend.FacebookBackend',
+)
 
 # for the Django debug toolbar
 INTERNAL_IPS = ('127.0.0.1',)
@@ -124,6 +127,14 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+
+TEMPLATE_CONTEXT_PROCESSORS =(
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.static',
+    #context process for providing facebook app id to templates
+    'Albumizer.context_processors.facebook_app_id',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -189,3 +200,6 @@ elif workstation_owner == 'tomas':
     from settings_tomas import *
 elif workstation_owner == 'lauri':
     from settings_lauri import *
+    
+from settings_facebook import *
+

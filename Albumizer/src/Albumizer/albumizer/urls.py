@@ -19,6 +19,7 @@ urlpatterns = patterns('albumizer.views',
     (r'^accounts/profile/$', 'show_profile'),
     (r'^accounts/information/$', 'edit_account_information'),
     (r'^accounts/register/$', 'get_registration_information'),
+    (r'^accounts/facebooklogin$','facebook_login'),
 
     (r'^cart/$', 'edit_shopping_cart'),
 
