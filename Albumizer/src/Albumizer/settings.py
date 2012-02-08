@@ -76,6 +76,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # "django.core.context_processors.i18n",
     "django.core.context_processors.request",
     "Albumizer.albumizer.context_processors.common_variables",
+    'Albumizer.albumizer.context_processors.facebook_app_id',
 )
 
 
@@ -136,13 +137,6 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
-
-TEMPLATE_CONTEXT_PROCESSORS =(
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.static',
-    #context process for providing facebook app id to templates
-    'Albumizer.context_processors.facebook_app_id',
-)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',

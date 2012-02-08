@@ -120,7 +120,8 @@ class Album(models.Model):
     isPublic = models.BooleanField(
         verbose_name = u"is public",
         help_text = u"If album is declared as a public one, it will be visible for everybody to browse"
-
+    )
+    
     creationDate = models.DateTimeField(
         auto_now_add = True,
         blank = True,

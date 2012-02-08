@@ -15,18 +15,9 @@ class Migration(SchemaMigration):
             ('gender', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('serviceConditionsAccepted', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('homePhone', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
+            ('facebookID', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
         ))
         db.send_create_signal('albumizer', ['UserProfile'])
-
-        # Adding model 'FacebookProfile'
-        db.create_table('albumizer_facebookprofile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('userProfile', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['albumizer.UserProfile'], unique=True)),
-            ('facebookID', self.gf('django.db.models.fields.BigIntegerField')(unique=True)),
-            ('token', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('profileUrl', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
-        ))
-        db.send_create_signal('albumizer', ['FacebookProfile'])
 
         # Adding model 'Album'
         db.create_table('albumizer_album', (
@@ -138,9 +129,6 @@ class Migration(SchemaMigration):
         # Deleting model 'UserProfile'
         db.delete_table('albumizer_userprofile')
 
-        # Deleting model 'FacebookProfile'
-        db.delete_table('albumizer_facebookprofile')
-
         # Deleting model 'Album'
         db.delete_table('albumizer_album')
 
@@ -191,14 +179,6 @@ class Migration(SchemaMigration):
             'code': ('django.db.models.fields.CharField', [], {'max_length': '10', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'})
         },
-        'albumizer.facebookprofile': {
-            'Meta': {'object_name': 'FacebookProfile'},
-            'facebookID': ('django.db.models.fields.BigIntegerField', [], {'unique': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'profileUrl': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
-            'token': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'userProfile': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['albumizer.UserProfile']", 'unique': 'True'})
-        },
         'albumizer.order': {
             'Meta': {'ordering': "['orderer', 'purchaseDate', 'status']", 'unique_together': "(('orderer', 'purchaseDate'),)", 'object_name': 'Order'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -235,6 +215,7 @@ class Migration(SchemaMigration):
         },
         'albumizer.userprofile': {
             'Meta': {'ordering': "['user']", 'object_name': 'UserProfile'},
+            'facebookID': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'homePhone': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
