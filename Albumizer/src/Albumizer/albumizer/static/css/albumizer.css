@@ -259,8 +259,8 @@ img {
 a.albumListItem {
 float:left;
 text-decoration:none;
-margin:0.5em 1.125em;
-width:16.2em;
+margin:10px 4px;
+width:174px;
 }
 
 .albumList a:first-child, .albumList a.firstOnRow {
@@ -279,9 +279,9 @@ word-wrap:break-word;
 
 .albumListItemImage {
 display:block;
-width:16em;
-height:16em;
-border:0.1em solid #eeeeee;
+width:172px;
+height:172px;
+border:1px solid #eeeeee;
 }
 
 .clear {
