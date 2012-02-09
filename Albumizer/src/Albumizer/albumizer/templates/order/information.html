@@ -10,4 +10,11 @@
 
   <h1>Ordering Information</h1>
 
+  <form name="frmOrderInformation" method="post" action="/order/accept/">
+    {% csrf_token %}
+    <input type="submit" value="Show Summary">  
+  </form>
+  
+
+
 {% endblock %}

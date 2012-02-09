@@ -1,9 +1,11 @@
 # This Python file uses the following encoding: utf-8
 
+import md5
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core import serializers
+from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -37,7 +39,7 @@ def dispatch_by_method(request, *args, **kwargs):
 
 
 def return_json(content):
-    """ A shortcut function for returning a json string as a response from view functions """
+    """ A shortcut function for returning a json string as a response from view functions. """
     response = HttpResponse()
     response["Content-Type"] = "text/javascript"
     response["Cache-Control"] = "no-cache"
@@ -49,7 +51,7 @@ def return_json(content):
 
 
 def welcome_page(request):
-    """ The first view of this application """
+    """ The first view of this application. """
     random_albums = Album.get_pseudo_random_public(8)
     if len(random_albums) < 3:
         random_albums = None
@@ -68,7 +70,7 @@ def welcome_page(request):
 
 
 def list_all_visible_albums(request):
-    """ Lists all albums visible to the current user (logged in or not) """
+    """ Lists all albums visible to the current user (logged in or not). """
     albums = Album.objects.filter(isPublic = True).order_by('title')
 
     paginator = Paginator(albums, 20) # Show 20 albums per page
@@ -92,7 +94,7 @@ def list_all_visible_albums(request):
 
 
 def show_single_album(request, album_id):
-    """ Allows user to browse a single album """
+    """ Allows user to browse a single album. """
     album_resultset = Album.objects.filter(id__exact = album_id)
     if not album_resultset:
         return render_to_response('album/not-found.html', RequestContext(request))
@@ -108,7 +110,7 @@ def show_single_album(request, album_id):
 
 @login_required
 def create_album_GET(request):
-    """ Displays a form which allows user to create new photo albums """
+    """ Displays a form which allows user to create new photo albums. """
     assert request.method == "GET"
     form = AlbumCreationForm(request)
     return render_to_response("album/create.html",
@@ -116,7 +118,7 @@ def create_album_GET(request):
 
 @login_required
 def create_album_POST(request):
-    """ Creates a new photo album and redirects to its view """
+    """ Creates a new photo album and redirects to its view. """
     assert request.method == "POST"
     form = AlbumCreationForm(request, request.POST)
     if not form.is_valid():
@@ -142,7 +144,7 @@ def create_album_POST(request):
 
 @login_required
 def edit_album(request, album_id):
-    """ Allows user to edit a single album """
+    """ Allows user to edit a single album. """
     album_resultset = Album.objects.filter(id__exact = album_id)
     if not album_resultset:
         return render_to_response('album/not-found.html', RequestContext(request))
@@ -158,7 +160,7 @@ def edit_album(request, album_id):
 
 @login_required
 def add_album_to_shopping_cart(request):
-    """ Allows user to add items into his/her shopping cart """
+    """ Allows user to add items into his/her shopping cart. """
     if request.method != "POST":
         return HttpResponseNotFound()
 
@@ -168,7 +170,7 @@ def add_album_to_shopping_cart(request):
 
 
 def get_registration_information_GET(request):
-    """ Displays a form which allows user to register himself/herself into this service """
+    """ Displays a form which allows user to register himself/herself into this service. """
     assert request.method == "GET"
     template_parameters = {
         "is_registration_page": True,
@@ -178,7 +180,7 @@ def get_registration_information_GET(request):
                               RequestContext(request, template_parameters))
 
 def get_registration_information_POST(request):
-    """ Register an user to this service and redirects him/her to his/her profile """
+    """ Register an user to this service and redirects him/her to his/her profile. """
     assert request.method == "POST"
     form = RegistrationForm(request.POST)
     if not form.is_valid():
@@ -230,7 +232,7 @@ def get_registration_information_POST(request):
 
 
 def log_in_GET(request):
-    """ Displays a form which allows user to log in """
+    """ Displays a form which allows user to log in. """
     form = LoginForm()
     next_url = request.GET.get("next")
     template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
@@ -238,7 +240,7 @@ def log_in_GET(request):
 
 
 def log_in_POST(request):
-    """ Logs an user in to the service and redirects him/her to his/her profile page """
+    """ Logs an user in to the service and redirects him/her to his/her profile page. """
     form = LoginForm(request.POST)
     if not form.is_valid():
         next_url = request.POST.get("nextURL")
@@ -263,7 +265,7 @@ def log_in_POST(request):
 
 
 def log_out(request):
-    """ Allows user to log out """
+    """ Allows user to log out. """
     auth.logout(request)
     return HttpResponseRedirect("/")
 
@@ -272,8 +274,8 @@ def log_out(request):
 
 @login_required
 def show_profile(request):
-    """ Shows user his/her profile page """
-    albums = Album.objects.filter(owner=request.user).order_by('title')
+    """ Shows user his/her profile page. """
+    albums = Album.objects.filter(owner = request.user).order_by('title')
 
     paginator = Paginator(albums, 10) # Show 10 albums per page
 
@@ -313,46 +315,129 @@ def edit_shopping_cart(request):
 
 @login_required
 def get_ordering_information(request):
-    """ 
-        Lets user to enter non-product-related information required
-        for making an order, and finally accept the order
-    """
-    return render_to_response('order/information.html', RequestContext(request))
+    """ Lets user to enter non-product-related information required for making an order. """
+    template_parameters = {}
+    return render_to_response('order/information.html', RequestContext(request, template_parameters))
 
 
 
 
 @login_required
-def report_order_as_succesful(request):
-    """ Acknowledges user about a successful order """
-    return render_to_response('order/successful.html', RequestContext(request))
+def show_order_summary(request):
+    """ Shows user a summary about his/her order and lets him/her to finally place the order. """
+    template_parameters = {}
+    return render_to_response('order/summary.html', RequestContext(request, template_parameters))
+
+
+
+
+@login_required
+def report_order_as_successful(request):
+    """
+        Actually creates an order based on the content of user's shopping cart and
+        acknowledges user about the fact. After this, the shopping cart will be empty.
+        User will be asked to pay the order via the Simple Payments service by clicking
+        a link leading to the service.
+    """
+    sps_address = settings.SIMPLE_PAYMENT_SERVICE_ADDRESS
+    sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
+    sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
+
+    our_protocol = "http"
+    our_domain = Site.objects.get_current().domain
+
+    our_url_start = "%s://%s/%s" % (our_protocol, our_domain, settings.URL_SPS_PAYMENT_BEGINNING)
+    sps_success_url = our_url_start + settings.URL_SPS_PAYMENT_ENDING_SUCCESSFUL
+    sps_cancel_url = our_url_start + settings.URL_SPS_PAYMENT_ENDING_CANCELED
+    sps_error_url = our_url_start + settings.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
+
+    sps_payment_id = 3
+    amount = 4
+
+    checksum_source = "pid=%s&sid=%s&amount=%s&token=%s" % (sps_payment_id, sps_seller_id, amount, sps_secret)
+    checksum = md5.new(checksum_source).hexdigest()
+
+    template_parameters = {
+        "sps_address": sps_address,
+        "sps_seller_id": sps_seller_id,
+        "sps_payment_id": sps_payment_id,
+        "sps_amount": amount,
+        "sps_checksum": checksum,
+        "sps_success_url": sps_success_url,
+        "sps_cancel_url": sps_cancel_url,
+        "sps_error_url": sps_error_url
+    }
+    return render_to_response('order/successful.html', RequestContext(request, template_parameters))
+
+
+
+
+VALID_SPS_PAYMENT_STATUSES = [
+    settings.URL_SPS_PAYMENT_ENDING_SUCCESSFUL,
+    settings.URL_SPS_PAYMENT_ENDING_CANCELED,
+    settings.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
+]
+
+@login_required
+def report_sps_payment_status(request, status):
+    """
+        Verifies correctness of the payment details the Simple Payments service
+        sent. If everything is ok, the payment is registered as done and the user 
+        is acknowledged about success of the payment.
+    """
+    if request.method != "GET" or not status in VALID_SPS_PAYMENT_STATUSES:
+        return HttpResponseBadRequest()
+
+    payment_id = request.GET.get("pid")
+    reference = request.GET.get("ref")
+    sps_checksum = request.GET.get("checksum")
+    if not payment_id or not reference or not sps_checksum:
+        return HttpResponseBadRequest()
+
+    sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
+    our_checksum_source = "pid=%s&ref=%s&token=%s" % (payment_id, reference, sps_secret)
+    our_checksum = md5.new(our_checksum_source).hexdigest()
+    if our_checksum != sps_checksum:
+        return HttpResponseBadRequest()
+
+    order_qs = Order.objects.filter(id__exact = payment_id)
+    if not order_qs:
+        return HttpResponseServerError()
+    order = order_qs[0]
+
+    template_parameters = {
+        "order": order,
+        "payment_id": payment_id
+    }
+    return render_to_response('payment/sps/' + status + '.html',
+                              RequestContext(request, template_parameters))
 
 
 
 
 def api_json_get_latest_albums(request, how_many):
-    """ Returns a json representation of data of the latest publicly visible albums """
+    """ Returns a json representation of data of the latest publicly visible albums. """
     return return_json(Album.get_latest_public_as_json(int(how_many)))
 
 
 
 
 def api_json_get_random_albums(request, how_many):
-    """ Returns a json representation of data of random publicly visible albums """
+    """ Returns a json representation of data of random publicly visible albums. """
     return return_json(Album.get_pseudo_random_public_as_json(int(how_many)))
 
 
 
 
 def api_json_get_album_count(request):
-    """ Returns the number of albums currently registered """
+    """ Returns the number of albums currently registered. """
     return return_json(Album.objects.count())
 
 
 
 
 def api_json_get_user_count(request):
-    """ Returns the number of users currently registered """
+    """ Returns the number of users currently registered. """
     return return_json(User.objects.count())
 
 

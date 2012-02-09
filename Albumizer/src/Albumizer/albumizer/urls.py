@@ -2,8 +2,13 @@
 
 import os
 import views
+from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 from django.views.generic.simple import redirect_to
+
+
+
+
 
 
 
@@ -27,7 +32,10 @@ urlpatterns = patterns('albumizer.views',
 
     (r'^order/$', redirect_to, {'url': '/order/information/'}),
     (r'^order/information/$', 'get_ordering_information'),
-    (r'^order/successful/$', 'report_order_as_succesful'),
+    (r'^order/summary/$', 'show_order_summary'),
+    (r'^order/successful/$', 'report_order_as_successful'),
+
+    (r'^' + settings.URL_SPS_PAYMENT_BEGINNING + '(?P<status>.*)/$', 'report_sps_payment_status'),
 
     (r'^api/json/album/latest/$', redirect_to, {'url': '/api/json/album/latest/20/'}),
     (r'^api/json/album/latest/(?P<how_many>\d{1,2})/$', 'api_json_get_latest_albums'),

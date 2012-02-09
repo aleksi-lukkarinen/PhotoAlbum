@@ -1,0 +1,21 @@
+{% extends "base-template.html" %}
+
+
+
+{% block page_title %}Order Summary{% endblock %}
+
+
+
+{% block page_content %}
+
+  <h1>Order Summary</h1>
+
+  <form name="frmOrderSummary" method="post" action="/order/summary/">
+    {% csrf_token %}
+    
+    <input type="submit" value="Place Order">  
+  </form>
+  
+
+
+{% endblock %}

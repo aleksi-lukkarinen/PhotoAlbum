@@ -112,23 +112,27 @@ class Album(models.Model):
         return u"%s (%s)" % (self.title, self.owner)
 
     def is_owned_by(self, user):
-        """ Checks if this album is owner by a given user """
+        """ Checks if this album is owner by a given user. """
         return user == self.owner
 
     def is_editable_to_user(self, user):
-        """ Checks if this album is editable to a given user """
+        """ Checks if this album is editable to a given user. """
         return self.is_owned_by(user)
 
     def is_visible_to_user(self, user):
-        """ Checks if this album is visible to a given user """
+        """ Checks if this album is visible to a given user. """
         return self.isPublic or self.is_owned_by(user)
 
     def is_hidden_from_user(self, user):
-        """ Checks if this album is hidden from a given user """
+        """ Checks if this album is hidden from a given user. """
         return not self.is_visible_to_user(user)
 
+    def pages(self):
+        """ Return all pages of this album. """
+        return Page.objects.filter(album__exact = self)
+
     def as_api_dict(self):
-        """ Returns this album as an dictionary containing values wanted to be exposed in the public api """
+        """ Returns this album as an dictionary containing values wanted to be exposed in the public api. """
         return {
             "id": self.id,
             "title": self.title,
@@ -138,12 +142,12 @@ class Album(models.Model):
 
     @staticmethod
     def list_as_api_dict(album_list):
-        """ Returns a list of albums as an dictionary containing values wanted to be exposed in the public api """
+        """ Returns a list of albums as an dictionary containing values wanted to be exposed in the public api. """
         return [album.as_api_dict() for album in album_list]
 
     @staticmethod
     def get_latest_public(how_many = 20):
-        """ Returns some latest publicly visible albums """
+        """ Returns some latest publicly visible albums. """
         if how_many < 1:
             how_many = 1
         if how_many > 99:
@@ -152,12 +156,12 @@ class Album(models.Model):
 
     @classmethod
     def get_latest_public_as_json(cls, how_many = 20):
-        """ Returns some latest publicly visible albums as json """
+        """ Returns some latest publicly visible albums as json. """
         return serialize_into_json(cls.list_as_api_dict(cls.get_latest_public(how_many)))
 
     @classmethod
     def get_pseudo_random_public(cls, how_many = 4):
-        """ Returns some pseudo-random publicly visible albums """
+        """ Returns some pseudo-random publicly visible albums. """
         if how_many < 1:
             how_many = 1
         if how_many > 9:
@@ -183,7 +187,7 @@ class Album(models.Model):
 
     @classmethod
     def get_pseudo_random_public_as_json(cls, how_many = 4):
-        """ Returns some pseudo-random publicly visible albums as json """
+        """ Returns some pseudo-random publicly visible albums as json. """
         return serialize_into_json(cls.list_as_api_dict(cls.get_pseudo_random_public(how_many)))
 
     class Meta():
@@ -205,6 +209,8 @@ class Page(models.Model):
         max_length = 255,
         verbose_name = u"layout id"
     )
+
+
 
     def __unicode__(self):
         return u"%s, %s" % (self.album, self.pageNumber)
@@ -359,6 +365,10 @@ class Order(models.Model):
         verbose_name = u"purchase date"
     )
     status = models.IntegerField()
+
+    def items(self):
+        """ Return all items of this order. """
+        return OrderItem.objects.filter(order__exact = self)
 
     def __unicode__(self):
         return u"%s, %s" % (self.orderer, self.purchaseDate)
