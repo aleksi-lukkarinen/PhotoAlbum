@@ -1,0 +1,11 @@
+{% extends "base-template.html" %}
+{% block page_title %}{{ albumTitle }}{% endblock %}
+{% block page_content %}
+	<div>
+		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
+		<div style="border:1px solid black; height:400px;width:600px;">
+			{% block album_page %}
+			{% endblock %}
+		</div>
+	<div>
+{% endblock %}

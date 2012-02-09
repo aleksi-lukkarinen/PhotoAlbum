@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+﻿# This Python file uses the following encoding: utf-8
 
 import json
 import Albumizer.settings
@@ -17,7 +17,6 @@ def json_serialization_handler(object_to_serialize):
     else:
         raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % \
                                 (type(object_to_serialize), repr(object_to_serialize))
-
 
 def serialize_into_json(object_to_serialize):
     """ 
@@ -53,11 +52,7 @@ class UserProfile(models.Model):
         blank = True,
         verbose_name = u"home phone",
         help_text = u"e.g. \"+358 44 123 4567\" (max. 20 characters)"
-    )
-    facebookID = models.CharField(
-        max_length = 255,
-        blank = True,
-        verbose_name = u"Facebook id"
+
     )
 
     def __unicode__(self):
@@ -67,7 +62,6 @@ class UserProfile(models.Model):
         ordering = ["user"]
         verbose_name = u"user profile"
         verbose_name_plural = u"user profiles"
-
 
 def create_user_profile(sender, instance, created, **kwargs):
     """
@@ -80,6 +74,41 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_user_profile, sender = User, dispatch_uid = "albumizer-models-profile-creation")
 
+
+
+
+class FacebookProfile(models.Model):
+    userProfile = models.OneToOneField(
+        UserProfile,
+        related_name = "facebookProfile"
+    )
+    facebookID = models.BigIntegerField(
+        unique = True,
+        verbose_name = "Facebook id"
+    )
+    token = models.TextField(
+        blank = True,
+        verbose_name = "Facebook authentication token"
+    )
+    profileUrl = models.URLField(
+        blank = True
+    )
+
+    lastQueryTime = models.DateTimeField(
+        null = True
+    )
+    rawResponse = models.TextField(
+        blank = True,
+        verbose_name = "raw response from facebook"
+    )
+
+    def __unicode__(self):
+        return self.userProfile.__unicode__()
+
+    class Meta():
+        ordering = ["userProfile"]
+        verbose_name = u"Facebook profile"
+        verbose_name_plural = u"Facebook profiles"
 
 
 
@@ -99,6 +128,7 @@ class Album(models.Model):
         verbose_name = u"is public",
         help_text = u"If album is declared as a public one, it will be visible for everybody to browse"
     )
+
     creationDate = models.DateTimeField(
         auto_now_add = True,
         blank = True,

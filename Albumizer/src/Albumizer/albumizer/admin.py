@@ -1,17 +1,25 @@
-# This Python file uses the following encoding: utf-8
+﻿# This Python file uses the following encoding: utf-8
 
 from django.contrib import admin
 from django.contrib.auth.models import User
-from models import UserProfile, Album, Page, PageContent, Country, State, Address, Order, OrderItem
+from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, Address, Order, OrderItem
 
 
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'facebookID', 'gender', 'homePhone', 'serviceConditionsAccepted')
+    list_display = ('user', 'gender', 'homePhone', 'serviceConditionsAccepted')
     list_filter = ('gender', 'serviceConditionsAccepted')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'facebookID')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name')
     date_hierarchy = 'serviceConditionsAccepted'
+
+
+
+
+class FacebookProfileAdmin(admin.ModelAdmin):
+    list_display = ('userProfile', 'facebookID', 'token', 'profileUrl', 'lastQueryTime', 'rawResponse')
+    search_fields = ('facebookID', 'userProfile__user__first_name', 'userProfile__user__last_name')
+    date_hierarchy = 'lastQueryTime'
 
 
 
@@ -88,6 +96,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(FacebookProfile, FacebookProfileAdmin)
 admin.site.register(Album, AlbumAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(PageContent, PageContentAdmin)

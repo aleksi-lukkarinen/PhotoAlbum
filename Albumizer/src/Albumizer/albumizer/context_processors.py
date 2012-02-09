@@ -2,7 +2,7 @@
 
 from django.contrib.sites.models import Site
 
-
+from django.conf import settings # import the settings file
 
 
 def common_variables(request):
@@ -11,3 +11,7 @@ def common_variables(request):
     return {
         "site_domain": current_site.domain
     }
+
+def facebook_app_id(context):
+    # return the value you want as a dictionary. you may add multiple values in there.
+    return {'FACEBOOK_APP_ID': settings.FACEBOOK_APP_ID}

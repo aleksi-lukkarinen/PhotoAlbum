@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 
 <!DOCTYPE html>
 
@@ -11,7 +11,6 @@
     
     <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
-
     {% if debug %}
       <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
       <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.js"></script>
@@ -20,7 +19,9 @@
       <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.min.js"></script>
     {% endif %}
   
+    <script type="text/javascript" src="{% get_static_prefix %}scripts/utils.js"></script>
     <script type="text/javascript">
+    //<![CDATA[
 	    {% block page_scripts_before %}
 	    {% endblock %}
 
@@ -46,10 +47,64 @@
       
       {% block page_scripts_after %}
       {% endblock %}
+      //]]>
     </script>    
   </head>
 
   <body>
+
+      <div id="fb-root"></div>
+      <script type="text/javascript">
+      //<![CDATA[
+        window.fbAsyncInit = function() {
+          FB.init({
+            appId      : '{{ FACEBOOK_APP_ID }}',
+            status     : true, 
+            cookie     : true,
+            xfbml      : true,
+            oauth      : true,
+          });
+          var tokenhandler=function(response) {
+          	if(response.status=='connected' && response.authResponse) {
+          		var dialog=$("<div title='Facebook login'>Checking authentication token..</div>")
+          			.dialog({ 
+          				modal:true,
+          				resizable:false
+          		});
+          		$.post('/accounts/facebooklogin',
+          			response.authResponse)
+          		.success(function(data, textStatus, jqXHR) {
+          				if(data.success) {
+          					//alert("great success, refrehing page");
+          					window.location.href=window.location.href;
+          				} else
+          					alert("Login failed: "+data.reason);
+          			})
+          		.error(function() {
+          			alert("Internal error while validating authentication token.");
+          		})
+          		.complete(function() {
+          				dialog.dialog("close");
+          				dialog.remove();          			
+          		});
+          	}
+          };
+          {% if not user.is_authenticated %}
+          //user is not authenticated, check if the user is logged to facebook
+          //TODO: if the user logs out, this will log her on again
+          FB.getLoginStatus(tokenhandler);
+          {% endif %}
+          FB.Event.subscribe('auth.login', tokenhandler);
+          
+        };
+        (function(d){
+           var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+           js = d.createElement('script'); js.id = id; js.async = true;
+           js.src = "//connect.facebook.net/en_US/all.js";
+           d.getElementsByTagName('head')[0].appendChild(js);
+         }(document));
+      //]]>
+      </script>
     <div id="pageContainer">
 	    <div id="pageHeader">
 	      <div id="pageHeaderLeftPart">
@@ -110,7 +165,8 @@
 			    <label for="txtLoginPassword">Password</label>
 			    <input type="password" name="txtLoginPassword" id="txtLoginPassword" value="" class="text ui-widget-content" />
 			  </fieldset>
-		  </form>
+		  </form>		  
+		  <div class="fb-login-button">Login with Facebook</div>
     </div>
     {% endif %}
 	  

@@ -1,4 +1,4 @@
-# This Python file uses the following encoding: utf-8
+﻿# This Python file uses the following encoding: utf-8
 
 import os
 import views
@@ -27,7 +27,7 @@ urlpatterns = patterns('albumizer.views',
     (r'^accounts/logout/$', 'log_out'),
     (r'^accounts/profile/$', 'show_profile'),
     (r'^accounts/information/$', 'edit_account_information'),
-
+    (r'^accounts/facebooklogin$', 'facebook_login'),
     (r'^cart/$', 'edit_shopping_cart'),
 
     (r'^order/$', redirect_to, {'url': '/order/information/'}),
