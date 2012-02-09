@@ -1,6 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 import md5
+from datetime import datetime
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -15,8 +16,7 @@ from models import Address, Album, Country, UserProfile, Order, OrderItem, Page,
 from forms import AlbumCreationForm, LoginForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
      HttpResponseForbidden, HttpResponseNotFound, HttpResponse
-from datetime import datetime
-
+import url_constants
 
 
 def dispatch_by_method(request, *args, **kwargs):
@@ -440,17 +440,17 @@ def report_order_as_successful(request):
         User will be asked to pay the order via the Simple Payments service by clicking
         a link leading to the service.
     """
-    sps_address = settings.SIMPLE_PAYMENT_SERVICE_ADDRESS
+    sps_address = url_constants.URL_SIMPLE_PAYMENT_SERVICE
     sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
     sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
 
     our_protocol = "http"
     our_domain = Site.objects.get_current().domain
 
-    our_url_start = "%s://%s/%s" % (our_protocol, our_domain, settings.URL_SPS_PAYMENT_BEGINNING)
-    sps_success_url = our_url_start + settings.URL_SPS_PAYMENT_ENDING_SUCCESSFUL
-    sps_cancel_url = our_url_start + settings.URL_SPS_PAYMENT_ENDING_CANCELED
-    sps_error_url = our_url_start + settings.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
+    our_url_start = "%s://%s/%s" % (our_protocol, our_domain, url_constants.URL_SPS_PAYMENT_BEGINNING)
+    sps_success_url = our_url_start + url_constants.URL_SPS_PAYMENT_ENDING_SUCCESSFUL
+    sps_cancel_url = our_url_start + url_constants.URL_SPS_PAYMENT_ENDING_CANCELED
+    sps_error_url = our_url_start + url_constants.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
 
     sps_payment_id = 3
     amount = 4
@@ -474,9 +474,9 @@ def report_order_as_successful(request):
 
 
 VALID_SPS_PAYMENT_STATUSES = [
-    settings.URL_SPS_PAYMENT_ENDING_SUCCESSFUL,
-    settings.URL_SPS_PAYMENT_ENDING_CANCELED,
-    settings.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
+    url_constants.URL_SPS_PAYMENT_ENDING_SUCCESSFUL,
+    url_constants.URL_SPS_PAYMENT_ENDING_CANCELED,
+    url_constants.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
 ]
 
 @login_required
