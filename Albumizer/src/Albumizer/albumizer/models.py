@@ -1,13 +1,13 @@
 ﻿# This Python file uses the following encoding: utf-8
 
 import json
-import Albumizer.settings
+from django.conf import settings
 from random import Random
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
-
+from django.utils.html import escape
 
 
 def json_serialization_handler(object_to_serialize):
@@ -23,7 +23,7 @@ def serialize_into_json(object_to_serialize):
         Serializes objects into json using Python's json package. In debug mode, the format is clearer,
         but in production, unnecessary line breaks and indenting is left out. 
     """
-    if Albumizer.settings.DEBUG:
+    if settings.DEBUG:
         return json.dumps(object_to_serialize, sort_keys = True, indent = 4, default = json_serialization_handler)
     else:
         return json.dumps(object_to_serialize, default = json_serialization_handler)
@@ -45,7 +45,8 @@ class UserProfile(models.Model):
     )
     serviceConditionsAccepted = models.DateTimeField(
         auto_now_add = True,
-        verbose_name = u"date and time when service conditions were accepted"
+        verbose_name = u"service conditions accepted",
+        help_text = u"date and time when service conditions were last accepted"
     )
     homePhone = models.CharField(
         max_length = 20,
@@ -80,7 +81,9 @@ post_save.connect(create_user_profile, sender = User, dispatch_uid = "albumizer-
 class FacebookProfile(models.Model):
     userProfile = models.OneToOneField(
         UserProfile,
-        related_name = "facebookProfile"
+        related_name = "facebookProfile",
+        verbose_name = "user profile",
+        help_text = u"profile of the user owning the Facebook account this record represents"
     )
     facebookID = models.BigIntegerField(
         unique = True,
@@ -88,19 +91,28 @@ class FacebookProfile(models.Model):
     )
     token = models.TextField(
         blank = True,
-        verbose_name = "Facebook authentication token"
+        verbose_name = "token",
+        help_text = u"authentication token given by Facebook"
     )
     profileUrl = models.URLField(
-        blank = True
+        blank = True,
+        verbose_name = "profile url",
+        help_text = u"e.g. http://www.facebook.com/mikko.mallikas"
     )
 
     lastQueryTime = models.DateTimeField(
-        null = True
+        null = True,
+        verbose_name = "time of last query",
+        help_text = u"time when this information was last updated from Facebook"
     )
     rawResponse = models.TextField(
         blank = True,
-        verbose_name = "raw response from facebook"
+        verbose_name = "raw response",
+        help_text = u"the full user information from Facebook as it was given"
     )
+
+    def user(self):
+        return self.userProfile.user
 
     def __unicode__(self):
         return self.userProfile.__unicode__()
@@ -109,6 +121,7 @@ class FacebookProfile(models.Model):
         ordering = ["userProfile"]
         verbose_name = u"Facebook profile"
         verbose_name_plural = u"Facebook profiles"
+
 
 
 
@@ -165,8 +178,8 @@ class Album(models.Model):
         """ Returns this album as an dictionary containing values wanted to be exposed in the public api. """
         return {
             "id": self.id,
-            "title": self.title,
-            "description": self.description,
+            "title": escape(self.title),
+            "description": escape(self.description),
             "creationDate": self.creationDate
         }
 

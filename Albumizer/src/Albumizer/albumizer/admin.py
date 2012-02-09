@@ -12,14 +12,16 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_filter = ('gender', 'serviceConditionsAccepted')
     search_fields = ('user__username', 'user__first_name', 'user__last_name')
     date_hierarchy = 'serviceConditionsAccepted'
+    raw_id_fields = ('user',)
 
 
 
 
 class FacebookProfileAdmin(admin.ModelAdmin):
-    list_display = ('userProfile', 'facebookID', 'token', 'profileUrl', 'lastQueryTime', 'rawResponse')
+    list_display = ('userProfile', 'facebookID', 'profileUrl', 'lastQueryTime')
     search_fields = ('facebookID', 'userProfile__user__first_name', 'userProfile__user__last_name')
     date_hierarchy = 'lastQueryTime'
+    raw_id_fields = ('userProfile',)
 
 
 
@@ -29,6 +31,7 @@ class AlbumAdmin(admin.ModelAdmin):
     list_filter = ('isPublic',)
     search_fields = ('title', 'owner__username', 'owner__first_name', 'owner__last_name', 'description')
     date_hierarchy = 'creationDate'
+    raw_id_fields = ('owner',)
 
     def owning_customer(self, obj):
         return obj.owner
@@ -41,12 +44,14 @@ class AlbumAdmin(admin.ModelAdmin):
 class PageAdmin(admin.ModelAdmin):
     list_display = ('album', 'pageNumber', 'layoutID')
     search_fields = ('album__title',)
+    raw_id_fields = ('album',)
 
 
 
 
 class PageContentAdmin(admin.ModelAdmin):
     list_display = ('page', 'placeHolderID', 'content')
+    raw_id_fields = ('page',)
 
 
 
@@ -71,6 +76,7 @@ class AddressAdmin(admin.ModelAdmin):
     list_display = ('owner', 'postAddressLine1', 'zipCode', 'city', 'state', 'country')
     search_fields = ('owner__username', 'postAddressLine1', 'zipCode', 'city', 'state__name', 'country__name')
     list_editable = ('postAddressLine1', 'zipCode', 'city', 'state', 'country')
+    raw_id_fields = ('owner',)
 
 
 
@@ -80,6 +86,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('customer__username',)
     date_hierarchy = 'purchaseDate'
+    raw_id_fields = ('orderer',)
 
 
 
@@ -91,6 +98,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     def date_of_order(self, obj):
         return obj.order.purchaseDate
     date_of_order.short_description = 'date of order'
+    raw_id_fields = ('order', 'album', 'deliveryAddress')
 
 
 

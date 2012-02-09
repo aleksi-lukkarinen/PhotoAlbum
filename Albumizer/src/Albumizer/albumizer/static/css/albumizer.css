@@ -152,6 +152,10 @@ img {
 	margin-bottom:             0.3em;
 }
 
+#welcomePageIntroductionTabs {
+	display:                   none;
+}
+
 #welcomePageRightColumn {
   float:                     right;
 	width:                     20em;
@@ -301,6 +305,7 @@ clear:both;
 }
 
 #welcomePageMainContent #twitter-buttons {
+	display:                   none;
 	margin-top:                1em;
 }
 

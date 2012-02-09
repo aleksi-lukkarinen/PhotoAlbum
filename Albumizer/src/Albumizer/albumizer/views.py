@@ -38,14 +38,16 @@ def dispatch_by_method(request, *args, **kwargs):
         return HttpResponseNotFound()
 
 
-def return_json(content):
-    """ A shortcut function for returning a json string as a response from view functions. """
-    response = HttpResponse()
-    response["Content-Type"] = "text/javascript"
-    response["Cache-Control"] = "no-cache"
-    response.write(content)
-    return response
+def return_as_json(view_function):
+    """ A view decorator for returning a json string as a response from view functions. """
+    def _compose_request(*args, **kwargs):
+        response = HttpResponse()
+        response["Content-Type"] = "text/javascript"
+        response["Cache-Control"] = "no-cache"
+        response.write(view_function(*args, **kwargs))
+        return response
 
+    return _compose_request
 
 
 
@@ -137,7 +139,6 @@ def create_album_POST(request):
     new_album.save()
 
     return HttpResponseRedirect("/album/" + unicode(new_album.id) + "/")
-
 
 
 
@@ -515,30 +516,34 @@ def report_sps_payment_status(request, status):
 
 
 
+@return_as_json
 def api_json_get_latest_albums(request, how_many):
     """ Returns a json representation of data of the latest publicly visible albums. """
-    return return_json(Album.get_latest_public_as_json(int(how_many)))
+    return Album.get_latest_public_as_json(int(how_many))
 
 
 
 
+@return_as_json
 def api_json_get_random_albums(request, how_many):
     """ Returns a json representation of data of random publicly visible albums. """
-    return return_json(Album.get_pseudo_random_public_as_json(int(how_many)))
+    return Album.get_pseudo_random_public_as_json(int(how_many))
 
 
 
 
+@return_as_json
 def api_json_get_album_count(request):
     """ Returns the number of albums currently registered. """
-    return return_json(Album.objects.count())
+    return Album.objects.count()
 
 
 
 
+@return_as_json
 def api_json_get_user_count(request):
     """ Returns the number of users currently registered. """
-    return return_json(User.objects.count())
+    return User.objects.count()
 
 
 
