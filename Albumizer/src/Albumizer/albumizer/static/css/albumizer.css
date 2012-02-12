@@ -642,13 +642,19 @@ clear:both;
 }
 
 .albumBrowser .albumDetails th {
-  padding:                   0.2em 0.2em 0.2em 0em; 
+  padding:                   0.2em 0.7em 0.2em 0.7em;
+  vertical-align:            top; 
 	text-align:                left;
 	width:                     7em;
+	background:                #eeffdd;
+  color:                     #000000;
 }
 
 .albumBrowser .albumDetails td {
-  padding:                   0.2em; 
+  padding:                   0.2em 0.7em 0.2em 0.7em; 
+  vertical-align:            top; 
+  background:                #eeffdd;
+  color:                     #000000;
 }
 
 .albumBrowser .offer-sell,
@@ -656,11 +662,45 @@ clear:both;
 	display:                   none;
 }
 
-.albumBrowser .albumDetails .url {
-  text-decoration:           none;
-  background:                #ffffff;
-  color:                     #000000;
+.albumBrowser .additionalInfoContainer {
+	width:                     100%;
+	padding-right:             3em;
+  vertical-align:            top;
+  text-align:                left;
 }
 
+.albumBrowser .additionalInfoContainer .publicUrlContainer {
+  width:                     30%;
+}
+
+.albumBrowser .additionalInfoContainer .urlContainer {
+	font-size:                 90%;
+  background:                #ffffff;
+  color:                     #bbbbbb;
+}
+
+.albumBrowser .additionalInfoContainer .urlContainer a {
+  background:                #ffffff;
+  color:                     #aaccaa;
+  text-decoration:           none;
+}
+
+.albumBrowser .additionalInfoContainer .urlContainer a:hover {
+  color:                     #88aa88;
+}
+
+.albumBrowser .additionalInfoContainer .urlContainer .helpText {
+	display:                   block;
+}
+
+.albumBrowser .additionalInfoContainer .urlContainer .secretUrl {
+  display:                   block;
+  background:                #ffffff;
+  color:                     #aaccaa;
+}
+
+.albumBrowser .additionalInfoContainer .twitter-tweet-button-album-container {
+	margin-top: 0em;
+}
 
 

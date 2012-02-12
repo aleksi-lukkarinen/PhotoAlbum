@@ -52,11 +52,27 @@ def dispatch_by_method(request, *args, **kwargs):
 
 
 
+def add_public_caching_headers(response):
+    """ A helper function to add http response some headers for responses that can be publicly cached. """
+    response["Cache-Control"] = "public, must-revalidate, max-age=300"
+
+
+
+
 def add_caching_preventing_headers(response):
     """ A helper function to add http response some headers to prevent all kinds of caching. """
     response["Pragma"] = "no-cache"
     response["Expires"] = "Sat, 01 Jan 2000 00:00:00 GMT"   # In the past on purpose, do not change!!
     response["Cache-Control"] = "private, no-cache, no-store, must-revalidate"
+
+
+
+
+def render_to_response_as_public(*args, **kwargs):
+    """ A shortcut function for rendering public content with headers allowing public caching. """
+    response = render_to_response(*args, **kwargs)
+    add_public_caching_headers(response)
+    return response
 
 
 
@@ -89,16 +105,14 @@ def prevent_all_caching(view_function):
 
 
 
-@cache_control(Public = True, max_age = 300)
 def welcome_page(request):
     """ The first view of this application. """
     template_parameters = {'latest_albums': Album.latest_public_ones()}
-    return render_to_response("welcome.html", RequestContext(request, template_parameters))
+    return render_to_response_as_public("welcome.html", RequestContext(request, template_parameters))
 
 
 
 
-@cache_control(Public = True, max_age = 300)
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not). """
     albums = Album.objects.filter(isPublic = True).order_by('title')
@@ -118,23 +132,25 @@ def list_all_visible_albums(request):
       albums = paginator.page(paginator.num_pages)
 
     template_parameters = {'albums': albums, 'is_album_list_page': True}
-    return render_to_response('album/list-all.html', RequestContext(request, template_parameters))
+    return render_to_response_as_public('album/list-all.html', RequestContext(request, template_parameters))
 
 
 
 
-@cache_control(Public = True)
 def show_single_album(request, album_id):
     """ Allows user to browse a single album. """
-    album_resultset = Album.objects.filter(id__exact = album_id)
-    if not album_resultset:
-        return render_to_response('album/not-found.html', RequestContext(request))
+    album = Album.by_id(album_id)
+    if not album:
+        return render_to_response_as_public('album/not-found.html', RequestContext(request))
 
-    album = album_resultset[0]
     if album.is_hidden_from_user(request.user):
-        return render_to_response('album/view-access-denied.html', RequestContext(request))
+        return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
 
-    return render_to_response('album/show-single.html', RequestContext(request, {'album': album}))
+    response = render_to_response_as_public('album/show-single.html', RequestContext(request, {'album': album}))
+    if not album.isPublic:
+        add_caching_preventing_headers(response)
+
+    return response
 
 
 
@@ -143,18 +159,15 @@ def show_single_album(request, album_id):
 def show_single_album_with_hash(request, album_id, secret_hash):
     """ Allows user to browse a single private album with a secret hash code. """
 
-    album_resultset = Album.objects.filter(id__exact = album_id, secretHash__exact = secret_hash)
-    if not album_resultset:
+    album = Album.by_id_and_secret_hash(album_id, secret_hash)
+    if not album:
         return render_to_response('album/not-found.html', RequestContext(request))
 
-    album = album_resultset[0]
-    if album.isPublic:
+    if album.isPublic or album.is_owned_by(request.user):
         return HttpResponseRedirect(album.get_absolute_url())
 
-    if album.is_owned_by(request.user):
-        return HttpResponseRedirect(album.get_absolute_url())
-
-    return render_to_response('album/show-single.html', RequestContext(request, {'album': album}))
+    template_parameters = {'album': album, 'opened_using_secret_hash': True}
+    return render_to_response('album/show-single.html', RequestContext(request, template_parameters))
 
 
 
@@ -288,6 +301,7 @@ def get_registration_information_POST(request):
 @prevent_all_caching
 def log_in_GET(request):
     """ Displays a form which allows user to log in. """
+    assert request.method == "GET"
     form = LoginForm()
     next_url = request.GET.get("next")
     template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
@@ -297,6 +311,7 @@ def log_in_GET(request):
 @prevent_all_caching
 def log_in_POST(request):
     """ Logs an user in to the service and redirects him/her to his/her profile page. """
+    assert request.method == "POST"
     form = LoginForm(request.POST)
     if not form.is_valid():
         next_url = request.POST.get("nextURL")
@@ -320,9 +335,8 @@ def log_in_POST(request):
 
 
 
-@cache_control(Public = True)
 def log_out(request):
-    """ Allows user to log out. """
+    """ Allows user to log out and redirects him/her to the welcome page. """
     auth.logout(request)
     return HttpResponseRedirect(reverse("albumizer.views.welcome_page"))
 
@@ -440,7 +454,7 @@ def facebook_login(request):
 @prevent_all_caching
 def show_profile(request):
     """ Shows user his/her profile page. """
-    albums = Album.objects.filter(owner = request.user).order_by('title')
+    albums = Album.ones_owned_by(request.user)
 
     paginator = Paginator(albums, 10) # Show 10 albums per page
 

@@ -258,6 +258,27 @@ class Album(models.Model):
         """ Checks if this album is hidden from a given user. """
         return not self.is_visible_to_user(user)
 
+    @staticmethod
+    def by_id(album_id):
+        """ Returns an album having given id, if one exists. Otherwise returns None. """
+        album_resultset = Album.objects.filter(id__exact = album_id)
+        if not album_resultset:
+            return None
+        return album_resultset[0]
+
+    @staticmethod
+    def by_id_and_secret_hash(album_id, secret_hash):
+        """ Returns an album having given id and secret hash, if one exists. Otherwise returns None. """
+        album_resultset = Album.objects.filter(id__exact = album_id, secretHash__exact = secret_hash)
+        if not album_resultset:
+            return None
+        return album_resultset[0]
+
+    @staticmethod
+    def ones_owned_by(user):
+        """ Returns a queryset of albums owned by given user and ordered by title. """
+        return Album.objects.filter(owner = user).order_by('title')
+
     def pages(self):
         """ Return all pages of this album. """
         return Page.objects.filter(album__exact = self)
