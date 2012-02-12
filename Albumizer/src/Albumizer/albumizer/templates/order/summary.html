@@ -1,5 +1,5 @@
 {% extends "base-template.html" %}
-
+{% load url from future %}
 
 
 {% block page_title %}Order Summary{% endblock %}
@@ -10,7 +10,7 @@
 
   <h1>Order Summary</h1>
 
-  <form name="frmOrderSummary" method="post" action="/order/summary/">
+  <form name="frmOrderSummary" method="post" action="{% url "albumizer.views.show_order_summary" %}">
     {% csrf_token %}
     
     <input type="submit" value="Place Order">  

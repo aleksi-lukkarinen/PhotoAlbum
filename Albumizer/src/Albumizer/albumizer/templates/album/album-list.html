@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load url from future %}
 
 {% block page_content %}
 
@@ -7,7 +8,7 @@
 <div class="albumList">
   {% if albums.object_list %}
   {% for album in albums.object_list %}
-  <a href="/album/{{ album.id }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+  <a href="{{ album.get_absolute_url }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
     <img src="" alt="" class="albumListItemImage" />
     <p class="albumListItemTitle">{{ album.title }}</p>
   </a>

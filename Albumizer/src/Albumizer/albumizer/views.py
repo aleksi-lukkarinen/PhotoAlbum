@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-import md5
+import hashlib
 from datetime import datetime
 from django.conf import settings
 from django.contrib import auth
@@ -8,15 +8,27 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
+from django.views.decorators.cache import cache_control
 from Albumizer.albumizer import facebook_api
-from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State, FacebookProfile
+from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
+        Address, Order, SPSPayment, OrderStatus, OrderItem
 from forms import AlbumCreationForm, LoginForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
-     HttpResponseForbidden, HttpResponseNotFound, HttpResponse
-import url_constants
+        HttpResponseForbidden, HttpResponseNotFound, HttpResponse
+
+
+
+
+SPS_STATUS_SUCCESSFUL = "successful"
+SPS_STATUS_CANCELED = "canceled"
+SPS_STATUS_UNSUCCESSFUL = "unsuccessful"
+VALID_SPS_PAYMENT_STATUSES = [SPS_STATUS_SUCCESSFUL, SPS_STATUS_CANCELED, SPS_STATUS_UNSUCCESSFUL]
+
+
 
 
 def dispatch_by_method(request, *args, **kwargs):
@@ -38,13 +50,23 @@ def dispatch_by_method(request, *args, **kwargs):
         return HttpResponseNotFound()
 
 
+
+
+def add_caching_preventing_headers(response):
+    """ A helper function to add http response some headers to prevent all kinds of caching. """
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "Sat, 01 Jan 2000 00:00:00 GMT"   # In the past on purpose, do not change!!
+    response["Cache-Control"] = "private, no-cache, no-store, must-revalidate"
+
+
+
+
 def return_as_json(view_function):
     """ A view decorator for returning a json string as a response from view functions. """
     def _compose_request(*args, **kwargs):
         response = HttpResponse()
-        response["Content-Type"] = "text/javascript"
-        response["Cache-Control"] = "no-cache"
-        response.write(view_function(*args, **kwargs))
+        add_caching_preventing_headers(response)
+        response.write(unicode(view_function(*args, **kwargs)))
         return response
 
     return _compose_request
@@ -52,25 +74,31 @@ def return_as_json(view_function):
 
 
 
+def prevent_all_caching(view_function):
+    """ 
+        A view decorator for settings response headers so that any cache-provider
+        (including user's browser) does not cache any pages.
+    """
+    def _compose_request(*args, **kwargs):
+        response = view_function(*args, **kwargs)
+        add_caching_preventing_headers(response)
+        return response
+
+    return _compose_request
+
+
+
+
+@cache_control(Public = True, max_age = 300)
 def welcome_page(request):
     """ The first view of this application. """
-    random_albums = Album.get_pseudo_random_public(8)
-    if len(random_albums) < 3:
-        random_albums = None
-    elif len(random_albums) > 4:
-        random_albums = random_albums[0:(len(random_albums) / 4) * 4]
-
-    template_parameters = {
-        'latest_albums': Album.get_latest_public(),
-        'random_albums': random_albums,
-        'album_count': Album.objects.count(),
-        'user_count': User.objects.count()
-    }
+    template_parameters = {'latest_albums': Album.latest_public_ones()}
     return render_to_response("welcome.html", RequestContext(request, template_parameters))
 
 
 
 
+@cache_control(Public = True, max_age = 300)
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not). """
     albums = Album.objects.filter(isPublic = True).order_by('title')
@@ -95,6 +123,7 @@ def list_all_visible_albums(request):
 
 
 
+@cache_control(Public = True)
 def show_single_album(request, album_id):
     """ Allows user to browse a single album. """
     album_resultset = Album.objects.filter(id__exact = album_id)
@@ -110,7 +139,28 @@ def show_single_album(request, album_id):
 
 
 
+@prevent_all_caching
+def show_single_album_with_hash(request, album_id, secret_hash):
+    """ Allows user to browse a single private album with a secret hash code. """
+
+    album_resultset = Album.objects.filter(id__exact = album_id, secretHash__exact = secret_hash)
+    if not album_resultset:
+        return render_to_response('album/not-found.html', RequestContext(request))
+
+    album = album_resultset[0]
+    if album.isPublic:
+        return HttpResponseRedirect(album.get_absolute_url())
+
+    if album.is_owned_by(request.user):
+        return HttpResponseRedirect(album.get_absolute_url())
+
+    return render_to_response('album/show-single.html', RequestContext(request, {'album': album}))
+
+
+
+
 @login_required
+@prevent_all_caching
 def create_album_GET(request):
     """ Displays a form which allows user to create new photo albums. """
     assert request.method == "GET"
@@ -119,6 +169,7 @@ def create_album_GET(request):
                               RequestContext(request, {"form": form}))
 
 @login_required
+@prevent_all_caching
 def create_album_POST(request):
     """ Creates a new photo album and redirects to its view. """
     assert request.method == "POST"
@@ -138,12 +189,13 @@ def create_album_POST(request):
     )
     new_album.save()
 
-    return HttpResponseRedirect("/album/" + unicode(new_album.id) + "/")
+    return HttpResponseRedirect(new_album.get_absolute_url())
 
 
 
 
 @login_required
+@prevent_all_caching
 def edit_album(request, album_id):
     """ Allows user to edit a single album. """
     album_resultset = Album.objects.filter(id__exact = album_id)
@@ -160,6 +212,7 @@ def edit_album(request, album_id):
 
 
 @login_required
+@prevent_all_caching
 def add_album_to_shopping_cart(request):
     """ Allows user to add items into his/her shopping cart. """
     if request.method != "POST":
@@ -167,6 +220,8 @@ def add_album_to_shopping_cart(request):
 
 
 
+
+@prevent_all_caching
 def get_registration_information_GET(request):
     """ Displays a form which allows user to register himself/herself into this service. """
     assert request.method == "GET"
@@ -177,6 +232,7 @@ def get_registration_information_GET(request):
     return render_to_response("accounts/register.html",
                               RequestContext(request, template_parameters))
 
+@prevent_all_caching
 def get_registration_information_POST(request):
     """ Register an user to this service and redirects him/her to his/her profile. """
     assert request.method == "POST"
@@ -224,11 +280,12 @@ def get_registration_information_POST(request):
     authenticated_user = auth.authenticate(username = username, password = password)
     auth.login(request, authenticated_user)
 
-    return HttpResponseRedirect("/accounts/profile/")
+    return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
 
 
 
 
+@prevent_all_caching
 def log_in_GET(request):
     """ Displays a form which allows user to log in. """
     form = LoginForm()
@@ -237,6 +294,7 @@ def log_in_GET(request):
     return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
 
+@prevent_all_caching
 def log_in_POST(request):
     """ Logs an user in to the service and redirects him/her to his/her profile page. """
     form = LoginForm(request.POST)
@@ -245,7 +303,7 @@ def log_in_POST(request):
         template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
         return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
-    next_url = request.POST.get("nextURL", "/accounts/profile/")
+    next_url = request.POST.get("nextURL", reverse("albumizer.views.show_profile"))
     template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
     username = form.cleaned_data.get("txtLoginUserName")
     password = form.cleaned_data.get("txtLoginPassword")
@@ -262,10 +320,14 @@ def log_in_POST(request):
 
 
 
+@cache_control(Public = True)
 def log_out(request):
     """ Allows user to log out. """
     auth.logout(request)
-    return HttpResponseRedirect("/")
+    return HttpResponseRedirect(reverse("albumizer.views.welcome_page"))
+
+
+
 
 def validateFbToken(request, fbProfile, aToken):
     """ connects facebook to validate token
@@ -373,7 +435,9 @@ def facebook_login(request):
 
 
 
+
 @login_required
+@prevent_all_caching
 def show_profile(request):
     """ Shows user his/her profile page. """
     albums = Album.objects.filter(owner = request.user).order_by('title')
@@ -399,6 +463,7 @@ def show_profile(request):
 
 
 @login_required
+@prevent_all_caching
 def edit_account_information(request):
     """ Allows user to edit his/her personal information managed by the application """
     return render_to_response('accounts/edit-information.html', RequestContext(request))
@@ -407,6 +472,7 @@ def edit_account_information(request):
 
 
 @login_required
+@prevent_all_caching
 def edit_shopping_cart(request):
     """ Allows user to edit the content of his/her shopping cart """
     return render_to_response('order/shopping-cart.html', RequestContext(request))
@@ -415,6 +481,7 @@ def edit_shopping_cart(request):
 
 
 @login_required
+@prevent_all_caching
 def get_ordering_information(request):
     """ Lets user to enter non-product-related information required for making an order. """
     template_parameters = {}
@@ -424,6 +491,7 @@ def get_ordering_information(request):
 
 
 @login_required
+@prevent_all_caching
 def show_order_summary(request):
     """ Shows user a summary about his/her order and lets him/her to finally place the order. """
     template_parameters = {}
@@ -433,6 +501,7 @@ def show_order_summary(request):
 
 
 @login_required
+@prevent_all_caching
 def report_order_as_successful(request):
     """
         Actually creates an order based on the content of user's shopping cart and
@@ -440,23 +509,24 @@ def report_order_as_successful(request):
         User will be asked to pay the order via the Simple Payments service by clicking
         a link leading to the service.
     """
-    sps_address = url_constants.URL_SIMPLE_PAYMENT_SERVICE
+    sps_address = settings.SIMPLE_PAYMENT_SERVICE_URL
     sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
     sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
 
     our_protocol = "http"
     our_domain = Site.objects.get_current().domain
 
-    our_url_start = "%s://%s/%s" % (our_protocol, our_domain, url_constants.URL_SPS_PAYMENT_BEGINNING)
-    sps_success_url = our_url_start + url_constants.URL_SPS_PAYMENT_ENDING_SUCCESSFUL
-    sps_cancel_url = our_url_start + url_constants.URL_SPS_PAYMENT_ENDING_CANCELED
-    sps_error_url = our_url_start + url_constants.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
+    our_url_start = "%s://%s/" % (our_protocol, our_domain)
+    report_view_name = "albumizer.views.report_sps_payment_status"
+    sps_success_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_SUCCESSFUL])
+    sps_cancel_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_CANCELED])
+    sps_error_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_UNSUCCESSFUL])
 
     sps_payment_id = 3
     amount = 4
 
     checksum_source = "pid=%s&sid=%s&amount=%s&token=%s" % (sps_payment_id, sps_seller_id, amount, sps_secret)
-    checksum = md5.new(checksum_source).hexdigest()
+    checksum = hashlib.md5(checksum_source).hexdigest()
 
     template_parameters = {
         "sps_address": sps_address,
@@ -473,13 +543,8 @@ def report_order_as_successful(request):
 
 
 
-VALID_SPS_PAYMENT_STATUSES = [
-    url_constants.URL_SPS_PAYMENT_ENDING_SUCCESSFUL,
-    url_constants.URL_SPS_PAYMENT_ENDING_CANCELED,
-    url_constants.URL_SPS_PAYMENT_ENDING_UNSUCCESSFUL
-]
-
 @login_required
+@prevent_all_caching
 def report_sps_payment_status(request, status):
     """
         Verifies correctness of the payment details the Simple Payments service
@@ -497,7 +562,7 @@ def report_sps_payment_status(request, status):
 
     sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
     our_checksum_source = "pid=%s&ref=%s&token=%s" % (payment_id, reference, sps_secret)
-    our_checksum = md5.new(our_checksum_source).hexdigest()
+    our_checksum = hashlib.md5(our_checksum_source).hexdigest()
     if our_checksum != sps_checksum:
         return HttpResponseBadRequest()
 
@@ -510,7 +575,7 @@ def report_sps_payment_status(request, status):
         "order": order,
         "payment_id": payment_id
     }
-    return render_to_response('payment/sps/' + status + '.html',
+    return render_to_response('payment/sps/%s.html' % status,
                               RequestContext(request, template_parameters))
 
 
@@ -519,7 +584,7 @@ def report_sps_payment_status(request, status):
 @return_as_json
 def api_json_get_latest_albums(request, how_many):
     """ Returns a json representation of data of the latest publicly visible albums. """
-    return Album.get_latest_public_as_json(int(how_many))
+    return Album.latest_public_ones_as_json(int(how_many))
 
 
 
@@ -527,7 +592,7 @@ def api_json_get_latest_albums(request, how_many):
 @return_as_json
 def api_json_get_random_albums(request, how_many):
     """ Returns a json representation of data of random publicly visible albums. """
-    return Album.get_pseudo_random_public_as_json(int(how_many))
+    return Album.pseudo_random_public_ones_as_json(int(how_many))
 
 
 

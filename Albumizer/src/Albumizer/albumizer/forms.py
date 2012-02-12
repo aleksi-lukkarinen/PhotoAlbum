@@ -7,7 +7,36 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms.forms import NON_FIELD_ERRORS
 from django.forms.util import ErrorList, ErrorDict
-from models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
+from django.forms.widgets import Input
+from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, \
+                State, Address, Order, SPSPayment, OrderStatus, OrderItem
+
+
+
+class AlbumizerEmailInput(Input):
+    """ Input widget for emails with type according to html5. """
+    input_type = 'email'
+
+
+
+
+class AlbumizerURLInput(Input):
+    """ Input widget for urls with type according to html5. """
+    input_type = 'url'
+
+
+
+
+class AlbumizerTelInput(Input):
+    """ Input widget for telephone numbers with type according to html5. """
+    input_type = 'tel'
+
+
+
+
+class AlbumizerSearchCriteriaInput(Input):
+    """ Input widget for search criteria with type according to html5. """
+    input_type = 'search'
 
 
 
@@ -36,14 +65,20 @@ class CommonAlbumizerForm(forms.Form):
 
 
 REGISTRATION_FORM_ERR_USERNAME_MISSING = u'Please enter a username you would like to use.'
-REGISTRATION_FORM_ERR_PASSWORD_MISSING = u'Please enter a password you would like to use.'
+REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING = u'Please enter a password you would like to use.'
+REGISTRATION_FORM_ERR_SECOND_PASSWORD_MISSING = u'Please re-enter the password you would like to use.'
 ERR_FIRST_NAME_MISSING = u'Please enter your first name.'
 ERR_LAST_NAME_MISSING = u'Please enter your last name.'
 ERR_GENDER_MISSING = u'Please enter your gender.'
-ERR_EMAIL_MISSING = u'Please enter a real email address you are using.'
+ERR_FIRST_EMAIL_MISSING = u'Please enter a real email address you are using.'
+ERR_SECOND_EMAIL_MISSING = u'Please re-enter the email address you are using.'
+ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED = u'This service cannot be used without accepting the Terms and Conditions.'
 
-RE_VALID_USER_ID = re.compile("^[A-Za-z0-9_]*[A-Za-z0-9][A-Za-z0-9_]*$")
-RE_VALID_PHONE_NUMBER = re.compile("^\+?[ 0-9]+$")
+RE_VALID_USER_ID = "^[A-Za-z0-9_]*[A-Za-z0-9][A-Za-z0-9_]*$"
+COMPILED_RE_VALID_USER_ID = re.compile(RE_VALID_USER_ID)
+
+RE_VALID_PHONE_NUMBER = "^\+?[ 0-9]+$"
+COMPILED_RE_VALID_PHONE_NUMBER = re.compile(RE_VALID_PHONE_NUMBER)
 
 class RegistrationForm(CommonAlbumizerForm):
     """ Form class representing registration form used to add new users to database. """
@@ -51,7 +86,14 @@ class RegistrationForm(CommonAlbumizerForm):
         min_length = 5,
         max_length = 30,
         label = u"Username",
-        widget = forms.TextInput(attrs = {'size':'30'}),
+        widget = forms.TextInput(attrs = {
+            'size': '30',
+            'pattern': RE_VALID_USER_ID,
+            'required': 'true',
+            'autofocus': 'true',
+            'title': REGISTRATION_FORM_ERR_USERNAME_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_USERNAME_MISSING
+        }),
         error_messages = {'required': (REGISTRATION_FORM_ERR_USERNAME_MISSING)},
         help_text = u"e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
     )
@@ -59,26 +101,47 @@ class RegistrationForm(CommonAlbumizerForm):
         min_length = 8,
         max_length = 50,
         label = u"Password",
-        widget = forms.PasswordInput(attrs = {'size':'50'}),
-        error_messages = {'required': (REGISTRATION_FORM_ERR_PASSWORD_MISSING)},
+        widget = forms.PasswordInput(attrs = {
+            'size':'50',
+            'required': 'true',
+            'title': REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING
+        }),
+        error_messages = {'required': (REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING)},
         help_text = u"8 - 50 characters"
     )
     txtPasswordAgain = forms.CharField(
         required = False,
         label = u"Re-Enter Password",
-        widget = forms.PasswordInput(attrs = {'size':'50'})
+        widget = forms.PasswordInput(attrs = {
+            'size':'50',
+            'required': 'true',
+            'title': REGISTRATION_FORM_ERR_SECOND_PASSWORD_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_SECOND_PASSWORD_MISSING
+        })
     )
 
     txtFirstName = forms.CharField(
         max_length = 30,
         label = u"First Name",
-        widget = forms.TextInput(attrs = {'size':'30'}),
+        widget = forms.TextInput(attrs = {
+            'size':'30',
+            'required': 'true',
+            'title': ERR_FIRST_NAME_MISSING,
+            'x-moz-errormessage': ERR_FIRST_NAME_MISSING
+        }),
         error_messages = {'required': (ERR_FIRST_NAME_MISSING)},
         help_text = u"e.g. \"Terhi-Anneli\" or \"Derek\" (max. 30 characters)"
     )
     txtLastName = forms.CharField(
         max_length = 30,
         label = u"Last Name",
+        widget = forms.TextInput(attrs = {
+            'size':'30',
+            'required': 'true',
+            'title': ERR_LAST_NAME_MISSING,
+            'x-moz-errormessage': ERR_LAST_NAME_MISSING
+        }),
         error_messages = {'required': (ERR_LAST_NAME_MISSING)},
         help_text = u"e.g. \"Virtanen-Kulmala\" or \"Smith\" (max. 30 characters)"
     )
@@ -86,24 +149,43 @@ class RegistrationForm(CommonAlbumizerForm):
         label = u"Gender",
         choices = UserProfile.GENDER_CHOICES,
         error_messages = {'required': (ERR_GENDER_MISSING)},
-        widget = forms.RadioSelect
+        widget = forms.RadioSelect(attrs = {
+            'required': 'true',
+            'title': ERR_GENDER_MISSING,
+            'x-moz-errormessage': ERR_GENDER_MISSING
+        })
     )
     txtEmail = forms.EmailField(
         max_length = 100,
         label = u"Email",
-        widget = forms.TextInput(attrs = {'size':'50'}),
-        error_messages = {'required': (ERR_EMAIL_MISSING)},
+        widget = AlbumizerEmailInput(attrs = {
+            'size':'50',
+            'required': 'true',
+            'placeholder': 'firstname.lastname@domain',
+            'title': ERR_FIRST_EMAIL_MISSING,
+            'x-moz-errormessage': ERR_FIRST_EMAIL_MISSING
+        }),
+        error_messages = {'required': (ERR_FIRST_EMAIL_MISSING)},
         help_text = u"real address like \"matti.virtanen@company.com\" (max. 100 characters)"
     )
     txtEmailAgain = forms.CharField(
         required = False,
         label = u"Re-Enter Email",
-        widget = forms.TextInput(attrs = {'size':'50'})
+        widget = AlbumizerEmailInput(attrs = {
+            'size':'50',
+            'required': 'true',
+            'placeholder': 'firstname.lastname@domain',
+            'title': ERR_SECOND_EMAIL_MISSING,
+            'x-moz-errormessage': ERR_SECOND_EMAIL_MISSING
+        })
     )
     txtHomePhone = forms.CharField(
         required = False,
         max_length = 20,
-        widget = forms.TextInput(attrs = {'size':'20'}),
+        widget = AlbumizerTelInput(attrs = {
+            'size':'20',
+            'pattern': RE_VALID_PHONE_NUMBER
+        }),
         label = u"Home Phone",
         help_text = u"e.g. \"+358 44 123 4567\" (max. 20 characters)"
     )
@@ -150,8 +232,13 @@ class RegistrationForm(CommonAlbumizerForm):
     )
 
     chkServiceConditionsAccepted = forms.BooleanField(
+        widget = forms.CheckboxInput(attrs = {
+            'required': 'true',
+            'title': ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED,
+            'x-moz-errormessage': ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED
+        }),
         label = u"I Hereby Accept the Terms and Conditions and the Privacy Policy of the Albumizer Service",
-        error_messages = {'required': (u'This service cannot be used without accepting the Terms and Conditions.')}
+        error_messages = {'required': (ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED)}
     )
 
 
@@ -162,7 +249,7 @@ class RegistrationForm(CommonAlbumizerForm):
             raise ValidationError(REGISTRATION_FORM_ERR_USERNAME_MISSING)
 
         userid = userid.strip()
-        if not re.match(RE_VALID_USER_ID, userid):
+        if not re.match(COMPILED_RE_VALID_USER_ID, userid):
             raise ValidationError(u"User name can contain only letters A-Z, numbers 0-9 and underscores.")
 
         if User.objects.filter(username__exact = userid):
@@ -212,11 +299,11 @@ class RegistrationForm(CommonAlbumizerForm):
         """ Trim the first email address. """
         email = self.cleaned_data.get("txtEmail")
         if not email:
-            raise ValidationError(ERR_EMAIL_MISSING)
+            raise ValidationError(ERR_FIRST_EMAIL_MISSING)
 
         email = email.strip()
         if not email:
-            raise ValidationError(ERR_EMAIL_MISSING)
+            raise ValidationError(ERR_FIRST_EMAIL_MISSING)
 
         return email
 
@@ -237,7 +324,7 @@ class RegistrationForm(CommonAlbumizerForm):
 
         if homephone:
             homephone = homephone.strip()
-            if not re.match(RE_VALID_PHONE_NUMBER, homephone):
+            if not re.match(COMPILED_RE_VALID_PHONE_NUMBER, homephone):
                 raise ValidationError(u"Phone number can contain only numbers 0-9 and spaces, " +
                                       u"and it may begin with a plus character.")
 
@@ -291,10 +378,17 @@ class AlbumCreationForm(CommonAlbumizerForm):
     """ Form class representing album creation form used to add new albums to database. """
     txtAlbumTitle = forms.CharField(
         max_length = 255,
+        min_length = 5,
         label = u"Title",
-        widget = forms.TextInput(attrs = {'size':'50'}),
-        error_messages = {'required': (ERR_ALBUM_TITLE_MISSING)},
-        help_text = u"e.g. \"Holiday Memories\" or \"Dad's Birthday\" (max. 255 characters)"
+        widget = forms.TextInput(attrs = {
+            'size':'50',
+            'required': 'true',
+            'autofocus': 'true',
+            'title': ERR_ALBUM_TITLE_MISSING,
+            'x-moz-errormessage': ERR_ALBUM_TITLE_MISSING
+        }),
+        error_messages = {'required': ERR_ALBUM_TITLE_MISSING},
+        help_text = u"e.g. \"Holiday Memories\" or \"Dad's Birthday\" (5-255 characters)"
     )
     txtAlbumDescription = forms.CharField(
         required = False,
@@ -338,18 +432,30 @@ class AlbumCreationForm(CommonAlbumizerForm):
 
 
 LOGIN_FORM_ERR_USERNAME_MISSING = u'Please enter your username.'
+LOGIN_FORM_ERR_PASSWORD_MISSING = u'Please enter your password.'
 
 class LoginForm(CommonAlbumizerForm):
     """ Form class representing login form. """
     txtLoginUserName = forms.CharField(
         label = u"Username",
-        widget = forms.TextInput(attrs = {'size':'50'}),
+        widget = forms.TextInput(attrs = {
+            'size':'50',
+            'required': 'true',
+            'autofocus': 'true',
+            'title': LOGIN_FORM_ERR_USERNAME_MISSING,
+            'x-moz-errormessage': LOGIN_FORM_ERR_USERNAME_MISSING
+        }),
         error_messages = {'required': LOGIN_FORM_ERR_USERNAME_MISSING}
     )
     txtLoginPassword = forms.CharField(
         label = u"Password",
-        widget = forms.PasswordInput(attrs = {'size':'50'}),
-        error_messages = {'required': (u'Please enter your password.')}
+        widget = forms.PasswordInput(attrs = {
+            'size':'50',
+            'required': 'true',
+            'title': LOGIN_FORM_ERR_PASSWORD_MISSING,
+            'x-moz-errormessage': LOGIN_FORM_ERR_PASSWORD_MISSING
+        }),
+        error_messages = {'required': LOGIN_FORM_ERR_PASSWORD_MISSING}
     )
 
     def clean_txtLoginUserName(self):

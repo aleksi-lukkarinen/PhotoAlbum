@@ -1,0 +1,28 @@
+{% load url from future %}
+
+  <div id="twitter-follow-button-container-{{ id }}" class="twitter-follow-button-container">
+    <a href="https://twitter.com/{{ twitter_account }}" 
+       class="twitter-follow-button" 
+       data-show-count="true">Follow @{{ twitter_account }}</a>
+
+	  <script>
+	    !function(d, s, id) {
+	      var js, fjs = d.getElementsByTagName(s)[0];
+	      
+	      if (!d.getElementById(id)){
+	        js=d.createElement(s);
+	        js.id=id;
+	        js.src="//platform.twitter.com/widgets.js";
+	        fjs.parentNode.insertBefore(js, fjs);
+	      }
+	    }(document, "script", "twitter-wjs");
+	  </script>
+  </div>
+
+  <script type="text/javascript">
+    //<![CDATA[
+      $(window).load(function() {
+        $("div#twitter-follow-button-container-{{ id }}").css("display", "block");
+      });
+    //]]>
+  </script>

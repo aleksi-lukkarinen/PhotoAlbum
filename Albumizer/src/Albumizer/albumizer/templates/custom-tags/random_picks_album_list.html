@@ -1,0 +1,120 @@
+{% load url from future %}
+
+  {% if random_pick_albums %}
+    <div class="randomPickAlbumsList">
+      <div class="randomPickAlbumsListHeader">
+        <div class="randomPickAlbumsListTitle">Some Random Picks From Our Users</div>
+        <a class="randomPickAlbumsListSeeMoreLink" href="/album/">See more</a>
+      </div>
+      <table class="randomPickAlbumsListTable" id="randomPickAlbumsListTable_{{ id }}">
+        <tr>
+        {% for album in random_pick_albums %}
+          <td>
+            <div class="randomPickAlbumsListItemContainer hlisting">
+              <figure id="randomPickAlbumsListItemWrapper{{ album.id }}_{{ id }}">
+                <a href="{{ album.get_absolute_url }}"><img class="randomPickAlbumsListItemImage photo" src="" alt="Cover of {{ album.title }}" /></a>
+                <figcaption class="randomPickAlbumsListItemTitle fn"><a href="{{ album.get_absolute_url }}">{{ album.title }}</a></figcaption>
+              </figure>
+              <div class="offer-sell">available for order</div>
+              <div class="lister"><span class="fn">Albumizer</span>, <span class="url">http://{{ site_domain }}{{ album.get_absolute_url }}</span></div>
+              <div class="dtlisted">{{ album.creationDate|date:"c" }}</div>
+              <div class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</div>
+            </div>
+          </td>
+          {% if forloop.counter|divisibleby:"4" and forloop.counter < random_pick_albums|length %}
+            </tr><tr>
+          {% endif %}
+        {% endfor %}
+        </tr>
+      </table>
+    </div>
+
+	  <script type="text/javascript">
+	    //<![CDATA[
+				var oldRandomAlbumIds_{{ id }} = Array(
+				  {% for album in random_pick_albums %}
+				    {{ album.id }}{% if forloop.revcounter > 1 %},{% endif %}
+				  {% endfor %}
+				);
+				
+				var albumUrlSample_{{ id }} = "{% url "albumizer.views.show_single_album" "0000000000000000000" %}";
+				var albumUrlPattern_{{ id }} = albumUrlSample_{{ id }}.replace("0000000000000000000", "{0}"); 
+
+				function updateRandomPics_{{ id }}() {
+				  $.getJSON("{% url "albumizer.views.api_json_get_random_albums" number_of_random_picks %}",
+				    function(data) {
+				      if (data.length < 3) {
+				          return;
+				      }
+				      else if (data.length > 4) {
+				          data = data.slice(0, Math.floor(data.length / 4) * 4);
+				      }
+
+				      var albumCounter = 0;
+				      var strHtml = "<tr>";
+				
+				      var newRandomAlbumIds = Array();
+				      var albumUrl = "";
+				      $.each(data, function () {
+                newRandomAlbumIds.push(this.id);
+                albumUrl = albumUrlPattern_{{ id }}.replace("{0}", this.id);
+				        albumCounter++;
+
+				        strHtml +=
+				          '<td>' +
+				            '<div class="randomPickAlbumsListItemContainer hlisting">' +
+                      '<figure id="randomPickAlbumsListItemWrapper' + this.id + '_{{ id }}" class="randomPickAlbumsListItemWrapperHidden">' +
+			                  '<a href="' + albumUrl + '"><img class="randomPickAlbumsListItemImage photo" src="" alt="Cover of ' + this.title + '" /></a>' +
+			                  '<figcaption class="randomPickAlbumsListItemTitle fn"><a href="' + albumUrl + '">' + this.title + '</a></figcaption>' +
+                      '</figure>' +
+                      '<div class="offer-sell">available for order</div>' +
+                      '<div class="lister"><span class="fn">Albumizer</span>, <span class="url">http://{{ site_domain }}' + albumUrl + '</span></div>' +
+                      '<div class="dtlisted">' + this.creationDate + '</div>' +
+                      '<div class="url permalink">http://{{ site_domain }}' + albumUrl + '</div>' +
+				            '</div>' +
+				          '</td>';
+				
+				        if ((albumCounter % 4 == 0) && (albumCounter < data.length)) {
+				          strHtml += "</tr><tr>";
+				        }
+				      })
+				      strHtml += "</tr>";
+				
+				      function randomPicksUpdateFadeOutHandler_{{ id }}() {
+				        $("#randomPickAlbumsListTable_{{ id }}").html(strHtml);
+				        oldRandomAlbumIds_{{ id }} = newRandomAlbumIds;
+				        if (oldRandomAlbumIds_{{ id }}.length > 0) {
+				          var i;
+				          var delay = 100;
+				          for (i = 0; i < oldRandomAlbumIds_{{ id }}.length; i++) {
+				            setTimeout('$("#randomPickAlbumsListItemWrapper' + oldRandomAlbumIds_{{ id }}[i] + '_{{ id }}").show("fade", {}, 2000);', delay);
+				            delay += 200;
+				          }
+				        }
+				      }
+				      
+				      if (oldRandomAlbumIds_{{ id }}.length > 0) {
+				        var i;
+				        var delay = 100;
+				        for (i = 0; i < oldRandomAlbumIds_{{ id }}.length - 1; i++) {
+				          setTimeout('$("#randomPickAlbumsListItemWrapper' + oldRandomAlbumIds_{{ id }}[i] + '_{{ id }}").hide("fade", {}, 2000);', delay);
+				          delay += 200;
+				        }
+				        var lastItemFadeOutHandler_{{ id }} = function() {
+				          $("#randomPickAlbumsListItemWrapper" + oldRandomAlbumIds_{{ id }}[i] + "_{{ id }}").hide("fade", {}, 2000, randomPicksUpdateFadeOutHandler_{{ id }});
+				        }
+				        setTimeout(lastItemFadeOutHandler_{{ id }}, delay);
+				      }
+				      else {
+				        randomPicksUpdateFadeOutHandler_{{ id }}();
+				      }
+				    }
+				  )
+				}
+				
+				$(function() {
+				  setInterval("updateRandomPics_{{ id }}()", 20000);
+				});
+	    //]]>
+	  </script>
+  {% endif %}

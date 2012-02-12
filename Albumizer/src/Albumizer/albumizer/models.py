@@ -1,17 +1,20 @@
 ﻿# This Python file uses the following encoding: utf-8
 
-import json
-from django.conf import settings
+import json, hashlib
+from datetime import datetime
 from random import Random
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 from django.utils.html import escape
 
 
+
+
 def json_serialization_handler(object_to_serialize):
-    """ Serializes objects, which are not supported by the Python's json package """
+    """ Serializes objects, which are not supported by the Python's json package. """
     if hasattr(object_to_serialize, 'isoformat'):    # for datetimes: serialize them into a standard format
         return object_to_serialize.isoformat()
     else:
@@ -27,6 +30,39 @@ def serialize_into_json(object_to_serialize):
         return json.dumps(object_to_serialize, sort_keys = True, indent = 4, default = json_serialization_handler)
     else:
         return json.dumps(object_to_serialize, default = json_serialization_handler)
+
+
+
+
+#def usermodel_get_addresses(self):
+#    """ Returns this user's addresses. """
+#    return Address.objects.filter(owner__exact = self)
+#
+#def usermodel_get_albums(self):
+#    """ Returns this user's albums. """
+#    return Album.objects.filter(owner__exact = self)
+#
+#def usermodel_get_facebook_profile(self):
+#    """ Returns this user's Facebook profile, if one exists. """
+#    profile_qs = FacebookProfile.objects.filter(userProfile__exact = self.get_profile())
+#    if profile_qs.count() > 0:
+#        return profile_qs[0]
+#    return None
+#
+#def usermodel_get_orders(self):
+#    """ Returns this user's orders. """
+#    return Order.objects.filter(orderer__exact = self)
+#
+#def usermodel_get_shopping_cart_items(self):
+#    """ Returns items in this user's shopping cart. """
+#    return ShoppingCartItem.objects.filter(user__exact = self)
+#
+#User.add_to_class("addresses", usermodel_get_addresses)
+#User.add_to_class("albums", usermodel_get_albums)
+#User.add_to_class("facebook_profile", usermodel_get_facebook_profile)
+#User.add_to_class("orders", usermodel_get_orders)
+#User.add_to_class("shopping_cart", usermodel_get_shopping_cart_items)
+
 
 
 
@@ -141,7 +177,12 @@ class Album(models.Model):
         verbose_name = u"is public",
         help_text = u"If album is declared as a public one, it will be visible for everybody to browse"
     )
-
+    secretHash = models.TextField(
+        max_length = 64,
+        verbose_name = u"secret hash",
+        help_text = u"automatically generated secret hexadecimal " + \
+            "SHA256 hash for exposing a private album to a specific audience"
+    )
     creationDate = models.DateTimeField(
         auto_now_add = True,
         blank = True,
@@ -151,8 +192,34 @@ class Album(models.Model):
 
     _randomizer = Random()
 
+    def save(self, *args, **kwargs):
+        """ Generate/validate album data before saving. """
+        if len(self.title.strip()) < 5:
+            raise ValueError, "Length of album's title must be 5-255 non-whitespace characters (" + self.title + ")."
+
+        if not self.secretHash:
+            self.secretHash = self.generate_secret_hash_for(self)
+
+        super(Album, self).save(*args, **kwargs)
+
+    @staticmethod
+    def generate_secret_hash_for(album):
+        hash_source = album.owner.username + album.title + unicode(datetime.now())
+        return hashlib.sha256(hash_source.encode("ascii", "backslashreplace")).hexdigest()
+
     def __unicode__(self):
         return u"%s (%s)" % (self.title, self.owner)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ("albumizer.views.show_single_album", (), {"album_id": self.id})
+
+    @models.permalink
+    def get_secret_url(self):
+        if not self.secretHash:
+            self.secretHash = self.generate_secret_hash_for(self)
+        return ("albumizer.views.show_single_album_with_hash", (),
+                        {"album_id": self.id, "secret_hash": self.secretHash})
 
     def is_owned_by(self, user):
         """ Checks if this album is owner by a given user. """
@@ -180,6 +247,7 @@ class Album(models.Model):
             "id": self.id,
             "title": escape(self.title),
             "description": escape(self.description),
+            "ownerUname": escape(self.owner.username),
             "creationDate": self.creationDate
         }
 
@@ -189,7 +257,7 @@ class Album(models.Model):
         return [album.as_api_dict() for album in album_list]
 
     @staticmethod
-    def get_latest_public(how_many = 20):
+    def latest_public_ones(how_many = 20):
         """ Returns some latest publicly visible albums. """
         if how_many < 1:
             how_many = 1
@@ -198,12 +266,12 @@ class Album(models.Model):
         return Album.objects.filter(isPublic__exact = True).order_by("-creationDate")[:how_many]
 
     @classmethod
-    def get_latest_public_as_json(cls, how_many = 20):
+    def latest_public_ones_as_json(cls, how_many = 20):
         """ Returns some latest publicly visible albums as json. """
-        return serialize_into_json(cls.list_as_api_dict(cls.get_latest_public(how_many)))
+        return serialize_into_json(cls.list_as_api_dict(cls.latest_public_ones(how_many)))
 
     @classmethod
-    def get_pseudo_random_public(cls, how_many = 4):
+    def pseudo_random_public_ones(cls, how_many = 4):
         """ Returns some pseudo-random publicly visible albums. """
         if how_many < 1:
             how_many = 1
@@ -229,9 +297,9 @@ class Album(models.Model):
         return albums
 
     @classmethod
-    def get_pseudo_random_public_as_json(cls, how_many = 4):
+    def pseudo_random_public_ones_as_json(cls, how_many = 4):
         """ Returns some pseudo-random publicly visible albums as json. """
-        return serialize_into_json(cls.list_as_api_dict(cls.get_pseudo_random_public(how_many)))
+        return serialize_into_json(cls.list_as_api_dict(cls.pseudo_random_public_ones(how_many)))
 
     class Meta():
         unique_together = ("owner", "title")
@@ -252,8 +320,6 @@ class Page(models.Model):
         max_length = 255,
         verbose_name = u"layout id"
     )
-
-
 
     def __unicode__(self):
         return u"%s, %s" % (self.album, self.pageNumber)
@@ -400,6 +466,35 @@ class Address(models.Model):
 
 
 
+class ShoppingCartItem(models.Model):
+    """ Contains items, which a user currently has his/her shopping cart. """
+    user = models.ForeignKey(User)
+    album = models.ForeignKey(Album)
+    count = models.IntegerField()
+    additionDate = models.DateTimeField(
+        auto_now_add = True,
+        verbose_name = u"addition date",
+        help_text = u"time when the item was added into shopping cart"
+    )
+    status = models.IntegerField()
+
+    @staticmethod
+    def items_of_user(user):
+        """ Return all items in given user's shopping cart. """
+        return ShoppingCartItem.objects.filter(user__exact = user)
+
+    def __unicode__(self):
+        return u"%s, %s, %d, %s" % (self.user, self.album, self.count, self.additionDate)
+
+    class Meta():
+        unique_together = ("user", "album")
+        ordering = ["user", "album"]
+        verbose_name = u"shopping cart item"
+        verbose_name_plural = u"shopping cart items"
+
+
+
+
 class Order(models.Model):
     """ Represents a single order (containing many albums) as a whole. """
     orderer = models.ForeignKey(User)
@@ -408,6 +503,15 @@ class Order(models.Model):
         verbose_name = u"purchase date"
     )
     status = models.IntegerField()
+    statusClarification = models.CharField(
+        blank = True,
+        max_length = 255,
+        help_text = u"clarification of the current state of the order and the reasons for it, if necessary"
+    )
+
+    def is_paid(self):
+        """ Returns True if this order is paid, otherwise False. """
+        return SPSPayment.of_order(self) != None
 
     def items(self):
         """ Return all items of this order. """
@@ -421,6 +525,100 @@ class Order(models.Model):
         ordering = ["orderer", "purchaseDate", "status"]
         verbose_name = u"order"
         verbose_name_plural = u"orders"
+
+
+
+
+class SPSPayment(models.Model):
+    """ Represents a payment related to an order when paid via the Simple Payments service. """
+    order = models.OneToOneField(Order)
+    amount = models.DecimalField(
+        max_digits = 10,
+        decimal_places = 2,
+        verbose_name = u"amount [€]",
+        help_text = u"a number with max. 2 decimals, e.g. 2.45"
+    )
+    transactionDate = models.DateTimeField(
+        auto_now_add = True,
+        verbose_name = u"transaction date",
+        help_text = u"time when the payment is made"
+    )
+    referenceCode = models.CharField(
+        max_length = 255,
+        verbose_name = u"reference code",
+        help_text = u"payment reference code given by the Simple Payments service"
+    )
+    clarification = models.CharField(
+        blank = True,
+        max_length = 255,
+        help_text = u"clarifying information related to the payment"
+    )
+
+    @staticmethod
+    def of_order(order):
+        """ Returns payment of given order, if one exists. """
+        payment_qs = ShoppingCartItem.objects.filter(order__exact = order)
+        if payment_qs.count() < 1:
+            return None
+        return payment_qs[0]
+
+    def __unicode__(self):
+        return u"%s, %s, %f" % (self.order, self.transactionDate, self.amount)
+
+    class Meta():
+        ordering = ["order"]
+        verbose_name = u"Simple Payments service payment"
+        verbose_name_plural = u"Simple Payments service payments"
+
+
+
+
+class OrderStatus(models.Model):
+    """ 
+        Represents the current status of an order.
+        
+        Methods of this class do not need to check existence of any records they return, because the records
+        are assumed to exist and to have been imported from fixtures during creation/migration of the database
+        in use, and absence of any of those records is an error situation anyway. If we had logging and
+        email capability, the existence of those records could be checked e.g. at startup or so and a report
+        could be made if necessary.    
+    """
+    code = models.CharField(
+        unique = True,
+        max_length = 10,
+        help_text = u"a short code name describing this state"
+    )
+
+    @staticmethod
+    def ordered():
+        """ Returns an OrderStatus, in which the order has been made but not paid yet. """
+        return OrderStatus.objects.get(code__exact = "ordered")
+
+    @staticmethod
+    def paid_and_being_processed():
+        """ Returns an OrderStatus, in which the order is already paid and is currently being processed. """
+        return OrderStatus.objects.get(code__exact = "paid")
+
+    @staticmethod
+    def blocked():
+        """ 
+            Returns an OrderStatus, in which the order is already paid but the
+            processing of the order is prevented for some reason.
+        """
+        return OrderStatus.objects.get(code__exact = "blocked")
+
+    @staticmethod
+    def sent():
+        """ Returns an OrderStatus, in which the order is already processed and sent to the customer. """
+        return OrderStatus.objects.get(code__exact = "sent")
+
+    def __unicode__(self):
+        return self.code
+
+    class Meta():
+        ordering = ["id"]
+        verbose_name = u"order status"
+        verbose_name_plural = u"order statuses"
 
 
 

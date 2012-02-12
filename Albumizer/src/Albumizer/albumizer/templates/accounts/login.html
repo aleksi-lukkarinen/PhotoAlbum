@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load url from future %}
 
 
 
@@ -13,8 +14,9 @@
   });
   $(window).load(function() {
     $("#id_txtLoginUserName").focus();
-    $("#id_cmdLogIn").click(function() {
-      $("#id_cmdLogIn").button("option", "disabled", true);  
+    $("#frmLogin").submit(function() {
+      $("#id_cmdLogIn").button("option", "disabled", true);
+      return true;  
     })
   });
 
@@ -54,7 +56,7 @@
     </table>
   {% endif %}
 
-  <form id="frmLogin" class="commonForm" method="post" action="/accounts/login/">
+  <form id="frmLogin" class="commonForm" method="post" action="{% url "log_in" %}">
     {% csrf_token %}
     {% if nextURL %}<input type="hidden" name="nextURL" value="{{ nextURL }}" />{% endif %}
 

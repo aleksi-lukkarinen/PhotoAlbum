@@ -323,8 +323,9 @@ class Command(BaseCommand):
             for order_number in range(0, number_of_orders):
                 order_data = self.generate_order_data(new_user)
                 if not order_data["success"]:
-                    message = u"  - no valid albums and/or addresses to create orders with\n\n"
-                    self.stdout.write(message.encode("ascii", "backslashreplace"))
+                    if verbosity >= 2:
+                        message = u"  - no valid albums and/or addresses to create orders with\n\n"
+                        self.stdout.write(message.encode("ascii", "backslashreplace"))
                     break;
 
                 new_order = Order()
@@ -474,8 +475,9 @@ class Command(BaseCommand):
 
 
 
-    def generate_album_data(self, user):
-        """ Generates information related to a single photo album """
+
+    def generate_album_title(self):
+        """ Generates a title for a single photo album """
         album_type_factor = self._albumRandomizer.randrange(0, 99)
 
         title = u""
@@ -658,8 +660,22 @@ class Command(BaseCommand):
             else:
                 title = title.replace(u" ", u"-")
 
-        title = self.decorate_album_title(title)
+        return self.decorate_album_title(title)
 
+
+
+
+    def generate_album_data(self, user):
+        """ Generates information related to a single photo album """
+        title = self.generate_album_title()
+        title_generation_tries = 1
+        while len(title) < 5 and title_generation_tries < 5:
+            title_generation_tries += 1
+            title = self.generate_album_title()
+        if len(title) < 5:
+            title = "<Title generation failed>"
+        if len(title) > 255:
+            title = title[0:255]
 
         description = u""
         for i in range(0, self._albumRandomizer.randrange(1, 4)):

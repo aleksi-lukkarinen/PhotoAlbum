@@ -1,4 +1,4 @@
-@CHARSET "UTF-8";
+@charset "utf-8";
 
 
 * {
@@ -10,12 +10,14 @@ body {
   font-family:               "Tahoma", Arial, Helvetica, sans-serif;
   font-size:                 8pt;
   background:                #ffffff;
+  color:                     #000000;
 }
 
 #pageContainer {
   margin:                    0em auto;
   width:                     902px;
   background:                #ffffff;
+  color:                     #000000;
 }
 
 #pageHeader {
@@ -34,7 +36,8 @@ body {
 
 #pageHeaderSlogan {
 	margin-left:               0.4em;
-	color:                     #88dd00;
+  background:                #ffffff;
+  color:                     #88dd00;
 	font-size:                 200%;
 	font-style:                italic;
 }
@@ -49,6 +52,7 @@ body {
   margin-bottom:             2em;
   padding-top:               0.2em;
   border-top:                1px solid #eeeeee;
+  background:                #ffffff;
   color:                     #cccccc;
 }
 
@@ -67,18 +71,17 @@ body {
 .header-link {
 	display:                   block;
 	float:                     right;
-	font-face:                 "Tahoma", "Arial";
 	font-size:                 120%;
 	font-weight:               bold;
 	text-decoration:           none;
-	margin:                    0em;
-	color:                     #88cc88;
-	margin-left:               1em;
-	margin-top:                0.3em;
+	margin:                    0.3em 0em 0em 1em;
+  background:                #ffffff;
+  color:                     #88cc88;
 }
 
 .header-link:hover {
-  color:                     #559955;
+  background:                #ffffff;
+	color:                     #559955;
 }
 
 .dialog {
@@ -106,14 +109,22 @@ body {
 }
 
 h1 {
+  background:                #ffffff;
 	color:                     #339933;
 	font-size:                 150%;
 	margin-bottom:             1em;
+	/*text-shadow:               1px 1px 2px black, 0 0 1em blue, 0 0 0.2em blue;*/
 }
 
 p {
 	margin-bottom:             1em;
 	font-size:                 110%;
+}
+
+figure,
+figcaption,
+address {
+	display:                   inline;
 }
 
 img {
@@ -166,6 +177,8 @@ img {
   padding:                   0.7em;
   margin:                    0em 0em 0.5em 0.5em;
   overflow:                  hidden;
+  text-overflow:             ellipsis;
+  -o-text-overflow:          ellipsis;
 }
 
 #welcomePageAlbumListHeading {
@@ -174,16 +187,21 @@ img {
   padding:                   0.3em;
 }
 
-.welcomePageAlbumListItem {
-
+.welcomePageAlbumListItem .offer-sell,
+.welcomePageAlbumListItem .lister,
+.welcomePageAlbumListItem .permalink {
+  display:                   none;
 }
 
-.welcomePageAlbumListItem A {
-  text-decoration:           none;
+.welcomePageAlbumListItem .item .fn {
   font-weight:               bold;
 }
 
-.welcomePageAlbumListItem A:hover {
+.welcomePageAlbumListItem a {
+  text-decoration:           none;
+}
+
+.welcomePageAlbumListItem .item:hover {
 	color:                     blue;
 }
 
@@ -193,65 +211,90 @@ img {
 	font-size:                 95%;
 }
 
-#welcomePageRandomAlbums {
+
+
+
+
+
+
+
+
+.randomPickAlbumsList {
 	margin-top:                3em;
 	margin-bottom:             1em;
 }
 
-#welcomePageRandomAlbumsTitle {
+.randomPickAlbumsListTitle {
 	float:                     left;
 	font-size:                 150%;
 	font-weight:               bold;
-	color:                     #6699cc;
+  background:                #ffffff;
+  color:                     #6699cc;
   margin:                    0em 2em 1em 0em;
 }
 
-#welcomePageRandomAlbumsSeeMoreLink {
+.randomPickAlbumsListSeeMoreLink {
 	float:                     left;
 	display:                   block;
   margin:                    0.4em 0em 0em 0em;
   text-decoration:           none;
 }
 
-#welcomePageRandomAlbumsSeeMoreLink:hover {
-	color:                     maroon;
+.randomPickAlbumsListSeeMoreLink:hover {
+	background:                #ffffff;
+  color:                     maroon;
 }
 
-#welcomePageRandomAlbumsTable {
+.randomPickAlbumsListTable {
   clear:                     both;
 	width:                     100%;
 }
 
-#welcomePageRandomAlbumsTable td {
+.randomPickAlbumsListTable td {
 	vertical-align:            top;
 	text-align:                center;
 	padding-bottom:            0.5em;
 }
 
-.welcomePageRandomAlbumsItemContainer {
+.randomPickAlbumsListItemContainer {
   width:                     15.1em;
   height:                    19.5em;
+  overflow:                  hidden;
 }
 
-.welcomePageRandomAlbumsItemWrapperHidden {
+.randomPickAlbumsListItemContainer .offer-sell,
+.randomPickAlbumsListItemContainer .lister,
+.randomPickAlbumsListItemContainer .dtlisted, 
+.randomPickAlbumsListItemContainer .permalink {
+  display:                   none;
+} 
+
+.randomPickAlbumsListItemWrapperHidden {
 	display:                   none;
 }
 
-#welcomePageRandomAlbumsTable a {
+.randomPickAlbumsListTable a {
   text-decoration:           none;
 }
 
-.welcomePageRandomAlbumsItemImage {
+.randomPickAlbumsListItemImage {
 	display:                   block;
 	width:                     15em;
 	height:                    15em;
   border:                    1px solid #eeeeee;
+  overflow:                  hidden;
+  text-overflow:             ellipsis;
+  -o-text-overflow:          ellipsis;
 }
 
-.welcomePageRandomAlbumsItemTitle {
+.randomPickAlbumsListItemTitle {
   width:                     15em;
 	margin-top:                0.5em;
-	color:                     #000000;
+	background:                #ffffff;
+  color:                     #000000;
+  overflow:                  hidden;
+  text-overflow:             ellipsis;
+  -o-text-overflow:          ellipsis;
 }
 
 
@@ -296,38 +339,49 @@ clear:both;
 
 
 
-
-
-
-#formErrorList {
-	padding:                   0.5em 1em;
-	margin-bottom:             2em;
-}
-
-#welcomePageMainContent #twitter-buttons {
-	display:                   none;
-	margin-top:                1em;
-}
-
-#welcomePageMainContent #twitter-tweets {
-  margin-top:                6em;
+.show-twitter-tweet {
+  display:                   none;
+	margin-top:                6em;
   margin-bottom:             3em;
 }
 
-#welcomePageUsageNotice {
+.twitter-follow-button-container {
+  display:                   none;
+	margin-top:                1em;
+}
+
+.twitter-tweet-button-album-container {
+  margin-top:                1em;
+}
+
+.twitter-tweet-button-album-container a {
+  display:                   none;
+}
+
+
+
+
+
+
+
+
+
+.albumizerUsageNotice {
 	margin-top:                2em;
 	text-align:                center;
 }
 
-#welcomePageUsageNotice #firstLine {
+.albumizerUsageNotice .firstLine {
   font-size:                 120%;
   font-weight:               bold;
   margin-bottom:             0.3em;
+  background:                #ffffff;
   color:                     #cc11dd;  
 }
 
-#welcomePageUsageNotice #secondLine {
+.albumizerUsageNotice .secondLine {
   font-size:                 110%;
+  background:                #ffffff;
   color:                     #333333;
 }
 
@@ -431,6 +485,7 @@ clear:both;
 
 .commonForm .fieldRow label {
   float:                     left;
+  padding-top:               0.2em;
 }
 
 .commonForm .fieldRow ul {
@@ -481,10 +536,6 @@ clear:both;
 
 #frmRegister #errorRowServiceConditions {
   margin-top:                0.5em;
-}
-
-#frmRegister #id_txtHomePhone {
-  margin-top:                1em;
 }
 
 #frmRegister #lblServiceConditionsAccepted {
@@ -575,8 +626,30 @@ clear:both;
 
 
 
+.albumBrowser .albumDetails {
+  margin-bottom:             1em;
+}
 
+.albumBrowser .albumDetails th {
+  padding:                   0.2em 0.2em 0.2em 0em; 
+	text-align:                left;
+	width:                     7em;
+}
 
+.albumBrowser .albumDetails td {
+  padding:                   0.2em; 
+}
+
+.albumBrowser .offer-sell,
+.albumBrowser .lister {
+	display:                   none;
+}
+
+.albumBrowser .albumDetails .url {
+  text-decoration:           none;
+  background:                #ffffff;
+  color:                     #000000;
+}
 
 
 

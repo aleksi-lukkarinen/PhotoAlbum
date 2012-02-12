@@ -1,6 +1,7 @@
 {% extends "base-template.html" %}
 {% load static %}
-
+{% load albumizer_common %}
+{% load url from future %}
 
 
 {% block page_title %}Welcome{% endblock %}
@@ -9,111 +10,11 @@
 
 {% block page_scripts_after %}
 
-  function updateUsageData() {
-    $.getJSON("/api/json/album/count/",
-      function(data) {
-        if (!isNaN(data)) {
-          $("#albumCounter").text(data);
-        }
-      }
-    )
-    
-    $.getJSON("/api/json/user/count/",
-      function(data) {
-        if (!isNaN(data)) {
-          $("#userCounter").text(data);
-        }
-      }
-    )
-  }
-
-
-  var nextRandomAlbumListHtml = "";
-
-  {% if random_albums %}
-  var oldRandomAlbumIds = Array(
-    {% for album in random_albums %}
-      {{ album.id }}{% if forloop.revcounter > 1 %},{% endif %}
-    {% endfor %}
-  );
-  {% endif %}
-
-
-  function updateRandomPics() {
-    $.getJSON("/api/json/album/random/8/",
-      function(data) {
-		    if (data.length < 3) {
-		        return;
-		    }
-        else if (data.length > 4) {
-            data = data.slice(0, Math.floor(data.length / 4) * 4);
-        }
-      
-        var albumCounter = 0;
-        var strHtml = "<tr>";
-
-        var newRandomAlbumIds = Array();        
-        $.each(data, function () {
-          newRandomAlbumIds.push(this.id);
-          albumCounter++;
-
-          strHtml +=
-            '<td>' +
-              '<div class="welcomePageRandomAlbumsItemContainer">' +
-                '<span id="welcomePageRandomAlbumsItemWrapper' + this.id + '" class="welcomePageRandomAlbumsItemWrapperHidden">' +
-                  '<a href="/album/' + this.id + '/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of ' + this.title + '" /></a>' +
-                  '<div class="welcomePageRandomAlbumsItemTitle"><a href="/album/' + this.id + '/">' + this.title + '</a></div>' +
-                '</span>' +
-              '</div>' +
-            '</td>';
-          
-          if (albumCounter % 4 == 0) {
-            strHtml += "</tr><tr>";
-          }
-        })
-        strHtml += "</tr>";
-
-        function randomPicksUpdateFadeOutHandler() {
-          $("#welcomePageRandomAlbumsTable").html(strHtml);
-          oldRandomAlbumIds = newRandomAlbumIds;
-          if (oldRandomAlbumIds.length > 0) {
-            var i;
-            var delay = 100;
-            for (i = 0; i < oldRandomAlbumIds.length; i++) {
-              setTimeout('$("#welcomePageRandomAlbumsItemWrapper' + oldRandomAlbumIds[i] + '").show("fade", {}, 2000);', delay);
-              delay += 200;
-            }
-          }
-        }
-        
-        if (oldRandomAlbumIds.length > 0) {
-          var i;
-          var delay = 100;
-          for (i = 0; i < oldRandomAlbumIds.length - 1; i++) {
-            setTimeout('$("#welcomePageRandomAlbumsItemWrapper' + oldRandomAlbumIds[i] + '").hide("fade", {}, 2000);', delay);
-            delay += 200;
-          }
-          var lastItemFadeOutHandler = function() {
-            $("#welcomePageRandomAlbumsItemWrapper" + oldRandomAlbumIds[i]).hide("fade", {}, 2000, randomPicksUpdateFadeOutHandler);
-          }
-	        setTimeout(lastItemFadeOutHandler, delay);
-	      }
-	      else {
-	        randomPicksUpdateFadeOutHandler();
-	      }
-      }
-    )
-  }
-
   $(function() {
     $("#welcomePageIntroductionTabs").tabs();
     $("#welcomePageIntroductionTabs").css("display", "block");
-    $("#welcomePageMainContent #twitter-buttons").css("display", "block");
-
-    setInterval("updateUsageData()", 60000);
-    setInterval("updateRandomPics()", 20000);
   });
-  
+
 {% endblock %}
 
 
@@ -148,80 +49,35 @@
       </div>
 		</div>
 
-    <div id="twitter-buttons">
-      <a href="https://twitter.com/aaltowsd2012s" 
-         class="twitter-follow-button" 
-         data-show-count="false">Follow @aaltowsd2012s</a>
-      <script>
-        !function(d, s, id) {
-          var js, fjs = d.getElementsByTagName(s)[0];
-          
-          if (!d.getElementById(id)){
-            js=d.createElement(s);
-            js.id=id;
-            js.src="//platform.twitter.com/widgets.js";
-            fjs.parentNode.insertBefore(js, fjs);
-          }
-        }(document, "script", "twitter-wjs");
-      </script>
-    </div>
+    {% twitter_follow_button %}
 
-    {% if user_count > 0 and album_count > 0 %}
-      <div id="welcomePageUsageNotice">
-        <div id="firstLine">
-          There are already <span id="userCounter">{{ user_count }}</span> user{{ user_count|pluralize }}, who so far have created in total
-          <span id="albumCounter">{{ album_count }}</span> album{{ album_count|pluralize }}!
-        </div>
-        <div id="secondLine">
-          Be sure to check out this thrilling possibility to express yourself and share your visions!
-        </div>
-      </div>
-    {% endif %}
+    {% albumizer_usage_notice %}
 
-    {% if random_albums %}
-	    <div id="welcomePageRandomAlbums">
-	      <div id="welcomePageRandomAlbumsHeader">
-		      <div id="welcomePageRandomAlbumsTitle">Some Random Picks From Our Users</div>
-		      <a id="welcomePageRandomAlbumsSeeMoreLink" href="/album/">See more</a>
-		    </div>
-	      <table id="welcomePageRandomAlbumsTable">
-	        <tr>
-          {% for album in random_albums %}
-	          <td>
-	            <div class="welcomePageRandomAlbumsItemContainer">
-	              <span id="welcomePageRandomAlbumsItemWrapper{{ album.id }}">
-	                <a href="/album/{{ album.id }}/"><img class="welcomePageRandomAlbumsItemImage" src="" alt="Cover of {{ album.title }}" /></a>
-	                <div class="welcomePageRandomAlbumsItemTitle"><a href="/album/{{ album.id }}/">{{ album.title }}</a></div>
-	              </span>
-	            </div>
-	          </td>
-	          {% if forloop.counter|divisibleby:"4" %} 
-	            </tr><tr>
-	          {% endif %}
-	        {% endfor %}
-	        </tr>
-	      </table>
-	    </div>
-    {% endif %}
-    
-    <div id="twitter-tweets">
-      <blockquote class="twitter-tweet tw-align-center" lang="en"><p>The Albumizer team is excited about this new web site and hopes to see you all here making albums! <a href="http://t.co/0EONiQee" title="http://www.albumizer.com/">albumizer.com</a> <a href="https://twitter.com/search/%2523Albumizer">#Albumizer</a></p>&mdash; aaltowsd2012s (@aaltowsd2012s) <a href="https://twitter.com/aaltowsd2012s/status/166281721048866816" data-datetime="2012-02-05T22:07:06+00:00">helmikuu 5, 2012</a></blockquote>
-      <script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div>
+    {% random_picks_album_list 8 %}
+
+    {% show_twitter_tweet %}
+
   </div>
 
   {% if latest_albums %}
-		<div id="welcomePageRightColumn">
-		   <div id="welcomePageAlbumList" class="ui-widget-content">
-		     <div id="welcomePageAlbumListHeading" class="ui-widget-header">The Latest Published Albums</div>
+    <div id="welcomePageRightColumn">
+      <div id="welcomePageAlbumList" class="ui-widget-content">
+        <div id="welcomePageAlbumListHeading" class="ui-widget-header">The Latest Published Albums</div>
 
-		     {% for album in latest_albums %}
-		      <div class="welcomePageAlbumListItem"><a 
-		              href="/album/{{ album.id }}/">{{ album.title }}</a><span 
-		                    class="creationDate">{{ album.creationDate|date:"j.n.Y G.i" }}</span></div>
+		    {% for album in latest_albums %}
+		      <div class="welcomePageAlbumListItem hlisting">
+		        <a href="{{ album.get_absolute_url }}">
+			        <div class="item">
+			          <span class="fn">{{ album.title }}</span><span class="creationDate dtlisted" title="{{ album.creationDate|date:"c" }}">{{ album.creationDate|date:"j.n.Y G.i" }}</span>
+			        </div>
+            </a>
+            <div class="offer-sell">available for order</div>
+            <div class="lister"><span class="fn">Albumizer</span>, <span class="url">http://{{ site_domain }}{{ album.get_absolute_url }}</span></div>
+            <div class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</div>
+          </div>
 		    {% endfor %}
-		   </div>
-		</div>
+		  </div>
+    </div>
   {% endif %}
 
 {% endblock %}

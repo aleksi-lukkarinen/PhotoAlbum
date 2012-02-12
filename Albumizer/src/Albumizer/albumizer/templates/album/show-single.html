@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 
@@ -8,28 +9,35 @@
 
 {% block page_content %}
 
-  <h1>{{ album.title }}</h1>
-  {% if album.description %}
-  <p>
-    {{ album.description }}
-  </p>
-  {% endif %}
+  <article class="albumBrowser hlisting">
+	  <h1 class="fn">{{ album.title }}</h1>
 
-  <a href="https://twitter.com/intent/tweet?button_hashtag=Albumizer&text=Hey!%20Some%20cool%20photos:%20{{ album.title|urlencode }}" 
-     class="twitter-hashtag-button" 
-     data-related="aaltowsd2012" 
-     data-url="http://{{ site_domain }}{% url 'albumizer.views.show_single_album' album.id %}">Tweet #Albumizer</a>
-  <script>
-    !function(d, s, id) {
-    	var js, fjs = d.getElementsByTagName(s)[0];
-    	
-    	if (!d.getElementById(id)){
-    		js=d.createElement(s);
-    		js.id=id;
-    		js.src="//platform.twitter.com/widgets.js";
-    		fjs.parentNode.insertBefore(js, fjs);
-    	}
-    }(document, "script", "twitter-wjs");
-  </script>
+
+    <!--  The browsing interface here  -->
+
+
+	  {% if album.description %}
+	  <p class="description">
+	    {{ album.description }}
+	  </p>
+	  {% endif %}
+
+    <table class="albumDetails">
+      <tr><th>Created:</th><td> <span class="dtlisted" title="{{ album.creationDate|date:"c" }}">{{ album.creationDate|date:"j.n.Y G.i" }}</span> by {{ album.owner.username }}</td></tr>
+
+	    {% if album.isPublic %}
+	      <tr><th>Public URL:</th><td><a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="self bookmark" class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</td></tr>
+	    {% else %}
+        <tr><th>Secret URL:</th><td>http://{{ site_domain }}{{ album.get_secret_url }}</td></tr>
+	    {% endif %}
+
+      <tr><th>Unit Price:</th><td class="price"> &euro;</td></tr>
+    </table>
+
+    <div class="offer-sell">available for order</div>
+    <div class="lister"><span class="fn">Albumizer</span>, <span class="url">http://{{ site_domain }}{{ album.get_absolute_url }}</span></div>
+  </article>
+
+  {% twitter_tweet_button_album album %}
 
 {% endblock %}
