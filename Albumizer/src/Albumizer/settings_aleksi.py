@@ -28,18 +28,59 @@ DATABASES = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s M%(module)s P%(process)d T%(thread)d -- %(message)s"
+        },
+    },
     "handlers": {
-        "log_file": {
-            "filename": "D:/Django-loki.txt",
+        "common_log_file": {
+            "filename": "D:/Albumizer common log.txt",
             "encoding": "utf-8",
-            "class": "logging.FileHandler"
-        }
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+        },
+        "payments_log_file": {
+            "filename": "D:/Albumizer payments log.txt",
+            "encoding": "utf-8",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+        },
+        "userActions_log_file": {
+            "filename": "D:/Albumizer user action log.txt",
+            "encoding": "utf-8",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+        },
     },
     "loggers": {
-        "django.request": {
-            "handlers": ["log_file"],
-            "level": "ERROR",
+        "django": {
+            "handlers": ["common_log_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "level": "DEBUG",
             "propagate": True,
+        },
+        "django.request": {
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "albumizer": {
+            "handlers": ["common_log_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "albumizer.userActions": {
+            "handlers": ["userActions_log_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "albumizer.payments": {
+            "handlers": ["payments_log_file"],
+            "level": "INFO",
+            "propagate": False,
         },
     }
 }

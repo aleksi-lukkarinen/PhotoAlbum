@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-import hashlib
+import hashlib, logging
 from datetime import datetime
 from django.conf import settings
 from django.contrib import auth
@@ -27,6 +27,13 @@ SPS_STATUS_SUCCESSFUL = "successful"
 SPS_STATUS_CANCELED = "canceled"
 SPS_STATUS_UNSUCCESSFUL = "unsuccessful"
 VALID_SPS_PAYMENT_STATUSES = [SPS_STATUS_SUCCESSFUL, SPS_STATUS_CANCELED, SPS_STATUS_UNSUCCESSFUL]
+
+
+
+
+commonLogger = logging.getLogger(__name__)
+userActionLogger = logging.getLogger("albumizer.userActions")
+paymentLogger = logging.getLogger("albumizer.payments")
 
 
 
@@ -202,6 +209,8 @@ def create_album_POST(request):
     )
     new_album.save()
 
+    userActionLogger.info("User %s created an album called \"%s\"." % (request.user.username, new_album.title))
+
     return HttpResponseRedirect(new_album.get_absolute_url())
 
 
@@ -278,6 +287,8 @@ def get_registration_information_POST(request):
     user_profile.homePhone = homephone
     user_profile.save()
 
+    userActionLogger.info("User %s (id %d) was created." % (username, new_user.id))
+
     if postaddressline1 or postaddressline2 or zipcode or city or state or country:
         new_address = Address(
             owner = new_user,
@@ -289,6 +300,7 @@ def get_registration_information_POST(request):
             country = country
         )
         new_address.save()
+        userActionLogger.info("For user %s, an address (id %d) was created." % (username, new_address.id))
 
     authenticated_user = auth.authenticate(username = username, password = password)
     auth.login(request, authenticated_user)
@@ -326,9 +338,11 @@ def log_in_POST(request):
     user = auth.authenticate(username = username, password = password)
     if user is None:
         form.add_common_error(u"Unknown error: Albumizer was unable to authenticate this username.")
+        commonLogger.info("Login failed for username %s." % username)
         return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
 
     auth.login(request, user)
+    userActionLogger.info("User %s (id %d) logged in." % (user.username, user.id))
 
     return HttpResponseRedirect(next_url)
 
@@ -337,7 +351,9 @@ def log_in_POST(request):
 
 def log_out(request):
     """ Allows user to log out and redirects him/her to the welcome page. """
+    username = request.user.username;
     auth.logout(request)
+    userActionLogger.info("User %s logged out." % username)
     return HttpResponseRedirect(reverse("albumizer.views.welcome_page"))
 
 
@@ -431,6 +447,7 @@ def checkfb(request, aToken, userid):
                 raise RuntimeError(value = "facebook profile created, but authentication still failed")
         #user found and authenticated, let's login    
         auth.login(request, user)
+        userActionLogger.info("User %s (id %d) logged in via Facebook." % (user.username, user.id))
 
     return ""
 
