@@ -7,7 +7,8 @@ from random import Random
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
-from Albumizer.albumizer.models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
+from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
+        Address, Order, SPSPayment, OrderStatus, OrderItem
 
 
 
@@ -313,14 +314,15 @@ class Command(BaseCommand):
                         self.stdout.write(u"p ")
 
                 if verbosity >= 2:
-                    self.stdout.write(u"\n\n")
+                    message = u"\n    * Price: %s euros\n\n" % new_album.price_as_2dstr()
+                    self.stdout.write(message.encode("ascii", "backslashreplace"))
 
 
 
             most_recent_order = None
             most_recent_order_purchasedate = datetime(1900, 1, 1, 0, 0, 0)
             number_of_orders = self._orderRandomizer.randrange(min_number_of_orders, max_number_of_orders + 1)
-            for order_number in range(0, number_of_orders):
+            for order_number in range(number_of_orders):
                 order_data = self.generate_order_data(new_user)
                 if not order_data["success"]:
                     if verbosity >= 2:
@@ -365,15 +367,27 @@ class Command(BaseCommand):
                         self.stdout.write(u"i ")
 
                 if verbosity >= 2:
-                    self.stdout.write(u"\n")
+                    message = u"            Total price: %s euros\n" % new_order.total_price_as_2dstr()
+                    if order_number < number_of_orders - 1:
+                        message += u"\n"
+                    self.stdout.write(message.encode("ascii", "backslashreplace"))
 
 
             if most_recent_order and self._orderRandomizer.randrange(0, 100) > 50:
-                most_recent_order.status = 0
+                order_status_factor = self._orderRandomizer.randrange(0, 100)
+                if order_status_factor < 33:
+                    most_recent_order.status = OrderStatus.ordered()
+                elif order_status_factor < 80:
+                    most_recent_order.status = OrderStatus.paid_and_being_processed()
+                else:
+                    most_recent_order.status = OrderStatus.blocked()
+                    most_recent_order.statusClarification = u"We are temporarily out of stock, but will send " + \
+                                                            u"the products as soon as they arrive to our warehouse."
+
                 most_recent_order.save()
 
                 if verbosity >= 2:
-                    message = u"\n  - the most recent order (%s) is still in the shopping cart (status = %d)\n" % \
+                    message = u"\n  - status of the most recent order (%s) is \"%s\"\n" % \
                                             (most_recent_order.purchaseDate, most_recent_order.status)
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
@@ -767,7 +781,7 @@ class Command(BaseCommand):
 
     def generate_order_data(self, user):
         """ Generates information related to a single order """
-        status = 3
+        status = OrderStatus.sent()
 
         orderable_albums_qs = Album.objects.filter(id__lt = 0)
         purchase_date_calculation_counter = 0

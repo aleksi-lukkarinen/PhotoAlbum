@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import post_save
 from django.utils.html import escape
 
 
@@ -21,6 +21,9 @@ def json_serialization_handler(object_to_serialize):
         raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % \
                                 (type(object_to_serialize), repr(object_to_serialize))
 
+
+
+
 def serialize_into_json(object_to_serialize):
     """ 
         Serializes objects into json using Python's json package. In debug mode, the format is clearer,
@@ -30,6 +33,24 @@ def serialize_into_json(object_to_serialize):
         return json.dumps(object_to_serialize, sort_keys = True, indent = 4, default = json_serialization_handler)
     else:
         return json.dumps(object_to_serialize, default = json_serialization_handler)
+
+
+
+
+def convert_money_into_two_decimal_string(amount):
+    """ Returns the price of this album as a string with two decimal places. """
+    amount_str = unicode(int(amount * 100.0) / 100.0)
+    period_pos = amount_str.find(".")
+    if period_pos == -1:
+        amount_str += ".00"
+    else:
+        numbers_after_period = len(amount_str) - period_pos - 1
+        if numbers_after_period == 1:
+            amount_str += "0"
+        elif numbers_after_period == 0:
+            amount_str += "00"
+
+    return amount_str
 
 
 
@@ -240,6 +261,20 @@ class Album(models.Model):
     def pages(self):
         """ Return all pages of this album. """
         return Page.objects.filter(album__exact = self)
+
+    def price(self):
+        """ Calculates and returns the price of this album. """
+        total = 0.0
+        page_count = self.pages().count()
+        if page_count < 1:
+            return total
+        total += settings.PRICE_PER_ALBUM
+        total += page_count * settings.PRICE_PER_ALBUM_PAGE
+        return total
+
+    def price_as_2dstr(self):
+        """ Calculates and returns the price of this album as a string with two decimal places. """
+        return convert_money_into_two_decimal_string(self.price())
 
     def as_api_dict(self):
         """ Returns this album as an dictionary containing values wanted to be exposed in the public api. """
@@ -495,84 +530,6 @@ class ShoppingCartItem(models.Model):
 
 
 
-class Order(models.Model):
-    """ Represents a single order (containing many albums) as a whole. """
-    orderer = models.ForeignKey(User)
-    purchaseDate = models.DateTimeField(
-        auto_now_add = True,
-        verbose_name = u"purchase date"
-    )
-    status = models.IntegerField()
-    statusClarification = models.CharField(
-        blank = True,
-        max_length = 255,
-        help_text = u"clarification of the current state of the order and the reasons for it, if necessary"
-    )
-
-    def is_paid(self):
-        """ Returns True if this order is paid, otherwise False. """
-        return SPSPayment.of_order(self) != None
-
-    def items(self):
-        """ Return all items of this order. """
-        return OrderItem.objects.filter(order__exact = self)
-
-    def __unicode__(self):
-        return u"%s, %s" % (self.orderer, self.purchaseDate)
-
-    class Meta():
-        unique_together = ("orderer", "purchaseDate")
-        ordering = ["orderer", "purchaseDate", "status"]
-        verbose_name = u"order"
-        verbose_name_plural = u"orders"
-
-
-
-
-class SPSPayment(models.Model):
-    """ Represents a payment related to an order when paid via the Simple Payments service. """
-    order = models.OneToOneField(Order)
-    amount = models.DecimalField(
-        max_digits = 10,
-        decimal_places = 2,
-        verbose_name = u"amount [€]",
-        help_text = u"a number with max. 2 decimals, e.g. 2.45"
-    )
-    transactionDate = models.DateTimeField(
-        auto_now_add = True,
-        verbose_name = u"transaction date",
-        help_text = u"time when the payment is made"
-    )
-    referenceCode = models.CharField(
-        max_length = 255,
-        verbose_name = u"reference code",
-        help_text = u"payment reference code given by the Simple Payments service"
-    )
-    clarification = models.CharField(
-        blank = True,
-        max_length = 255,
-        help_text = u"clarifying information related to the payment"
-    )
-
-    @staticmethod
-    def of_order(order):
-        """ Returns payment of given order, if one exists. """
-        payment_qs = ShoppingCartItem.objects.filter(order__exact = order)
-        if payment_qs.count() < 1:
-            return None
-        return payment_qs[0]
-
-    def __unicode__(self):
-        return u"%s, %s, %f" % (self.order, self.transactionDate, self.amount)
-
-    class Meta():
-        ordering = ["order"]
-        verbose_name = u"Simple Payments service payment"
-        verbose_name_plural = u"Simple Payments service payments"
-
-
-
-
 class OrderStatus(models.Model):
     """ 
         Represents the current status of an order.
@@ -623,6 +580,102 @@ class OrderStatus(models.Model):
 
 
 
+class Order(models.Model):
+    """ Represents a single order (containing many albums) as a whole. """
+    orderer = models.ForeignKey(User)
+    purchaseDate = models.DateTimeField(
+        auto_now_add = True,
+        verbose_name = u"purchase date"
+    )
+    status = models.ForeignKey(OrderStatus)
+    statusClarification = models.CharField(
+        blank = True,
+        max_length = 255,
+        help_text = u"clarification of the current state of the order and the reasons for it, if necessary"
+    )
+
+    def total_price(self):
+        """ Calculates and returns the total price for this order. """
+        items = self.items()
+        total = 0.0
+        for i in range(items.count()):
+            total += items[i].count * items[i].album.price()
+        total += settings.SHIPPING_EXPENSES
+        return total
+
+    def total_price_as_2dstr(self):
+        """ Calculates and returns the total price for this order as a string with two decimal places. """
+        return convert_money_into_two_decimal_string(self.total_price())
+
+    def is_paid(self):
+        """ Returns True if this order is paid, otherwise False. """
+        return SPSPayment.exists_for_order(self)
+
+    def items(self):
+        """ Return all items of this order. """
+        return OrderItem.items_of_order(self)
+
+    def __unicode__(self):
+        return u"%s, %s" % (self.orderer, self.purchaseDate)
+
+    class Meta():
+        unique_together = ("orderer", "purchaseDate")
+        ordering = ["orderer", "purchaseDate", "status"]
+        verbose_name = u"order"
+        verbose_name_plural = u"orders"
+
+
+
+
+class SPSPayment(models.Model):
+    """ Represents a payment related to an order when paid via the Simple Payments service. """
+    order = models.OneToOneField(Order)
+    amount = models.DecimalField(
+        max_digits = 10,
+        decimal_places = 2,
+        verbose_name = u"amount [€]",
+        help_text = u"a number with max. 2 decimals, e.g. 2.45"
+    )
+    transactionDate = models.DateTimeField(
+        auto_now_add = True,
+        verbose_name = u"transaction date",
+        help_text = u"time when the payment is made"
+    )
+    referenceCode = models.CharField(
+        max_length = 255,
+        verbose_name = u"reference code",
+        help_text = u"payment reference code given by the Simple Payments service"
+    )
+    clarification = models.CharField(
+        blank = True,
+        max_length = 255,
+        help_text = u"clarifying information related to the payment"
+    )
+
+    @staticmethod
+    def of_order(order):
+        """ Returns payment of given order, if one exists. """
+        payment_qs = SPSPayment.objects.filter(order__exact = order)
+        if payment_qs.count() < 1:
+            return None
+        return payment_qs[0]
+
+    @staticmethod
+    def exists_for_order(order):
+        """ Checks if a payment for given order exists. """
+        return ShoppingCartItem.objects.filter(order__exact = order).exists()
+
+    def __unicode__(self):
+        return u"%s, %s, %f" % (self.order, self.transactionDate, self.amount)
+
+    class Meta():
+        ordering = ["order"]
+        verbose_name = u"Simple Payments service payment"
+        verbose_name_plural = u"Simple Payments service payments"
+
+
+
+
 class OrderItem(models.Model):
     """ Represents a single item (line) in an order. """
     order = models.ForeignKey(Order)
@@ -636,6 +689,11 @@ class OrderItem(models.Model):
     def __unicode__(self):
         return u"%s, %s, %s, %d piece(s)" % (self.order.orderer, self.order.purchaseDate,
                                              self.album.title, self.count)
+
+    @staticmethod
+    def items_of_order(order):
+        """ Returns items of given order, if there are any. """
+        return OrderItem.objects.filter(order__exact = order)
 
     class Meta():
         unique_together = ("order", "album")

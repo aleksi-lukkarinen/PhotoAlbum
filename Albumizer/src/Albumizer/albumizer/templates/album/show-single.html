@@ -21,7 +21,7 @@
 	    {{ album.description }}
 	  </p>
 	  {% endif %}
-
+ 
     <table class="albumDetails">
       <tr><th>Created:</th><td> <span class="dtlisted" title="{{ album.creationDate|date:"c" }}">{{ album.creationDate|date:"j.n.Y G.i" }}</span> by {{ album.owner.username }}</td></tr>
 
@@ -31,7 +31,7 @@
         <tr><th>Secret URL:</th><td>http://{{ site_domain }}{{ album.get_secret_url }}</td></tr>
 	    {% endif %}
 
-      <tr><th>Unit Price:</th><td class="price"> &euro;</td></tr>
+      <tr><th>Unit Price:</th><td class="price">{{ album.price_as_2dstr }} &euro;</td></tr>
     </table>
 
     <div class="offer-sell">available for order</div>
