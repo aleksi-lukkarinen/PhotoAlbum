@@ -10,7 +10,7 @@ from Albumizer.albumizer.models import Order, OrderStatus
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        Order.objects.all().update(status = OrderStatus.sent().id)
+        orm['albumizer.order'].objects.all().update(status = OrderStatus.sent().id)
 
 
 
