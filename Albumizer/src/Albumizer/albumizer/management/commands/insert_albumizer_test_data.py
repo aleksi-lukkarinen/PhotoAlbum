@@ -216,10 +216,11 @@ class Command(BaseCommand):
                 unique_username = unicode(username + unicode(postfix_counter))
                 postfix_counter += 1
 
-            new_user = User(username = unique_username, email = user_data["email"], password = "salasana")
+            new_user = User(username = unique_username, email = user_data["email"], password = "")
             new_user.first_name = user_data["first_name"]
             new_user.last_name = user_data["last_name"]
             new_user.date_joined = user_data["serviceConditionsAccepted"]
+            new_user.set_password("salasana")
             new_user.save()
             self._ids_of_generated_users.append(new_user.id)
 
