@@ -15,7 +15,7 @@ from django.utils import simplejson as json
 from django.views.decorators.cache import cache_control
 from Albumizer.albumizer import facebook_api
 from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
-        Address, Order, SPSPayment, OrderStatus, OrderItem
+        Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 from forms import AlbumCreationForm, LoginForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
         HttpResponseForbidden, HttpResponseNotFound, HttpResponse
@@ -122,7 +122,7 @@ def welcome_page(request):
 
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not). """
-    albums = Album.objects.filter(isPublic = True).order_by('title')
+    albums = Album.ones_visible_to(request.user)
 
     paginator = Paginator(albums, 20) # Show 20 albums per page
 

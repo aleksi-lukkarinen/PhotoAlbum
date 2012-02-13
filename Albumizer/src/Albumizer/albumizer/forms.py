@@ -8,8 +8,8 @@ from django.core.exceptions import ValidationError
 from django.forms.forms import NON_FIELD_ERRORS
 from django.forms.util import ErrorList, ErrorDict
 from django.forms.widgets import Input
-from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, \
-                State, Address, Order, SPSPayment, OrderStatus, OrderItem
+from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
+        Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 
 
 

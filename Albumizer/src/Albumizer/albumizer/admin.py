@@ -2,8 +2,8 @@
 
 from django.contrib import admin
 from django.contrib.auth.models import User
-from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, \
-                State, Address, Order, SPSPayment, OrderStatus, OrderItem
+from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
+        Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 
 
 
@@ -82,6 +82,15 @@ class AddressAdmin(admin.ModelAdmin):
 
 
 
+class ShoppingCartItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'album', 'count', 'additionDate')
+    search_fields = ('user__username', 'album__title')
+    date_hierarchy = 'additionDate'
+    raw_id_fields = ('user', 'album')
+
+
+
+
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('orderer', 'purchaseDate', 'status')
     list_filter = ('status',)
@@ -128,6 +137,7 @@ admin.site.register(PageContent, PageContentAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(State, StateAdmin)
 admin.site.register(Address, AddressAdmin)
+admin.site.register(ShoppingCartItem, ShoppingCartItemAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(SPSPayment, SPSPaymentAdmin)
 admin.site.register(OrderStatus, OrderStatusAdmin)

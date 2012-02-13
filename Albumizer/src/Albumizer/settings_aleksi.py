@@ -36,19 +36,16 @@ LOGGING = {
     "handlers": {
         "common_log_file": {
             "filename": "D:/Albumizer common log.txt",
-            "encoding": "utf-8",
             "class": "logging.FileHandler",
             "formatter": "verbose",
         },
         "payments_log_file": {
             "filename": "D:/Albumizer payments log.txt",
-            "encoding": "utf-8",
             "class": "logging.FileHandler",
             "formatter": "verbose",
         },
         "userActions_log_file": {
             "filename": "D:/Albumizer user action log.txt",
-            "encoding": "utf-8",
             "class": "logging.FileHandler",
             "formatter": "verbose",
         },

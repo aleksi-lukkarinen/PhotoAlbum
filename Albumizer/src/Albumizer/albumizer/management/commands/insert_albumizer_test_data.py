@@ -6,9 +6,9 @@ from optparse import make_option
 from random import Random
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
+from django.db.models import Max, Q
 from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
-        Address, Order, SPSPayment, OrderStatus, OrderItem
+        Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 
 
 
@@ -103,9 +103,11 @@ class Command(BaseCommand):
 
 
 
+
     def _read_data_file(self, filename):
         """ Reads lines of a file to a list and trims them """
         return [unicode(line.strip(), encoding = "utf-8") for line in fileinput.input(filename)]
+
 
 
 
@@ -241,14 +243,15 @@ class Command(BaseCommand):
             for address_number in range(1, number_of_addresses + 1):
                 address_data = self.generate_address_data()
 
-                new_address = Address()
-                new_address.owner = new_user
-                new_address.postAddressLine1 = address_data["postAddressLine1"]
-                new_address.postAddressLine2 = address_data["postAddressLine2"]
-                new_address.zipCode = address_data["zipCode"]
-                new_address.city = address_data["city"]
-                new_address.state = address_data["state"]
-                new_address.country = address_data["country"]
+                new_address = Address(
+                    owner = new_user,
+                    postAddressLine1 = address_data["postAddressLine1"],
+                    postAddressLine2 = address_data["postAddressLine2"],
+                    zipCode = address_data["zipCode"],
+                    city = address_data["city"],
+                    state = address_data["state"],
+                    country = address_data["country"],
+                )
                 new_address.save()
 
                 if verbosity >= 2:
@@ -275,11 +278,12 @@ class Command(BaseCommand):
                     unique_album_title = unicode(album_title + u" " + unicode(postfix_counter))
                     postfix_counter += 1
 
-                new_album = Album()
-                new_album.owner = new_user
-                new_album.title = unique_album_title
-                new_album.description = album_data["description"]
-                new_album.isPublic = album_data["is_public"]
+                new_album = Album(
+                    owner = new_user,
+                    title = unique_album_title,
+                    description = album_data["description"],
+                    isPublic = album_data["is_public"]
+                )
                 new_album.save()
                 new_album.creationDate = album_data["creation_date"]
                 new_album.save()
@@ -302,9 +306,10 @@ class Command(BaseCommand):
                 for page_number in range(1, number_of_pages + 1):
                     #page_data = self.generate_page_data()
 
-                    new_page = Page()
-                    new_page.album = new_album
-                    new_page.pageNumber = page_number
+                    new_page = Page(
+                        album = new_album,
+                        pageNumber = page_number
+                    )
                     new_page.save()
 
                     if verbosity >= 2:
@@ -319,8 +324,48 @@ class Command(BaseCommand):
 
 
 
+
+
+
+            shopping_cart_data = self.generate_shopping_cart_data(new_user)
+            if not shopping_cart_data["success"] and verbosity >= 2:
+                message = u"  - no valid albums to create shopping cart with\n\n"
+                self.stdout.write(message.encode("ascii", "backslashreplace"))
+            else:
+                message = u"  - shopping cart:\n"
+                self.stdout.write(message.encode("ascii", "backslashreplace"))
+
+                item_counter = 0
+                for item in shopping_cart_data["items"]:
+                    item_counter += 1
+                    new_shopping_cart_item = ShoppingCartItem(
+                        user = new_user,
+                        album = item["album"],
+                        count = item["count"]
+                    )
+                    new_shopping_cart_item.save()
+                    new_shopping_cart_item.additionDate = item["additionDate"]
+                    new_shopping_cart_item.save()
+
+                    if verbosity >= 2:
+                        message = u"            (%d) %s, %d, %s\n" % \
+                                        (item_counter, new_shopping_cart_item.album, new_shopping_cart_item.count,
+                                         new_shopping_cart_item.additionDate)
+                        self.stdout.write(message.encode("ascii", "backslashreplace"))
+                    elif verbosity == 1:
+                        self.stdout.write(u"c ")
+
+
+                if verbosity >= 2:
+                    self.stdout.write("\n".encode("ascii", "backslashreplace"))
+
+
+
+
+
             most_recent_order = None
             most_recent_order_purchasedate = datetime(1900, 1, 1, 0, 0, 0)
+            generated_orders = []
             number_of_orders = self._orderRandomizer.randrange(min_number_of_orders, max_number_of_orders + 1)
             for order_number in range(number_of_orders):
                 order_data = self.generate_order_data(new_user)
@@ -330,12 +375,15 @@ class Command(BaseCommand):
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     break;
 
-                new_order = Order()
-                new_order.orderer = new_user
-                new_order.status = order_data["status"]
+                new_order = Order(
+                    orderer = new_user,
+                    status = order_data["status"]
+                )
                 new_order.save()
                 new_order.purchaseDate = order_data["purchase_date"]
                 new_order.save()
+
+                generated_orders.append(new_order)
 
                 if new_order.purchaseDate > most_recent_order_purchasedate:
                     most_recent_order_purchasedate = new_order.purchaseDate
@@ -351,11 +399,12 @@ class Command(BaseCommand):
                 for item in order_data["items"]:
                     order_item_counter += 1
 
-                    new_order_item = OrderItem()
-                    new_order_item.order = new_order
-                    new_order_item.album = item["album"]
-                    new_order_item.count = item["count"]
-                    new_order_item.deliveryAddress = item["address"]
+                    new_order_item = OrderItem(
+                        order = new_order,
+                        album = item["album"],
+                        count = item["count"],
+                        deliveryAddress = item["address"]
+                    )
                     new_order_item.save()
 
                     if verbosity >= 2:
@@ -390,6 +439,38 @@ class Command(BaseCommand):
                     message = u"\n  - status of the most recent order (%s) is \"%s\"\n" % \
                                             (most_recent_order.purchaseDate, most_recent_order.status)
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
+
+
+            if verbosity >= 2:
+                self.stdout.write("\n".encode("ascii", "backslashreplace"))
+
+
+
+
+            for order in generated_orders:
+                if order.status != OrderStatus.ordered():
+                    payment_data = self.generate_sps_payment_data(order)
+
+                    new_sps_payment = SPSPayment(
+                        order = order,
+                        amount = payment_data["amount"],
+                        referenceCode = payment_data["referenceCode"],
+                        clarification = payment_data["clarification"]
+                    )
+
+                    new_sps_payment.save()
+                    new_sps_payment.transactionDate = payment_data["transactionDate"]
+                    new_sps_payment.save()
+
+                    if verbosity >= 2:
+                        message = u"  - SPS payment for order (%s), %s euros, made %s, ref code %s\n" % \
+                                        (order.purchaseDate, new_sps_payment.amount_as_2dstr(),
+                                         new_sps_payment.transactionDate, new_sps_payment.referenceCode)
+                        self.stdout.write(message.encode("ascii", "backslashreplace"))
+                    elif verbosity == 1:
+                        self.stdout.write(u"y ")
+
+
 
 
             if verbosity >= 1:
@@ -726,6 +807,7 @@ class Command(BaseCommand):
 
 
 
+
     def decorate_album_title(self, title):
         """ May insert some decorations to given title """
         if self._albumRandomizer.randrange(0, 99) < 5:
@@ -747,12 +829,14 @@ class Command(BaseCommand):
 
 
 
+
     def compose_heart_string(self):
         """ Compose a string of hearts (like <3) to be used in titles """
         hearts = "<3"
         for i in range(0, self._albumRandomizer.randrange(0, 3)):
             hearts += " <3"
         return hearts
+
 
 
 
@@ -779,11 +863,60 @@ class Command(BaseCommand):
 
 
 
+
+    def generate_shopping_cart_data(self, user):
+        """ Generates information related to user's shopping cart """
+
+        orderable_albums_qs = Album.ones_visible_to(user)
+        orderable_albums_qs_count = orderable_albums_qs.count()
+
+        if not orderable_albums_qs_count:
+            return {"success": False}
+
+        number_of_cart_items = self._orderRandomizer.randrange(1, 10)
+        if number_of_cart_items > orderable_albums_qs_count:
+            number_of_cart_items = orderable_albums_qs_count
+
+        max_album_id = orderable_albums_qs.aggregate(Max("id")).values()[0]
+        if not max_album_id:
+            return []
+
+        albums = []
+        album_ids = []
+        missed_tries = 0
+        while len(albums) < number_of_cart_items and missed_tries < 10:
+            base_album_id = self._orderRandomizer.randrange(0, max_album_id)
+            album = orderable_albums_qs.filter(id__gte = base_album_id).order_by("id")[0]
+            if not album.id in album_ids:
+                albums.append(album)
+                album_ids.append(album.id)
+            else:
+                missed_tries += 1
+
+        if not albums:
+            return {"success": False}
+
+        cart_item_infos = []
+        for album in albums:
+            cart_item_infos.append({
+                "album": album,
+                "count": self._orderRandomizer.randrange(1, 6),
+                "additionDate": datetime.now()
+            })
+
+        return {
+            "success": True,
+            "items": cart_item_infos
+        }
+
+
+
+
     def generate_order_data(self, user):
         """ Generates information related to a single order """
         status = OrderStatus.sent()
 
-        orderable_albums_qs = Album.objects.filter(id__lt = 0)
+        orderable_albums_qs = Album.objects.filter(id__lt = 0)  # empty qs, don't modify
         purchase_date_calculation_counter = 0
         o_maxtimdelta = datetime.now() - user.date_joined
         o_deltaseconds = int(o_maxtimdelta.total_seconds())
@@ -832,6 +965,27 @@ class Command(BaseCommand):
             "status": status,
             "items": album_infos
         }
+
+
+
+
+    def generate_sps_payment_data(self, order):
+        """ 
+            Generates information related to a single transaction
+            via Simple Payments service related to given order.
+        """
+
+        secondsFromOrder = self._orderRandomizer.randrange(5, 20)
+        transactionDate = order.purchaseDate + timedelta(seconds = secondsFromOrder)
+
+        return {
+            "order": order,
+            "amount": order.total_price(),
+            "transactionDate": transactionDate,
+            "referenceCode": self._orderRandomizer.randrange(1234567890, 9876543210),
+            "clarification": ""
+        }
+
 
 
 

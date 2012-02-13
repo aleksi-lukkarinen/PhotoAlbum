@@ -6,7 +6,7 @@ from random import Random
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.db.models.signals import post_save
 from django.utils.html import escape
 
@@ -279,8 +279,13 @@ class Album(models.Model):
         """ Returns a queryset of albums owned by given user and ordered by title. """
         return Album.objects.filter(owner = user).order_by('title')
 
+    @staticmethod
+    def ones_visible_to(user):
+        """ Returns a queryset of albums visible to a given user. """
+        return Album.objects.filter(Q(isPublic = True) | Q(owner = user)).order_by('title')
+
     def pages(self):
-        """ Return all pages of this album. """
+        """ Return a queryset of all pages of this album. """
         return Page.objects.filter(album__exact = self)
 
     def price(self):
@@ -532,7 +537,6 @@ class ShoppingCartItem(models.Model):
         verbose_name = u"addition date",
         help_text = u"time when the item was added into shopping cart"
     )
-    status = models.IntegerField()
 
     @staticmethod
     def items_of_user(user):
@@ -685,6 +689,10 @@ class SPSPayment(models.Model):
     def exists_for_order(order):
         """ Checks if a payment for given order exists. """
         return ShoppingCartItem.objects.filter(order__exact = order).exists()
+
+    def amount_as_2dstr(self):
+        """ Returns the amount of this payment as a string with two decimal places. """
+        return convert_money_into_two_decimal_string(self.amount)
 
     def __unicode__(self):
         return u"%s, %s, %f" % (self.order, self.transactionDate, self.amount)
