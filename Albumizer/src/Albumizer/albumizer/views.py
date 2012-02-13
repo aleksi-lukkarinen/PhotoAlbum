@@ -506,7 +506,30 @@ def edit_account_information(request):
 @prevent_all_caching
 def edit_shopping_cart(request):
     """ Allows user to edit the content of his/her shopping cart """
-    return render_to_response('order/shopping-cart.html', RequestContext(request))
+    items = ShoppingCartItem.items_of_user(request.user)
+
+    item_info = []
+    sub_total_price = 0.00
+    for item in items:
+        item_price = item.album.price()
+        row_total = item.count * item_price
+        sub_total_price += row_total
+        item_info.append({
+            "title": item.album.title,
+            "url": item.album.get_absolute_url(),
+            "description": item.album.description,
+            "creator": item.album.owner,
+            "coverUrl": "",
+            "number_of_units": item.count,
+            "unit_price": item_price,
+            "row_total": row_total
+        })
+
+    template_parameters = {
+        "item_info": item_info,
+        "sub_total_price": sub_total_price
+    }
+    return render_to_response('order/shopping-cart.html', RequestContext(request, template_parameters))
 
 
 

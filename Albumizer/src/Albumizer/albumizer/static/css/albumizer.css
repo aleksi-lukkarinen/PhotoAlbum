@@ -646,14 +646,14 @@ clear:both;
   vertical-align:            top; 
 	text-align:                left;
 	width:                     7em;
-	background:                #eeffdd;
+	background:                #ccddbb;
   color:                     #000000;
 }
 
 .albumBrowser .albumDetails td {
   padding:                   0.2em 0.7em 0.2em 0.7em; 
   vertical-align:            top; 
-  background:                #eeffdd;
+  background:                #ccddbb;
   color:                     #000000;
 }
 
@@ -676,17 +676,17 @@ clear:both;
 .albumBrowser .additionalInfoContainer .urlContainer {
 	font-size:                 90%;
   background:                #ffffff;
-  color:                     #bbbbbb;
+  color:                     #666666;
 }
 
 .albumBrowser .additionalInfoContainer .urlContainer a {
   background:                #ffffff;
-  color:                     #aaccaa;
+  color:                     #779977;
   text-decoration:           none;
 }
 
 .albumBrowser .additionalInfoContainer .urlContainer a:hover {
-  color:                     #88aa88;
+  color:                     #446644;
 }
 
 .albumBrowser .additionalInfoContainer .urlContainer .helpText {
@@ -696,11 +696,168 @@ clear:both;
 .albumBrowser .additionalInfoContainer .urlContainer .secretUrl {
   display:                   block;
   background:                #ffffff;
-  color:                     #aaccaa;
+  color:                     #779977;
 }
 
 .albumBrowser .additionalInfoContainer .twitter-tweet-button-album-container {
 	margin-top: 0em;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.shoppingCart table {
+  width:                     100%;
+}
+
+.shoppingCart .headerRowTable {
+	font-size:                 90%;
+	background:                #ffffff;
+	color:                     #444444;
+}
+
+.shoppingCart .itemRowTable,
+.shoppingCart .subtotalRowTable {
+  border-top:                1px solid #888888; 
+}
+
+.shoppingCart tr {
+	vertical-align:            top;
+}
+
+.shoppingCart th {
+	padding:                   0.2em 0.4em 0.2em 0em;
+}
+
+.shoppingCart td {
+	padding:                   0.5em 0.4em 2em 0em;
+}
+
+.shoppingCart .itemColumn {
+  width:                     70%;                                
+	text-align:                left;
+}
+
+.shoppingCart .itemColumn img {
+  display:                   block;
+  float:                     left;
+  width:                     8em;
+  height:                    8em;
+  margin-right:              2em;
+  border:                    1px solid #aaaaaa;
+  background:                #dddddd;
+  color:                     #888888;
+  padding-top:               0.3em;
+  text-align:                center;
+  overflow:                  hidden;
+  text-overflow:             ellipsis;
+  -o-text-overflow:          ellipsis;
+}
+
+.shoppingCart .itemColumn img:hover {
+	border:                    1px solid #aa0000;
+}
+
+.shoppingCart .itemColumn .item1stRow {
+	margin-bottom:             1em;
+}
+
+.shoppingCart .itemColumn .item1stRow a {
+  font-size:                 120%;
+  font-weight:               bold;
+  text-decoration:           none;
+  color:                     #336699;
+}
+
+.shoppingCart .itemColumn .item1stRow a:hover {
+  text-decoration:           underline;
+  color:                     #aa0000;
+}
+
+.shoppingCart .itemColumn .item1stRow .creator {
+  color:                     #444444;
+}
+
+.shoppingCart .itemColumn .item2ndRow {
+  color:                     #444444;
+}
+
+.shoppingCart .quantityColumn {
+  width:                     10%;                                
+	text-align:                center;
+}
+
+.shoppingCart .itemRowTable .quantityColumn,
+.shoppingCart .itemRowTable .unitPriceColumn,
+.shoppingCart .itemRowTable .rowTotalColumn {
+  font-size:                 110%;
+}
+
+.shoppingCart .itemRowTable .rowTotalColumn {
+  color:                     #aa0000;
+  font-weight:               bold;
+}
+
+.shoppingCart .unitPriceColumn {
+  width:                     10%;                                
+	text-align:                right;           
+}
+
+.shoppingCart .rowTotalColumn {
+  width:                     10%;                                
+	text-align:                right;           
+}
+
+.shoppingCart .subTotalRow {
+  text-align:                right;           
+}
+
+.shoppingCart .subtotalRowTable {
+	text-align:                right;
+	font-size:                 130%;
+	font-weight:               bold;
+}
+
+.shoppingCart .subtotalRowTable .subTotal {
+  color:                     #880000;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 

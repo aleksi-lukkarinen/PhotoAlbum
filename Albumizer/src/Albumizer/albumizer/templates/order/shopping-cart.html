@@ -9,5 +9,49 @@
 {% block page_content %}
 
   <h1>Shopping Cart</h1>
+  
+  {% if not item_info %}
+    Your shopping cart is empty.
+  {% else %}
+    <div class="shoppingCart">
+	    <table class="headerRowTable">
+	      <tbody>
+		      <tr>
+		        <th class="itemColumn">Album</th>
+		        <th class="quantityColumn">Quantity</th>
+		        <th class="unitPriceColumn">Unit Price</th>
+		        <th class="rowTotalColumn">Row Total</th>
+		      </tr>
+		    </tbody>
+	    </table> 
+	    {% for item in item_info %}
+		    <table class="itemRowTable">
+		      <tbody>
+		        <tr>
+		          <td class="itemColumn">
+		            <a href="{{ item.url }}"><img src="coverUrl" alt="Cover of {{ item.title }}" title="Cover of {{ item.title }}" /></a>
+		            <div class="item1stRow">
+		              <a href="{{ item.url }}">{{ item.title }}</a> &mdash;
+		              <span class="creator">{{ item.creator }}</span>
+		            </div>
+		            <div class="item2ndRow">{{ item.description }}</div>
+		          </td>
+		          <td class="quantityColumn">{{ item.number_of_units }}</td>
+		          <td class="unitPriceColumn">{{ item.unit_price|floatformat:"2" }} &euro;</td>
+		          <td class="rowTotalColumn">{{ item.row_total|floatformat:"2" }} &euro;</td>
+		        </tr>
+		      </tbody>	      
+		    </table> 
+	    {% endfor %}
+	    <table class="subtotalRowTable">
+		    <tr>
+		      <td>
+		        Subtotal ({{ item_info|length }} item{{ item_info|length|pluralize }}):
+		        <span class="subTotal">{{ sub_total_price|floatformat:"2" }} &euro;</span>
+		      </td>
+	      </tr>
+	    </table>
+	  </div> 
+  {% endif %}
 
 {% endblock %}
