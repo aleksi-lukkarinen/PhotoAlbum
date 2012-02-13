@@ -731,7 +731,15 @@ clear:both;
 
 
 
+#id_frmShoppingCart .commonActions {
+	width:                     100%;
+	text-align:                right;
+	margin:                    1em 0em 1em 0em;
+}
 
+#id_frmShoppingCart .commonActions input {
+  margin:                    0em 0em 0em 1em;
+}
 
 .shoppingCart table {
   width:                     100%;
@@ -786,7 +794,7 @@ clear:both;
 }
 
 .shoppingCart .itemColumn .item1stRow {
-	margin-bottom:             1em;
+  margin:                    0em 0em 1em 10.4em;
 }
 
 .shoppingCart .itemColumn .item1stRow a {
@@ -806,12 +814,32 @@ clear:both;
 }
 
 .shoppingCart .itemColumn .item2ndRow {
-  color:                     #444444;
+  margin:                    0em 0em 0em 10.5em;
+	color:                     #444444;
+}
+
+.shoppingCart .itemColumn .item3rdRow {
+	margin:                    1em 0em 0em 10em;
+}
+
+.shoppingCart .itemColumn .item3rdRow input {
+	display:                   inline-block;
+	background:                #ffffff;
+	border:                    none;
+	color:                     #336699;
+	text-decoration:           underline;
+	cursor:                    pointer;
+	margin:                    0em;
+  padding:                   0em;
 }
 
 .shoppingCart .quantityColumn {
   width:                     10%;                                
 	text-align:                center;
+}
+
+.shoppingCart .quantityColumn input {
+  text-align:                center;
 }
 
 .shoppingCart .itemRowTable .quantityColumn,
@@ -826,8 +854,8 @@ clear:both;
 }
 
 .shoppingCart .unitPriceColumn {
-  width:                     10%;                                
-	text-align:                right;           
+  width:                     10%;
+	text-align:                right;       
 }
 
 .shoppingCart .rowTotalColumn {
@@ -836,7 +864,11 @@ clear:both;
 }
 
 .shoppingCart .subTotalRow {
-  text-align:                right;           
+  text-align:                right;
+}
+
+.shoppingCart .subtotalRowTable td {
+  padding-bottom:            0em;           
 }
 
 .shoppingCart .subtotalRowTable {
