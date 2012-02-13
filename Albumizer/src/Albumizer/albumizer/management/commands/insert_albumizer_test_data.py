@@ -920,6 +920,7 @@ class Command(BaseCommand):
         purchase_date_calculation_counter = 0
         o_maxtimdelta = datetime.now() - user.date_joined
         o_deltaseconds = int(o_maxtimdelta.total_seconds())
+
         while orderable_albums_qs.count() < 1 and purchase_date_calculation_counter < 10:
             purchase_date_calculation_counter += 1;
             o_randomdeltaseconds = self._orderRandomizer.randrange(0, o_deltaseconds)
@@ -929,11 +930,11 @@ class Command(BaseCommand):
                     Q(creationDate__lt = o_datetime),
                     Q(isPublic = True) | Q(owner = user))
 
-        if not orderable_albums_qs:
+        if not orderable_albums_qs.exists():
             return {"success": False}
 
         valid_addresses_qs = Address.objects.filter(owner__exact = user)
-        if not valid_addresses_qs:
+        if not valid_addresses_qs.exists():
             return {"success": False}
 
         while Order.objects.filter(orderer__exact = user, purchaseDate__exact = o_datetime).exists():
@@ -941,6 +942,7 @@ class Command(BaseCommand):
 
         album_infos = []
         number_of_valid_addresses = valid_addresses_qs.count()
+
         ids_of_orderable_albums = [id for id in orderable_albums_qs.values_list('id', flat = True)]
 
         number_of_order_items = self._orderRandomizer.randrange(1, 10)
