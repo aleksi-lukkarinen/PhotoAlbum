@@ -99,7 +99,7 @@ class Command(BaseCommand):
     _trans_tbl_email_username_src = u"åäöÅÄÖáÁàÀèÈéÉêÊëËíÍìÌïÏîÎóÓòÒôÔúÚùÙûÛüÜýÝỳỲÿŸšŠß"
     _trans_tbl_email_username_dest = u"aaoAAOaAaAeEeEeEeEiIiIiIiIoOoOoOuUuUuUuUyYyYyYsSs"
     _trans_tbl_email_username = {}
-    _generated_users = []
+    _ids_of_generated_users = []
 
 
 
@@ -221,7 +221,7 @@ class Command(BaseCommand):
             new_user.last_name = user_data["last_name"]
             new_user.date_joined = user_data["serviceConditionsAccepted"]
             new_user.save()
-            self._generated_users.append(new_user)
+            self._ids_of_generated_users.append(new_user.id)
 
             user_profile = new_user.get_profile()
             user_profile.gender = user_data["gender"]
@@ -477,14 +477,19 @@ class Command(BaseCommand):
                 self.stdout.write(u"\n")
 
         if verbosity >= 1:
-            self.stdout.write(u"\nAll data has been created. Program created users with the following usernames:\n")
-            self.stdout.write(self._generated_users[0].username.encode("ascii", "backslashreplace"))
-            for i in range(1, number_of_users - 1):
-                self.stdout.write(u", " + self._generated_users[i].username.encode("ascii", "backslashreplace"))
-            if number_of_users > 1:
-                self.stdout.write(u" and " +
-                        self._generated_users[number_of_users - 1].username.encode("ascii", "backslashreplace"))
+            self.stdout.write(u"\nAll data has been created.")
+            if self._ids_of_generated_users:
+                self.stdout.write(u" Program created users with the following usernames:\n");
+                username = User.objects.get(id__exact = self._ids_of_generated_users[0]).username
+                self.stdout.write(username.encode("ascii", "backslashreplace"))
+                for i in range(1, number_of_users - 1):
+                    username = User.objects.get(id__exact = self._ids_of_generated_users[i]).username
+                    self.stdout.write(u", " + username.encode("ascii", "backslashreplace"))
+                if number_of_users > 1:
+                    username = User.objects.get(id__exact = self._ids_of_generated_users[number_of_users - 1]).username
+                    self.stdout.write(u" and " + username.encode("ascii", "backslashreplace"))
             self.stdout.write(u"\n")
+
 
 
 
