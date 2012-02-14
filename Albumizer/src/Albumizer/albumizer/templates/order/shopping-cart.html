@@ -27,11 +27,17 @@
 
 {% block page_content %}
 
-  <h1>Shopping Cart</h1>
+  <h1>Your Shopping Cart</h1>
   
   {% if not item_info %}
     <p>Your shopping cart is empty.</p>
   {% else %}
+    {% if messages %}
+      {% for message in messages %}
+        <div>{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  
     <form name="frmShoppingCart" id="id_frmShoppingCart"
           method="post" action="{% url "edit_shopping_cart" %}">
       {% csrf_token %}

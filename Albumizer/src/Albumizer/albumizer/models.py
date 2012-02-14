@@ -216,7 +216,7 @@ class Album(models.Model):
     def save(self, *args, **kwargs):
         """ Generate/validate album data before saving. """
         if len(self.title.strip()) < 5:
-            raise ValueError, "Length of album's title must be 5-255 non-whitespace characters (" + self.title + ")."
+            raise ValueError, "Length of album's title must be 5-255 non-whitespace characters (%s)." % self.title
 
         if not self.secretHash:
             self.secretHash = self.generate_secret_hash_for(self)
@@ -257,6 +257,11 @@ class Album(models.Model):
     def is_hidden_from_user(self, user):
         """ Checks if this album is hidden from a given user. """
         return not self.is_visible_to_user(user)
+
+    @staticmethod
+    def does_exist(album_id):
+        """ Returns True, if an album having given id exists. Otherwise returns False. """
+        return Album.objects.filter(id__exact = album_id).exists()
 
     @staticmethod
     def by_id(album_id):
@@ -368,23 +373,28 @@ class Album(models.Model):
         verbose_name = u"album"
         verbose_name_plural = u"albums"
 
+
+
+
 class Layout(models.Model):
     """Represents a single layout"""
-    name =models.CharField(
-        max_length=255,
-        unique=True,
-        verbose_name=u"the friendly name of the layout")
-    imageFieldCount =models.IntegerField(
-        default=0,
-        verbose_name=u"count of image fields in this layout")
-    textFieldCount =models.IntegerField(
-        default=0,
-        verbose_name=u"count of text fields in this layout")
-    cssClass =models.CharField(
-        max_length=255,
-        verbose_name=u"the css class that is used in cssContent field")
-    cssContent=models.TextField(
-        blank=True)
+    name = models.CharField(
+        max_length = 255,
+        unique = True,
+        verbose_name = u"the friendly name of the layout")
+    imageFieldCount = models.IntegerField(
+        default = 0,
+        verbose_name = u"count of image fields in this layout")
+    textFieldCount = models.IntegerField(
+        default = 0,
+        verbose_name = u"count of text fields in this layout")
+    cssClass = models.CharField(
+        max_length = 255,
+        verbose_name = u"the css class that is used in cssContent field")
+    cssContent = models.TextField(
+        blank = True)
+
+
 
 
 class Page(models.Model):
@@ -393,7 +403,7 @@ class Page(models.Model):
     pageNumber = models.IntegerField(
         verbose_name = u"page number"
     )
-    layout=models.ForeignKey(Layout)
+    layout = models.ForeignKey(Layout)
 
     def __unicode__(self):
         return u"%s, %s" % (self.album, self.pageNumber)
@@ -409,7 +419,7 @@ class Page(models.Model):
 
 class PageContent(models.Model):
     """ Represents a single piece of content in a placeholder. """
-    page = models.ForeignKey(Page, related_name="pagecontents")
+    page = models.ForeignKey(Page, related_name = "pagecontents")
     placeHolderID = models.CharField(
         max_length = 255,
         verbose_name = u"placeholder id"
@@ -553,18 +563,34 @@ class ShoppingCartItem(models.Model):
 
     @staticmethod
     def items_of_user(user):
-        """ Return all items in given user's shopping cart. """
+        """ Return a queryset of all items in given user's shopping cart. """
         return ShoppingCartItem.objects.filter(user__exact = user)
 
     @staticmethod
     def update_count(user, item_id, new_count):
-        """ Update count of given item of given user's shopping cart. """
-        #ShoppingCartItem.objects.filter(user=request.user, album) Album.by_id()
+        """ 
+            Updates count of given item of given user's shopping cart. 
+            Caller handles all exceptions (e.g. ShoppingCartItem.DoesNotExist).
+        """
+        sc_item = ShoppingCartItem.objects.get(user = user, album = item_id)
+        sc_item.count = new_count
+        sc_item.save()
 
     @staticmethod
-    def remove_item(user, item_id):
-        """ Remove given item of given user from user's shopping cart. """
-        #ShoppingCartItem.objects.filter(user=request.user, album) Album.by_id()
+    def remove(user, item_id):
+        """ 
+            Removes given item of given user from user's shopping cart. 
+            Caller handles all exceptions (e.g. ShoppingCartItem.DoesNotExist).
+        """
+        ShoppingCartItem.objects.get(user = user, album = item_id).delete()
+
+    @staticmethod
+    def remove_all_items_of_user(user):
+        """ 
+            Removes all items of given user from user's shopping cart. 
+            Caller handles all exceptions (e.g. ShoppingCartItem.DoesNotExist).
+        """
+        ShoppingCartItem.objects.get(user = user).delete()
 
     def __unicode__(self):
         return u"%s, %s, %d, %s" % (self.user, self.album, self.count, self.additionDate)

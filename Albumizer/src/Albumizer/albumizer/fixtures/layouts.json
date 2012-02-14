@@ -1,0 +1,13 @@
+[
+    {
+        "pk": 1,
+        "model": "albumizer.layout",
+        "fields": {
+            "cssContent": ".singleImage .image1 {\r\n\r\n}",
+            "cssClass": "singleImage",
+            "name": "SingleImage",
+            "textFieldCount": 1,
+            "imageFieldCount": 1
+        }
+    }
+]

@@ -142,27 +142,27 @@ def list_all_visible_albums(request):
     return render_to_response_as_public('album/list-all.html', RequestContext(request, template_parameters))
 
 def show_single_page(request, album_id, page_number):
-    myalbum= get_object_or_404(Album, pk=album_id)
-    mypage = get_object_or_404(Page, album=album_id, pageNumber=page_number)
-    pageNumberInt=int(page_number)
-    context={"pageNumber":mypage.pageNumber,
+    myalbum = get_object_or_404(Album, pk = album_id)
+    mypage = get_object_or_404(Page, album = album_id, pageNumber = page_number)
+    pageNumberInt = int(page_number)
+    context = {"pageNumber":mypage.pageNumber,
           "albumTitle":myalbum.title,
           "layoutCssClass":mypage.layout.cssClass}
-    images=[]
-    texts=[]
-    
+    images = []
+    texts = []
+
     for pagecontent in mypage.pagecontents.all():
         if pagecontent.placeHolderID.startswith("image"):
             images.append(pagecontent.content)
         elif pagecontent.placeHolderID.startswith("text"):
             texts.append(pagecontent.content)
-    context["texts"]=texts
-    context["images"]=images
-    context["cssContent"]=mypage.layout.cssContent
-    if myalbum.pages().filter(pageNumber=pageNumberInt+1).exists():
-        context["nextLink"]=reverse('albumizer.views.show_single_page', kwargs={"album_id":1, "page_number":pageNumberInt+1})
-    if myalbum.pages().filter(pageNumber=pageNumberInt-1).exists():
-        context["previousLink"]=reverse('albumizer.views.show_single_page', kwargs={"album_id":1, "page_number":pageNumberInt-1})
+    context["texts"] = texts
+    context["images"] = images
+    context["cssContent"] = mypage.layout.cssContent
+    if myalbum.pages().filter(pageNumber = pageNumberInt + 1).exists():
+        context["nextLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt + 1})
+    if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
+        context["previousLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt - 1})
     return render_to_response('album/view-album-page-single.html', RequestContext(request, context))
 
 
@@ -524,6 +524,21 @@ def edit_account_information(request):
 
 
 
+SHOPPING_CART_ERR_MSG_MISSING_ALBUM_UI = \
+    u"We are sorry. Your shopping cart referenced to at least one album, which does " + \
+    u"not exist. If the items in question have previously existed, " + \
+    u"they have been remove from our collection since."
+SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG = \
+    u"POST request from shopping cart of user %s referenced to a missing album: %d."
+SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_UI = \
+    u"We are sorry. The request you sent us referenced to at least one item, which " + \
+    u"actually is not in your shopping cart."
+SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_LOG = \
+    u"POST request from shopping cart of user %s referenced to an item, which actually is not in that user's cart: %d."
+SHOPPING_CART_ERR_MSG_INVALID_QUANTITY_UI = \
+    u"We are sorry. The quantity given for item \"%s\" is not valid. " + \
+    u"Please enter a quantity between 0 and 99."
+
 @login_required
 @prevent_all_caching
 def edit_shopping_cart_GET(request):
@@ -555,49 +570,121 @@ def edit_shopping_cart_GET(request):
     }
     return render_to_response('order/shopping-cart.html', RequestContext(request, template_parameters))
 
+@login_required
 @prevent_all_caching
 def edit_shopping_cart_POST(request):
     """ Updates the contents of user's shopping cart and proceeds to checkout if so desired. """
     assert request.method == "POST"
 
-    item_to_remove = None
+    missing_item_error_already_given = False
+    has_errors = False
     proceed_to_checkout = False
+    cart_content_to_remove = []
+    cart_content_to_update = {}
 
-    cart_content = {}
     for key in request.POST.keys():
-        if key.startswith("itemcount."):
-            id_str = key.split(".")[1]
-            count_str = request.POST[key]
-            if not id_str.isdigit() or not count_str.isdigit():
-                commonLogger.error("POST request from shopping cart of user %s contained an invalid variable: %s = %s." % \
-                                   (request.user.username, key, request.POST[key]))
+        is_itemcount_update = key.startswith("itemcount.")
+        is_item_removal = key.startswith("submit.remove.")
+
+        if is_itemcount_update or is_item_removal:
+            if is_itemcount_update:
+                index_of_id_in_split_array = 1
+            elif is_item_removal:
+                index_of_id_in_split_array = 2
+
+            id_str = key.split(".")[index_of_id_in_split_array]
+            if not id_str.isdigit():
+                commonLogger.warning(
+                    u"POST request from shopping cart of user %s contained an invalid variable: %s = %s." % \
+                    (request.user.username, key, request.POST[key]))
                 return HttpResponseBadRequest()
-            cart_content[int(id_str)] = int(count_str)
+
+            id_int = int(id_str)
+            if not Album.does_exist(id_int):
+                missing_item_error_already_given = shopping_cart_report_missing_album(
+                                                        id_int, request.user, missing_item_error_already_given)
+                has_errors = True
+                continue
+
+            if is_item_removal:
+                cart_content_to_remove.append(id_int)
+                continue
+
+            count_str = request.POST[key]
+            if not count_str.isdigit():
+                shopping_cart_report_invalid_quantity(id_int, request.user)
+                has_errors = True
+                continue
+
+            new_count = int(count_str)
+            if new_count > 99 or new_count < 0:
+                shopping_cart_report_invalid_quantity(id_int, request.user)
+                has_errors = True
+                continue
+
+            if new_count == 0:
+                cart_content_to_remove.append(id_int)
+                continue
+
+            cart_content_to_update[id_int] = new_count
 
         elif key == "submit.proceed":
             proceed_to_checkout = True
 
-        elif key.startswith("submit.remove."):
-            item_to_remove = key.split(".")[2]
-            if not item_to_remove.isdigit():
-                commonLogger.error("POST request from shopping cart of user %s contained an invalid variable: %s = %s." % \
-                                   (request.user.username, key, request.POST[key]))
-                return HttpResponseBadRequest()
-            item_to_remove = int(item_to_remove)
 
-    if item_to_remove:
-        del cart_content[item_to_remove]
+    for item_id in cart_content_to_remove:
+        try:
+            del cart_content_to_update[item_id]
+        except KeyError:
+            pass
 
-    for key in cart_content.keys():
-        result = ShoppingCartItem.update_count(request.user, key, cart_content[key])
-        if not result:
-            commonLogger.error("POST request from shopping cart of user %s referenced to a missing item: %d." % \
-                               (request.user.username, key))
+        try:
+            ShoppingCartItem.remove(request.user, item_id)
+        except ShoppingCartItem.DoesNotExist:
+            missing_item_error_already_given = shopping_cart_report_missing_album(
+                                                    item_id, request.user, missing_item_error_already_given)
+            has_errors = True
 
-    if proceed_to_checkout:
+
+    for item_id in cart_content_to_update.keys():
+        try:
+            ShoppingCartItem.update_count(request.user, item_id, cart_content_to_update[item_id])
+        except ShoppingCartItem.DoesNotExist:
+            missing_item_error_already_given = shopping_cart_report_missing_album(
+                                                    item_id, request.user, missing_item_error_already_given)
+            has_errors = True
+
+
+    if proceed_to_checkout and not has_errors:
         return HttpResponseRedirect(reverse("albumizer.views.get_ordering_information"))
 
     return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+def shopping_cart_report_invalid_quantity(item_id, user):
+    item_name = "<missing>"
+    item = Album.by_id(item_id)
+    if item:
+        item_name = item.title
+
+    user.message_set.create(message = SHOPPING_CART_ERR_MSG_INVALID_QUANTITY_UI % item_name)
+
+def shopping_cart_report_missing_album(item_id, user, error_already_given):
+    if not error_already_given:
+        user.message_set.create(message = SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_UI)
+        error_already_given = True
+
+    commonLogger.warning(SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG % (user.username, item_id))
+    return error_already_given
+
+def shopping_cart_report_missing_cart_item(item_id, user, error_already_given):
+    if not error_already_given:
+        user.message_set.create(message = SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_UI)
+        error_already_given = True
+
+    commonLogger.warning(SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG % (user.username, item_id))
+    return error_already_given
+
+
 
 
 @login_required
