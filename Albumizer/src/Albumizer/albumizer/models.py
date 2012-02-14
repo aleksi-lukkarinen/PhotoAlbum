@@ -381,18 +381,34 @@ class Layout(models.Model):
     name = models.CharField(
         max_length = 255,
         unique = True,
-        verbose_name = u"the friendly name of the layout")
+        verbose_name = u"name",
+        help_text = u"friendly name of this layout"
+    )
     imageFieldCount = models.IntegerField(
         default = 0,
-        verbose_name = u"count of image fields in this layout")
+        verbose_name = u"image field count",
+        help_text = u"number of image fields in this layout"
+    )
     textFieldCount = models.IntegerField(
         default = 0,
-        verbose_name = u"count of text fields in this layout")
+        verbose_name = u"text field count",
+        help_text = u"number of text fields in this layout"
+    )
     cssClass = models.CharField(
         max_length = 255,
-        verbose_name = u"the css class that is used in cssContent field")
+        verbose_name = u"CSS class",
+        help_text = u"css class that is used in the CSS content field"
+    )
     cssContent = models.TextField(
-        blank = True)
+        blank = True,
+        verbose_name = u"CSS content",
+        help_text = u"the actual css definitions for this layout"
+    )
+
+    class Meta():
+        ordering = ["name"]
+        verbose_name = u"page layout"
+        verbose_name_plural = u"page layouts"
 
 
 

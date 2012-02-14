@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.utils import simplejson as json
 from django.views.decorators.cache import cache_control
 from Albumizer.albumizer import facebook_api
-from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
+from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 from forms import AlbumCreationForm, LoginForm, RegistrationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \

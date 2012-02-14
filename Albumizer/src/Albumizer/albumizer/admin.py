@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.contrib.auth.models import User
-from models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
+from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 
 
@@ -38,6 +38,13 @@ class AlbumAdmin(admin.ModelAdmin):
         return obj.owner
     owning_customer.short_description = 'owning user'
     owning_customer.admin_order_field = 'owner'
+
+
+
+
+class LayoutAdmin(admin.ModelAdmin):
+    list_display = ('name', 'imageFieldCount', 'textFieldCount', 'cssClass')
+    search_fields = ('name', 'cssClass')
 
 
 
@@ -132,6 +139,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(FacebookProfile, FacebookProfileAdmin)
 admin.site.register(Album, AlbumAdmin)
+admin.site.register(Layout, LayoutAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(PageContent, PageContentAdmin)
 admin.site.register(Country, CountryAdmin)
