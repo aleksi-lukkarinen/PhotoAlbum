@@ -146,7 +146,12 @@ img {
 
 
 
-
+.albumpagecontainer {
+	/* use border to separate album page content from the html page */
+	border:1px solid black;
+	height:400px;
+	width:600px;
+}
 
 
 

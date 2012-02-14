@@ -368,7 +368,19 @@ class Album(models.Model):
         verbose_name = u"album"
         verbose_name_plural = u"albums"
 
-
+class Layout(models.Model):
+    """Represents a single layout"""
+    name =models.CharField(
+        unique=True,
+        verbose_name=u"the name of the layout")
+    imageFieldCount =models.IntegerField(
+        default=0,
+        verbose_name=u"count of image fields in this layout")
+    textFieldCount =models.IntegerField(
+        default=0,
+        verbose_name=u"count of text fields in this layout")
+    css=models.TextField(
+        Blank=True)
 
 
 class Page(models.Model):
@@ -381,6 +393,7 @@ class Page(models.Model):
         max_length = 255,
         verbose_name = u"layout id"
     )
+    layout=models.ForeignKey(Layout)
 
     def __unicode__(self):
         return u"%s, %s" % (self.album, self.pageNumber)

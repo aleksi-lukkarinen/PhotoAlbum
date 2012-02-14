@@ -1,19 +1,19 @@
 {% extends "base-template.html" %}
 {% load url from future %}
 
-
-
 {% block page_title %}{{ albumTitle }}{% endblock %}
-
-
 
 {% block page_content %}
 
 	<div>
 		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
-		<div style="border:1px solid black; height:400px;width:600px;">
-			{% block album_page %}
-			{% endblock %}
+		<div class="albumpagecontainer {{layoutid}}">
+			{% for text in texts %}
+			<span id="text{{ forloop.counter}}">{{ text }}</span>
+			{% endfor %}
+			{% for image in images %}
+			<img id="image{{ forloop.counter}}" src="{{ image }}" />
+			{% endfor %}
 		</div>
 	<div>
 
