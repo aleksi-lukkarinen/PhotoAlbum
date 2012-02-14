@@ -3,17 +3,34 @@
 
 {% block page_title %}{{ albumTitle }}{% endblock %}
 
+{% block header_definitions_before %}
+	<style type="text/css">
+	{{ cssContent }}
+	</style>
+{% endblock %}
+
 {% block page_content %}
 
 	<div>
 		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
-		<div class="albumpagecontainer {{layoutid}}">
-			{% for text in texts %}
-			<span id="text{{ forloop.counter}}">{{ text }}</span>
-			{% endfor %}
-			{% for image in images %}
-			<img id="image{{ forloop.counter}}" src="{{ image }}" />
-			{% endfor %}
+		<div class="albumpagewrapper">
+			<div class="albumpagecontainer {{layoutCssClass}}">
+				{% for text in texts %}
+				<span id="text{{ forloop.counter}}">{{ text }}</span>
+				{% endfor %}
+				{% for image in images %}
+				<img id="image{{ forloop.counter}}" src="{{ image }}" />
+				{% endfor %}
+			</div>
+			<div>
+			{% if previousLink %}
+				<div class="previousLink"><a href="{{ previousLink }}">&lt;&lt; Previous page</a></div>
+			{% endif %}
+			{% if nextLink %}
+				<div class="nextLink"><a href="{{ nextLink }}">Next page &gt;&gt;</a></div>
+			{% endif %}
+				<div class="clear" />
+			</div>
 		</div>
 	<div>
 

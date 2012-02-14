@@ -371,16 +371,20 @@ class Album(models.Model):
 class Layout(models.Model):
     """Represents a single layout"""
     name =models.CharField(
+        max_length=255,
         unique=True,
-        verbose_name=u"the name of the layout")
+        verbose_name=u"the friendly name of the layout")
     imageFieldCount =models.IntegerField(
         default=0,
         verbose_name=u"count of image fields in this layout")
     textFieldCount =models.IntegerField(
         default=0,
         verbose_name=u"count of text fields in this layout")
-    css=models.TextField(
-        Blank=True)
+    cssClass =models.CharField(
+        max_length=255,
+        verbose_name=u"the css class that is used in cssContent field")
+    cssContent=models.TextField(
+        blank=True)
 
 
 class Page(models.Model):
@@ -388,10 +392,6 @@ class Page(models.Model):
     album = models.ForeignKey(Album)
     pageNumber = models.IntegerField(
         verbose_name = u"page number"
-    )
-    layoutID = models.CharField(
-        max_length = 255,
-        verbose_name = u"layout id"
     )
     layout=models.ForeignKey(Layout)
 
@@ -409,7 +409,7 @@ class Page(models.Model):
 
 class PageContent(models.Model):
     """ Represents a single piece of content in a placeholder. """
-    page = models.ForeignKey(Page)
+    page = models.ForeignKey(Page, related_name="pagecontents")
     placeHolderID = models.CharField(
         max_length = 255,
         verbose_name = u"placeholder id"

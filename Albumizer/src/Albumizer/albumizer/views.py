@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson as json
 from django.views.decorators.cache import cache_control
@@ -128,20 +128,42 @@ def list_all_visible_albums(request):
 
     # Make sure page request is an int. If not, deliver first page.
     try:
-      page = int(request.GET.get('page', '1'))
+        page = int(request.GET.get('page', '1'))
     except ValueError:
-      page = 1
+        page = 1
 
     # If page request (9999) is out of range, deliver last page of results.
     try:
-      albums = paginator.page(page)
+        albums = paginator.page(page)
     except (EmptyPage, InvalidPage):
-      albums = paginator.page(paginator.num_pages)
+        albums = paginator.page(paginator.num_pages)
 
     template_parameters = {'albums': albums, 'is_album_list_page': True}
     return render_to_response_as_public('album/list-all.html', RequestContext(request, template_parameters))
 
-
+def show_single_page(request, album_id, page_number):
+    myalbum= get_object_or_404(Album, pk=album_id)
+    mypage = get_object_or_404(Page, album=album_id, pageNumber=page_number)
+    pageNumberInt=int(page_number)
+    context={"pageNumber":mypage.pageNumber,
+          "albumTitle":myalbum.title,
+          "layoutCssClass":mypage.layout.cssClass}
+    images=[]
+    texts=[]
+    
+    for pagecontent in mypage.pagecontents.all():
+        if pagecontent.placeHolderID.startswith("image"):
+            images.append(pagecontent.content)
+        elif pagecontent.placeHolderID.startswith("text"):
+            texts.append(pagecontent.content)
+    context["texts"]=texts
+    context["images"]=images
+    context["cssContent"]=mypage.layout.cssContent
+    if myalbum.pages().filter(pageNumber=pageNumberInt+1).exists():
+        context["nextLink"]=reverse('albumizer.views.show_single_page', kwargs={"album_id":1, "page_number":pageNumberInt+1})
+    if myalbum.pages().filter(pageNumber=pageNumberInt-1).exists():
+        context["previousLink"]=reverse('albumizer.views.show_single_page', kwargs={"album_id":1, "page_number":pageNumberInt-1})
+    return render_to_response('album/view-album-page-single.html', RequestContext(request, context))
 
 
 def show_single_album(request, album_id):
