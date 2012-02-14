@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson as json 
 from Albumizer.albumizer import facebook_api
@@ -87,7 +87,14 @@ def list_all_visible_albums(request):
     template_parameters = {'albums': albums, 'is_album_list_page': True}
     return render_to_response('album/list-all.html', RequestContext(request, template_parameters))
 
-
+def show_single_page(request, album_id, page_number):
+    myalbum= get_object_or_404(Album, pk=album_id)
+    mypage = get_object_or_404(Page, album=album_id, pageNumber=page_number)
+    dict={"pageNumber":mypage.pageNumber,
+          "albumTitle":myalbum.title}
+    for pagecontent in mypage.pagecontents.all():
+        dict[pagecontent.placeHolderID]=pagecontent.content
+    return render_to_response('album/layouts/{0}.html'.format(mypage.layoutID), RequestContext(request, dict))
 
 
 def show_single_album(request, album_id):

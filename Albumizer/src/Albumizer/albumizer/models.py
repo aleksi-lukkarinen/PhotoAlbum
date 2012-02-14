@@ -245,7 +245,7 @@ class Page(models.Model):
 
 class PageContent(models.Model):
     """ Represents a single piece of content in a placeholder. """
-    page = models.ForeignKey(Page)
+    page = models.ForeignKey(Page, related_name="pagecontents")
     placeHolderID = models.CharField(
         max_length = 255,
         verbose_name = u"placeholder id"

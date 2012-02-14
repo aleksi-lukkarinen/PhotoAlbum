@@ -27,7 +27,7 @@ def getGraph(request, aToken):
             if 'http error' in str(e).lower():
                 raise
             else:
-                attempts=-1
+                attempts-=1
                 if attempts<=0:
                     raise
         finally:
