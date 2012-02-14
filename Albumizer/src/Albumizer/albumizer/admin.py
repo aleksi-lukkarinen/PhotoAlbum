@@ -43,7 +43,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
 
 class PageAdmin(admin.ModelAdmin):
-    list_display = ('album', 'pageNumber', 'layoutID')
+    list_display = ('album', 'pageNumber', 'layout')
     search_fields = ('album__title',)
     raw_id_fields = ('album',)
 
