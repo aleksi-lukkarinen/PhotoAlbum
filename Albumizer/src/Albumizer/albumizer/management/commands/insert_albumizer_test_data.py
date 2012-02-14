@@ -1,9 +1,10 @@
 # This Python file uses the following encoding: utf-8
 
-import codecs, fileinput, os, string, time
+import codecs, fileinput, gc, os, string, time
 from datetime import datetime, timedelta
 from optparse import make_option
 from random import Random
+from django import db
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Max, Q
@@ -239,6 +240,10 @@ class Command(BaseCommand):
             elif verbosity == 1:
                 self.stdout.write(u"U%d: " % user_number)
 
+            del user_profile
+
+
+
 
             number_of_addresses = self._albumRandomizer.randrange(0, 10)
             for address_number in range(1, number_of_addresses + 1):
@@ -263,8 +268,15 @@ class Command(BaseCommand):
                 elif verbosity == 1:
                     self.stdout.write(u"d ")
 
+                del new_address
+                del address_data
+
             if verbosity >= 2:
                 self.stdout.write(u"\n")
+
+
+
+
 
 
 
@@ -319,12 +331,14 @@ class Command(BaseCommand):
                     elif verbosity == 1:
                         self.stdout.write(u"p ")
 
+                    del new_page
+
                 if verbosity >= 2:
                     message = u"\n    * Price: %s euros\n\n" % new_album.price_as_2dstr()
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
-
-
+                del new_album
+                del album_data
 
 
 
@@ -356,9 +370,13 @@ class Command(BaseCommand):
                     elif verbosity == 1:
                         self.stdout.write(u"c ")
 
+                    del new_shopping_cart_item
 
                 if verbosity >= 2:
                     self.stdout.write("\n".encode("ascii", "backslashreplace"))
+
+            del shopping_cart_data
+
 
 
 
@@ -422,6 +440,8 @@ class Command(BaseCommand):
                         message += u"\n"
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
+                del new_order
+                del order_data
 
             if most_recent_order and self._orderRandomizer.randrange(0, 100) > 50:
                 order_status_factor = self._orderRandomizer.randrange(0, 100)
@@ -441,12 +461,10 @@ class Command(BaseCommand):
                                             (most_recent_order.purchaseDate, most_recent_order.status)
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
+            del most_recent_order
 
             if verbosity >= 2:
                 self.stdout.write("\n".encode("ascii", "backslashreplace"))
-
-
-
 
             for order in generated_orders:
                 if order.status != OrderStatus.ordered():
@@ -471,11 +489,19 @@ class Command(BaseCommand):
                     elif verbosity == 1:
                         self.stdout.write(u"y ")
 
+                    del new_sps_payment
+                    del payment_data
 
-
+            del generated_orders
 
             if verbosity >= 1:
                 self.stdout.write(u"\n")
+
+            db.reset_queries()
+            gc.collect()
+
+
+
 
         if verbosity >= 1:
             self.stdout.write(u"\nAll data has been created.")
