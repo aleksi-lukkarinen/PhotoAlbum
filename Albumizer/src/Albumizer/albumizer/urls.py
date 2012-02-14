@@ -28,8 +28,6 @@ urlpatterns = patterns('albumizer.views',
     (r'^accounts/information/$', 'edit_account_information'),
     (r'^accounts/facebooklogin$', 'facebook_login'),
 
-    (r'^cart/$', 'edit_shopping_cart'),
-
     (r'^order/$', redirect_to, {'url': '/order/information/'}),
     (r'^order/information/$', 'get_ordering_information'),
     (r'^order/summary/$', 'show_order_summary'),
@@ -56,6 +54,9 @@ urlpatterns += patterns('',
     (r'^accounts/register/$', views.dispatch_by_method, {
         "GET": views.get_registration_information_GET, "POST": views.get_registration_information_POST},
         "get_registration_information"),
+    (r'^cart/$', views.dispatch_by_method, {
+        "GET": views.edit_shopping_cart_GET, "POST": views.edit_shopping_cart_POST},
+        "edit_shopping_cart"),
 )
 
 

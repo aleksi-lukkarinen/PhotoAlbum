@@ -33,11 +33,11 @@
     <p>Your shopping cart is empty.</p>
   {% else %}
     <form name="frmShoppingCart" id="id_frmShoppingCart"
-          method="post" action="{% url "albumizer.views.edit_shopping_cart" %}">
+          method="post" action="{% url "edit_shopping_cart" %}">
       {% csrf_token %}
       <div class="commonActions">
-        <input type="submit" class="updateButton" name="update" value="Update Shopping Cart" />
-        <input type="submit" class="proceedButton" name="proceed" value="Proceed to Checkout" />
+        <input type="submit" class="updateButton" name="submit.update" value="Update Shopping Cart" />
+        <input type="submit" class="proceedButton" name="submit.proceed" value="Proceed to Checkout" />
       </div>
 	    <div class="shoppingCart">
 		    <table class="headerRowTable">
@@ -61,10 +61,10 @@
 			              <span class="creator">{{ item.creator }}</span>
 			            </div>
 			            <div class="item2ndRow">{{ item.description }}</div>
-                  <div class="item3rdRow"><input type="submit" name="submit.delete.item" value="Delete" /></div>
+                  <div class="item3rdRow"><input type="submit" name="submit.remove.{{ item.id }}" value="Remove" /></div>
 			          </td>
 			          <td class="quantityColumn">
-			            <input type="text" value="{{ item.number_of_units }}" size="2" />
+			            <input type="text" name="itemcount.{{ item.id }}" value="{{ item.number_of_units }}" size="2" />
 			          </td>
 			          <td class="unitPriceColumn">{{ item.unit_price|floatformat:"2" }} &euro;</td>
 			          <td class="rowTotalColumn">{{ item.row_total|floatformat:"2" }} &euro;</td>
@@ -81,7 +81,7 @@
 		      </tr>
 		    </table>
 		    <div class="commonActions">
-          <input type="submit" class="updateButton" name="update" value="Update Shopping Cart" />
+          <input type="submit" class="updateButton" name="submit.update" value="Update Shopping Cart" />
 		      <input type="submit" class="proceedButton" name="submit.proceed" value="Proceed to Checkout" />
 		    </div>
 		  </div>

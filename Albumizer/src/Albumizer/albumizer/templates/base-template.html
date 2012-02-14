@@ -131,7 +131,7 @@
 	              {{ user.username }}
 	            {% endif %}
 	            </a>
-	            <a href="{% url "albumizer.views.edit_shopping_cart" %}" id="headerLinkShoppingCart" class="header-link">Shopping Cart</a>
+	            <a href="{% url "edit_shopping_cart" %}" id="headerLinkShoppingCart" class="header-link">Shopping Cart</a>
 	            <a href="{% url "create_album" %}" id="headerLinkAddAlbum" class="header-link">Create Album</a>
 		        {% else %}
 		          {% if not is_registration_page %}

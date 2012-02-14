@@ -504,8 +504,9 @@ def edit_account_information(request):
 
 @login_required
 @prevent_all_caching
-def edit_shopping_cart(request):
+def edit_shopping_cart_GET(request):
     """ Allows user to edit the content of his/her shopping cart """
+    assert request.method == "GET"
     items = ShoppingCartItem.items_of_user(request.user)
 
     item_info = []
@@ -515,6 +516,7 @@ def edit_shopping_cart(request):
         row_total = item.count * item_price
         sub_total_price += row_total
         item_info.append({
+            "id": item.album.id,
             "title": item.album.title,
             "url": item.album.get_absolute_url(),
             "description": item.album.description,
@@ -531,7 +533,49 @@ def edit_shopping_cart(request):
     }
     return render_to_response('order/shopping-cart.html', RequestContext(request, template_parameters))
 
+@prevent_all_caching
+def edit_shopping_cart_POST(request):
+    """ Updates the contents of user's shopping cart and proceeds to checkout if so desired. """
+    assert request.method == "POST"
 
+    item_to_remove = None
+    proceed_to_checkout = False
+
+    cart_content = {}
+    for key in request.POST.keys():
+        if key.startswith("itemcount."):
+            id_str = key.split(".")[1]
+            count_str = request.POST[key]
+            if not id_str.isdigit() or not count_str.isdigit():
+                commonLogger.error("POST request from shopping cart of user %s contained an invalid variable: %s = %s." % \
+                                   (request.user.username, key, request.POST[key]))
+                return HttpResponseBadRequest()
+            cart_content[int(id_str)] = int(count_str)
+
+        elif key == "submit.proceed":
+            proceed_to_checkout = True
+
+        elif key.startswith("submit.remove."):
+            item_to_remove = key.split(".")[2]
+            if not item_to_remove.isdigit():
+                commonLogger.error("POST request from shopping cart of user %s contained an invalid variable: %s = %s." % \
+                                   (request.user.username, key, request.POST[key]))
+                return HttpResponseBadRequest()
+            item_to_remove = int(item_to_remove)
+
+    if item_to_remove:
+        del cart_content[item_to_remove]
+
+    for key in cart_content.keys():
+        result = ShoppingCartItem.update_count(request.user, key, cart_content[key])
+        if not result:
+            commonLogger.error("POST request from shopping cart of user %s referenced to a missing item: %d." % \
+                               (request.user.username, key))
+
+    if proceed_to_checkout:
+        return HttpResponseRedirect(reverse("albumizer.views.get_ordering_information"))
+
+    return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
 
 @login_required

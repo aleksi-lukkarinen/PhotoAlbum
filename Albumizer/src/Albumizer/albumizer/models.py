@@ -543,6 +543,16 @@ class ShoppingCartItem(models.Model):
         """ Return all items in given user's shopping cart. """
         return ShoppingCartItem.objects.filter(user__exact = user)
 
+    @staticmethod
+    def update_count(user, item_id, new_count):
+        """ Update count of given item of given user's shopping cart. """
+        #ShoppingCartItem.objects.filter(user=request.user, album) Album.by_id()
+
+    @staticmethod
+    def remove_item(user, item_id):
+        """ Remove given item of given user from user's shopping cart. """
+        #ShoppingCartItem.objects.filter(user=request.user, album) Album.by_id()
+
     def __unicode__(self):
         return u"%s, %s, %d, %s" % (self.user, self.album, self.count, self.additionDate)
 
