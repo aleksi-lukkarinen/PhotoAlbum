@@ -405,6 +405,10 @@ class Layout(models.Model):
         help_text = u"the actual css definitions for this layout"
     )
 
+    def __unicode__(self):
+        return u"%s/%s - %d image(s), %d text(s)" % \
+            (self.name, self.cssClass, self.imageFieldCount, self.textFieldCount)
+
     class Meta():
         ordering = ["name"]
         verbose_name = u"page layout"
