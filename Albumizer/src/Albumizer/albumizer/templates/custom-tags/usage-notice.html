@@ -1,0 +1,43 @@
+{% load url from future %}
+
+
+
+  {% if user_count > 5 and album_count > 5 %}
+
+    <div class="albumizerUsageNotice">
+      <div class="firstLine">
+        There are already <span id="userCounter_{{ id }}">{{ user_count }}</span> users, who so far have
+        created in total <span id="albumCounter_{{ id }}">{{ album_count }}</span> albums!
+      </div>
+      <div class="secondLine">
+        Be sure to check out this thrilling possibility to express yourself and share your visions!
+      </div>
+    </div>
+      
+    <script type="text/javascript">
+      //<![CDATA[
+				  function updateUsageData_{{ id }}() {
+				    $.getJSON("{% url "albumizer.views.api_json_get_album_count" %}",
+				      function(data) {
+				        if (!isNaN(data)) {
+				          $("#albumCounter_{{ id }}").text(data);
+				        }
+				      }
+				    )
+				    
+				    $.getJSON("{% url "albumizer.views.api_json_get_user_count" %}",
+				      function(data) {
+				        if (!isNaN(data)) {
+				          $("#userCounter_{{ id }}").text(data);
+				        }
+				      }
+				    )
+				  }
+				
+				  $(function() {
+				    setInterval("updateUsageData_{{ id }}()", 60000);
+				  });
+	      //]]>
+    </script>
+      
+  {% endif %}

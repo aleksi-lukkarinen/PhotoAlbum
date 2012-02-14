@@ -1,14 +1,18 @@
-﻿
-﻿
-#Wed Feb 08 23:57:27 EET 2012
+#Sun Feb 12 13:57:58 EET 2012
 eclipse.preferences.version=1
-
 encoding//src/Albumizer/albumizer/admin.py=utf-8
 encoding//src/Albumizer/albumizer/context_processors.py=utf-8
 encoding//src/Albumizer/albumizer/forms.py=utf-8
 encoding//src/Albumizer/albumizer/management/commands/insert_albumizer_test_data.py=utf-8
 encoding//src/Albumizer/albumizer/migrations/0001_initial.py=utf-8
 encoding//src/Albumizer/albumizer/migrations/0002_auto__add_field_facebookprofile_lastQueryTime__add_field_facebookprofi.py=utf-8
+encoding//src/Albumizer/albumizer/migrations/0004_added_order_status_table.py=utf-8
+encoding//src/Albumizer/albumizer/migrations/0007_added_spspayment_table.py=utf-8
+encoding//src/Albumizer/albumizer/migrations/0008_added_secrethash_field_to_album.py=utf-8
+encoding//src/Albumizer/albumizer/migrations/0009_generate_secret_hashes_for_existing_albums.py=utf-8
+encoding//src/Albumizer/albumizer/migrations/0010_load_orderstates.py=utf-8
+encoding//src/Albumizer/albumizer/migrations/0011_set_orderstatus_fields_to_sent_4.py=utf-8
+encoding//src/Albumizer/albumizer/migrations/0012_connected_orderstatus_field_to_the_orderstatus_table.py=utf-8
 encoding//src/Albumizer/albumizer/models.py=utf-8
 encoding//src/Albumizer/albumizer/templatetags/albumizer_common.py=utf-8
 encoding//src/Albumizer/albumizer/urls.py=utf-8
@@ -18,3 +22,4 @@ encoding//src/Albumizer/settings_aleksi.py=utf-8
 encoding//src/Albumizer/settings_lauri.py=utf-8
 encoding//src/Albumizer/settings_tomas.py=utf-8
 encoding//src/Albumizer/urls.py=utf-8
+\u00EF\u00BB\u00BF=

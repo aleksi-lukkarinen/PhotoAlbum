@@ -13,8 +13,12 @@ PRICE_PER_ALBUM_PAGE = 0.50
 SHIPPING_EXPENSES = 8
 
 
+SIMPLE_PAYMENT_SERVICE_URL = "http://webcourse.cs.hut.fi/payment/pay/"
 SIMPLE_PAYMENT_SERVICE_SELLER_ID = "wsdTLAs2012"
 SIMPLE_PAYMENT_SERVICE_SECRET = "a76562ae5654109c5c349d45a6e24d16"
+
+TWITTER_HASHTAG = "Albumizer"
+TWITTER_ACCOUNT = "aaltowsd2012s"
 
 
 AUTHENTICATION_BACKENDS = (
@@ -25,6 +29,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 AUTH_PROFILE_MODULE = "albumizer.UserProfile"
+
+
 
 # for the Django debug toolbar
 INTERNAL_IPS = ('127.0.0.1',)
@@ -46,10 +52,10 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(os.path.dirname(__file__), 'albumizer_' + os.environ["USERNAME"] + '.db').replace('\\', '/'), # Or path to database file if using sqlite3.
-        'USER': '', # Not used with sqlite3.
-        'PASSWORD': '', # Not used with sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add '', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': "group024", # Or path to database file if using sqlite3.
+        'USER': 'group024', # Not used with sqlite3.
+        'PASSWORD': 'aApeLxAr', # Not used with sqlite3.
         'HOST': '', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     }
@@ -196,13 +202,13 @@ LOGGING = {
 
 
 
-workstation_owner = os.environ["USERNAME"].lower()
+workstation_owner = os.environ["USER"].lower()
 if workstation_owner == 'aleksi':
     from settings_aleksi import *
 elif workstation_owner == 'tomas':
     from settings_tomas import *
 elif workstation_owner == 'lauri':
     from settings_lauri import *
-    
+
 from settings_facebook import *
 

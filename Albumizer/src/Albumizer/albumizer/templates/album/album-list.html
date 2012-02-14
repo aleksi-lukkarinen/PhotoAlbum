@@ -1,0 +1,46 @@
+{% extends "base-template.html" %}
+{% load url from future %}
+
+{% block page_content %}
+
+{% block page_heading %}{% endblock %}
+
+<div class="albumList">
+  {% if albums.object_list %}
+  {% for album in albums.object_list %}
+  <a href="{{ album.get_absolute_url }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+    <img src="" alt="" class="albumListItemImage" />
+    <p class="albumListItemTitle">{{ album.title }}</p>
+  </a>
+  {% if forloop.counter|divisibleby:"5" %}
+  <div class="clear"></div>
+  {% endif %}
+  {% endfor %}
+  {% else %}
+  {% block no_albums %}
+  <p>There are no albums.</p>
+  {% endblock %}
+  {% endif %}
+</div>
+
+<div class="clear"></div>
+
+{% if albums.object_list %}
+<div class="pagination">
+  <span class="step-links">
+    {% if albums.has_previous %}
+    <a href="?page={{ albums.previous_page_number }}">previous</a>
+    {% endif %}
+
+    <span class="current">
+      Page {{ albums.number }} of {{ albums.paginator.num_pages }}.
+    </span>
+
+    {% if albums.has_next %}
+    <a href="?page={{ albums.next_page_number }}">next</a>
+    {% endif %}
+  </span>
+</div>
+{% endif %}
+
+{% endblock %}

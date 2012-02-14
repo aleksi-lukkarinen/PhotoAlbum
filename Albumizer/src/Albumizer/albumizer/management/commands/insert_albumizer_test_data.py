@@ -1,13 +1,15 @@
 # This Python file uses the following encoding: utf-8
 
-import codecs, fileinput, os, string, time
+import codecs, fileinput, gc, os, string, time
 from datetime import datetime, timedelta
 from optparse import make_option
 from random import Random
+from django import db
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
-from Albumizer.albumizer.models import Address, Album, Country, UserProfile, Order, OrderItem, Page, PageContent, State
+from django.db.models import Max, Q
+from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Page, PageContent, Country, State, \
+        Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 
 
 
@@ -98,13 +100,15 @@ class Command(BaseCommand):
     _trans_tbl_email_username_src = u"åäöÅÄÖáÁàÀèÈéÉêÊëËíÍìÌïÏîÎóÓòÒôÔúÚùÙûÛüÜýÝỳỲÿŸšŠß"
     _trans_tbl_email_username_dest = u"aaoAAOaAaAeEeEeEeEiIiIiIiIoOoOoOuUuUuUuUyYyYyYsSs"
     _trans_tbl_email_username = {}
-    _generated_users = []
+    _ids_of_generated_users = []
+
 
 
 
     def _read_data_file(self, filename):
         """ Reads lines of a file to a list and trims them """
         return [unicode(line.strip(), encoding = "utf-8") for line in fileinput.input(filename)]
+
 
 
 
@@ -213,12 +217,13 @@ class Command(BaseCommand):
                 unique_username = unicode(username + unicode(postfix_counter))
                 postfix_counter += 1
 
-            new_user = User(username = unique_username, email = user_data["email"], password = "salasana")
+            new_user = User(username = unique_username, email = user_data["email"], password = "")
             new_user.first_name = user_data["first_name"]
             new_user.last_name = user_data["last_name"]
             new_user.date_joined = user_data["serviceConditionsAccepted"]
+            new_user.set_password("salasana")
             new_user.save()
-            self._generated_users.append(new_user)
+            self._ids_of_generated_users.append(new_user.id)
 
             user_profile = new_user.get_profile()
             user_profile.gender = user_data["gender"]
@@ -235,19 +240,24 @@ class Command(BaseCommand):
             elif verbosity == 1:
                 self.stdout.write(u"U%d: " % user_number)
 
+            del user_profile
+
+
+
 
             number_of_addresses = self._albumRandomizer.randrange(0, 10)
             for address_number in range(1, number_of_addresses + 1):
                 address_data = self.generate_address_data()
 
-                new_address = Address()
-                new_address.owner = new_user
-                new_address.postAddressLine1 = address_data["postAddressLine1"]
-                new_address.postAddressLine2 = address_data["postAddressLine2"]
-                new_address.zipCode = address_data["zipCode"]
-                new_address.city = address_data["city"]
-                new_address.state = address_data["state"]
-                new_address.country = address_data["country"]
+                new_address = Address(
+                    owner = new_user,
+                    postAddressLine1 = address_data["postAddressLine1"],
+                    postAddressLine2 = address_data["postAddressLine2"],
+                    zipCode = address_data["zipCode"],
+                    city = address_data["city"],
+                    state = address_data["state"],
+                    country = address_data["country"],
+                )
                 new_address.save()
 
                 if verbosity >= 2:
@@ -258,8 +268,15 @@ class Command(BaseCommand):
                 elif verbosity == 1:
                     self.stdout.write(u"d ")
 
+                del new_address
+                del address_data
+
             if verbosity >= 2:
                 self.stdout.write(u"\n")
+
+
+
+
 
 
 
@@ -274,11 +291,12 @@ class Command(BaseCommand):
                     unique_album_title = unicode(album_title + u" " + unicode(postfix_counter))
                     postfix_counter += 1
 
-                new_album = Album()
-                new_album.owner = new_user
-                new_album.title = unique_album_title
-                new_album.description = album_data["description"]
-                new_album.isPublic = album_data["is_public"]
+                new_album = Album(
+                    owner = new_user,
+                    title = unique_album_title,
+                    description = album_data["description"],
+                    isPublic = album_data["is_public"]
+                )
                 new_album.save()
                 new_album.creationDate = album_data["creation_date"]
                 new_album.save()
@@ -301,9 +319,10 @@ class Command(BaseCommand):
                 for page_number in range(1, number_of_pages + 1):
                     #page_data = self.generate_page_data()
 
-                    new_page = Page()
-                    new_page.album = new_album
-                    new_page.pageNumber = page_number
+                    new_page = Page(
+                        album = new_album,
+                        pageNumber = page_number
+                    )
                     new_page.save()
 
                     if verbosity >= 2:
@@ -312,27 +331,78 @@ class Command(BaseCommand):
                     elif verbosity == 1:
                         self.stdout.write(u"p ")
 
+                    del new_page
+
                 if verbosity >= 2:
-                    self.stdout.write(u"\n\n")
+                    message = u"\n    * Price: %s euros\n\n" % new_album.price_as_2dstr()
+                    self.stdout.write(message.encode("ascii", "backslashreplace"))
+
+                del new_album
+                del album_data
+
+
+
+            shopping_cart_data = self.generate_shopping_cart_data(new_user)
+            if not shopping_cart_data["success"] and verbosity >= 2:
+                message = u"  - no valid albums to create shopping cart with\n\n"
+                self.stdout.write(message.encode("ascii", "backslashreplace"))
+            else:
+                message = u"  - shopping cart:\n"
+                self.stdout.write(message.encode("ascii", "backslashreplace"))
+
+                item_counter = 0
+                for item in shopping_cart_data["items"]:
+                    item_counter += 1
+                    new_shopping_cart_item = ShoppingCartItem(
+                        user = new_user,
+                        album = item["album"],
+                        count = item["count"]
+                    )
+                    new_shopping_cart_item.save()
+                    new_shopping_cart_item.additionDate = item["additionDate"]
+                    new_shopping_cart_item.save()
+
+                    if verbosity >= 2:
+                        message = u"            (%d) %s, %d, %s\n" % \
+                                        (item_counter, new_shopping_cart_item.album, new_shopping_cart_item.count,
+                                         new_shopping_cart_item.additionDate)
+                        self.stdout.write(message.encode("ascii", "backslashreplace"))
+                    elif verbosity == 1:
+                        self.stdout.write(u"c ")
+
+                    del new_shopping_cart_item
+
+                if verbosity >= 2:
+                    self.stdout.write("\n".encode("ascii", "backslashreplace"))
+
+            del shopping_cart_data
+
+
+
 
 
 
             most_recent_order = None
             most_recent_order_purchasedate = datetime(1900, 1, 1, 0, 0, 0)
+            generated_orders = []
             number_of_orders = self._orderRandomizer.randrange(min_number_of_orders, max_number_of_orders + 1)
-            for order_number in range(0, number_of_orders):
+            for order_number in range(number_of_orders):
                 order_data = self.generate_order_data(new_user)
                 if not order_data["success"]:
-                    message = u"  - no valid albums and/or addresses to create orders with\n\n"
-                    self.stdout.write(message.encode("ascii", "backslashreplace"))
+                    if verbosity >= 2:
+                        message = u"  - no valid albums and/or addresses to create orders with\n\n"
+                        self.stdout.write(message.encode("ascii", "backslashreplace"))
                     break;
 
-                new_order = Order()
-                new_order.orderer = new_user
-                new_order.status = order_data["status"]
+                new_order = Order(
+                    orderer = new_user,
+                    status = order_data["status"]
+                )
                 new_order.save()
                 new_order.purchaseDate = order_data["purchase_date"]
                 new_order.save()
+
+                generated_orders.append(new_order)
 
                 if new_order.purchaseDate > most_recent_order_purchasedate:
                     most_recent_order_purchasedate = new_order.purchaseDate
@@ -348,11 +418,12 @@ class Command(BaseCommand):
                 for item in order_data["items"]:
                     order_item_counter += 1
 
-                    new_order_item = OrderItem()
-                    new_order_item.order = new_order
-                    new_order_item.album = item["album"]
-                    new_order_item.count = item["count"]
-                    new_order_item.deliveryAddress = item["address"]
+                    new_order_item = OrderItem(
+                        order = new_order,
+                        album = item["album"],
+                        count = item["count"],
+                        deliveryAddress = item["address"]
+                    )
                     new_order_item.save()
 
                     if verbosity >= 2:
@@ -364,31 +435,88 @@ class Command(BaseCommand):
                         self.stdout.write(u"i ")
 
                 if verbosity >= 2:
-                    self.stdout.write(u"\n")
+                    message = u"            Total price: %s euros\n" % new_order.total_price_as_2dstr()
+                    if order_number < number_of_orders - 1:
+                        message += u"\n"
+                    self.stdout.write(message.encode("ascii", "backslashreplace"))
 
+                del new_order
+                del order_data
 
             if most_recent_order and self._orderRandomizer.randrange(0, 100) > 50:
-                most_recent_order.status = 0
+                order_status_factor = self._orderRandomizer.randrange(0, 100)
+                if order_status_factor < 33:
+                    most_recent_order.status = OrderStatus.ordered()
+                elif order_status_factor < 80:
+                    most_recent_order.status = OrderStatus.paid_and_being_processed()
+                else:
+                    most_recent_order.status = OrderStatus.blocked()
+                    most_recent_order.statusClarification = u"We are temporarily out of stock, but will send " + \
+                                                            u"the products as soon as they arrive to our warehouse."
+
                 most_recent_order.save()
 
                 if verbosity >= 2:
-                    message = u"\n  - the most recent order (%s) is still in the shopping cart (status = %d)\n" % \
+                    message = u"\n  - status of the most recent order (%s) is \"%s\"\n" % \
                                             (most_recent_order.purchaseDate, most_recent_order.status)
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
+            del most_recent_order
+
+            if verbosity >= 2:
+                self.stdout.write("\n".encode("ascii", "backslashreplace"))
+
+            for order in generated_orders:
+                if order.status != OrderStatus.ordered():
+                    payment_data = self.generate_sps_payment_data(order)
+
+                    new_sps_payment = SPSPayment(
+                        order = order,
+                        amount = payment_data["amount"],
+                        referenceCode = payment_data["referenceCode"],
+                        clarification = payment_data["clarification"]
+                    )
+
+                    new_sps_payment.save()
+                    new_sps_payment.transactionDate = payment_data["transactionDate"]
+                    new_sps_payment.save()
+
+                    if verbosity >= 2:
+                        message = u"  - SPS payment for order (%s), %s euros, made %s, ref code %s\n" % \
+                                        (order.purchaseDate, new_sps_payment.amount_as_2dstr(),
+                                         new_sps_payment.transactionDate, new_sps_payment.referenceCode)
+                        self.stdout.write(message.encode("ascii", "backslashreplace"))
+                    elif verbosity == 1:
+                        self.stdout.write(u"y ")
+
+                    del new_sps_payment
+                    del payment_data
+
+            del generated_orders
 
             if verbosity >= 1:
                 self.stdout.write(u"\n")
 
+            db.reset_queries()
+            gc.collect()
+
+
+
+
         if verbosity >= 1:
-            self.stdout.write(u"\nAll data has been created. Program created users with the following usernames:\n")
-            self.stdout.write(self._generated_users[0].username.encode("ascii", "backslashreplace"))
-            for i in range(1, number_of_users - 1):
-                self.stdout.write(u", " + self._generated_users[i].username.encode("ascii", "backslashreplace"))
-            if number_of_users > 1:
-                self.stdout.write(u" and " +
-                        self._generated_users[number_of_users - 1].username.encode("ascii", "backslashreplace"))
+            self.stdout.write(u"\nAll data has been created.")
+            if self._ids_of_generated_users:
+                self.stdout.write(u" Program created users with the following usernames:\n");
+                username = User.objects.get(id__exact = self._ids_of_generated_users[0]).username
+                self.stdout.write(username.encode("ascii", "backslashreplace"))
+                for i in range(1, number_of_users - 1):
+                    username = User.objects.get(id__exact = self._ids_of_generated_users[i]).username
+                    self.stdout.write(u", " + username.encode("ascii", "backslashreplace"))
+                if number_of_users > 1:
+                    username = User.objects.get(id__exact = self._ids_of_generated_users[number_of_users - 1]).username
+                    self.stdout.write(u" and " + username.encode("ascii", "backslashreplace"))
             self.stdout.write(u"\n")
+
 
 
 
@@ -474,8 +602,9 @@ class Command(BaseCommand):
 
 
 
-    def generate_album_data(self, user):
-        """ Generates information related to a single photo album """
+
+    def generate_album_title(self):
+        """ Generates a title for a single photo album """
         album_type_factor = self._albumRandomizer.randrange(0, 99)
 
         title = u""
@@ -658,8 +787,22 @@ class Command(BaseCommand):
             else:
                 title = title.replace(u" ", u"-")
 
-        title = self.decorate_album_title(title)
+        return self.decorate_album_title(title)
 
+
+
+
+    def generate_album_data(self, user):
+        """ Generates information related to a single photo album """
+        title = self.generate_album_title()
+        title_generation_tries = 1
+        while len(title) < 5 and title_generation_tries < 5:
+            title_generation_tries += 1
+            title = self.generate_album_title()
+        if len(title) < 5:
+            title = "<Title generation failed>"
+        if len(title) > 255:
+            title = title[0:255]
 
         description = u""
         for i in range(0, self._albumRandomizer.randrange(1, 4)):
@@ -696,6 +839,7 @@ class Command(BaseCommand):
 
 
 
+
     def decorate_album_title(self, title):
         """ May insert some decorations to given title """
         if self._albumRandomizer.randrange(0, 99) < 5:
@@ -717,12 +861,14 @@ class Command(BaseCommand):
 
 
 
+
     def compose_heart_string(self):
         """ Compose a string of hearts (like <3) to be used in titles """
         hearts = "<3"
         for i in range(0, self._albumRandomizer.randrange(0, 3)):
             hearts += " <3"
         return hearts
+
 
 
 
@@ -749,14 +895,64 @@ class Command(BaseCommand):
 
 
 
+
+    def generate_shopping_cart_data(self, user):
+        """ Generates information related to user's shopping cart """
+
+        orderable_albums_qs = Album.ones_visible_to(user)
+        orderable_albums_qs_count = orderable_albums_qs.count()
+
+        if not orderable_albums_qs_count:
+            return {"success": False}
+
+        number_of_cart_items = self._orderRandomizer.randrange(1, 10)
+        if number_of_cart_items > orderable_albums_qs_count:
+            number_of_cart_items = orderable_albums_qs_count
+
+        max_album_id = orderable_albums_qs.aggregate(Max("id")).values()[0]
+        if not max_album_id:
+            return []
+
+        albums = []
+        album_ids = []
+        missed_tries = 0
+        while len(albums) < number_of_cart_items and missed_tries < 10:
+            base_album_id = self._orderRandomizer.randrange(0, max_album_id)
+            album = orderable_albums_qs.filter(id__gte = base_album_id).order_by("id")[0]
+            if not album.id in album_ids:
+                albums.append(album)
+                album_ids.append(album.id)
+            else:
+                missed_tries += 1
+
+        if not albums:
+            return {"success": False}
+
+        cart_item_infos = []
+        for album in albums:
+            cart_item_infos.append({
+                "album": album,
+                "count": self._orderRandomizer.randrange(1, 6),
+                "additionDate": datetime.now()
+            })
+
+        return {
+            "success": True,
+            "items": cart_item_infos
+        }
+
+
+
+
     def generate_order_data(self, user):
         """ Generates information related to a single order """
-        status = 3
+        status = OrderStatus.sent()
 
-        orderable_albums_qs = Album.objects.filter(id__lt = 0)
+        orderable_albums_qs = Album.objects.filter(id__lt = 0)  # empty qs, don't modify
         purchase_date_calculation_counter = 0
         o_maxtimdelta = datetime.now() - user.date_joined
         o_deltaseconds = int(o_maxtimdelta.total_seconds())
+
         while orderable_albums_qs.count() < 1 and purchase_date_calculation_counter < 10:
             purchase_date_calculation_counter += 1;
             o_randomdeltaseconds = self._orderRandomizer.randrange(0, o_deltaseconds)
@@ -766,11 +962,11 @@ class Command(BaseCommand):
                     Q(creationDate__lt = o_datetime),
                     Q(isPublic = True) | Q(owner = user))
 
-        if not orderable_albums_qs:
+        if not orderable_albums_qs.exists():
             return {"success": False}
 
         valid_addresses_qs = Address.objects.filter(owner__exact = user)
-        if not valid_addresses_qs:
+        if not valid_addresses_qs.exists():
             return {"success": False}
 
         while Order.objects.filter(orderer__exact = user, purchaseDate__exact = o_datetime).exists():
@@ -778,6 +974,7 @@ class Command(BaseCommand):
 
         album_infos = []
         number_of_valid_addresses = valid_addresses_qs.count()
+
         ids_of_orderable_albums = [id for id in orderable_albums_qs.values_list('id', flat = True)]
 
         number_of_order_items = self._orderRandomizer.randrange(1, 10)
@@ -802,6 +999,27 @@ class Command(BaseCommand):
             "status": status,
             "items": album_infos
         }
+
+
+
+
+    def generate_sps_payment_data(self, order):
+        """ 
+            Generates information related to a single transaction
+            via Simple Payments service related to given order.
+        """
+
+        secondsFromOrder = self._orderRandomizer.randrange(5, 20)
+        transactionDate = order.purchaseDate + timedelta(seconds = secondsFromOrder)
+
+        return {
+            "order": order,
+            "amount": order.total_price(),
+            "transactionDate": transactionDate,
+            "referenceCode": self._orderRandomizer.randrange(1234567890, 9876543210),
+            "clarification": ""
+        }
+
 
 
 

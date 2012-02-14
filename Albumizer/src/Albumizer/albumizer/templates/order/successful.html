@@ -10,4 +10,22 @@
 
   <h1>Order Completed Successfully</h1>
 
+
+  <form name="frmSPSPayment" method="post" action="{{ sps_address }}">
+    {% csrf_token %}
+    
+    <input type="hidden" name="sid" value="{{ sps_seller_id }}" />
+    <input type="hidden" name="pid" value="{{ sps_payment_id }}" />
+    <input type="hidden" name="amount" value="{{ sps_amount }}" />
+    <input type="hidden" name="checksum" value="{{ sps_checksum }}" />
+    <input type="hidden" name="success_url" value="{{ sps_success_url }}" />
+    <input type="hidden" name="cancel_url" value="{{ sps_cancel_url }}" />
+    <input type="hidden" name="error_url" value="{{ sps_error_url }}" />
+    {% if debug %}
+    <input type="hidden" name="dev" value="developing environment" />
+    {% endif %}
+    
+    <input type="submit" value="Pay via Simple Payments Service">  
+  </form>
+
 {% endblock %}

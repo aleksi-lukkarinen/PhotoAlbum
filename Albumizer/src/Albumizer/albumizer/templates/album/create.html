@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load url from future %}
 
 
 
@@ -26,9 +27,9 @@
     });
   });
   $(window).load(function() {
-    $("#id_txtAlbumName").focus();
-    $("#id_cmdCreateAlbum").click(function() {
-      $("#id_cmdCreateAlbum").button("option", "disabled", true);  
+    $("#frmCreateAlbum").submit(function() {
+      $("#id_cmdCreateAlbum").button("option", "disabled", true);
+      return true;  
     })
   });
 
@@ -68,7 +69,7 @@
     </table>
   {% endif %}
 
-  <form id="frmCreateAlbum" class="commonForm" method="post" action="/album/create/">
+  <form id="frmCreateAlbum" class="commonForm" method="post" action="{% url "create_album" %}">
     {% csrf_token %}
     
     <div class="formSectionTitle ui-widget-header">Album Information</div>

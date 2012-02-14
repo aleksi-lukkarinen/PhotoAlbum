@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load url from future %}
 
 
 
@@ -9,5 +10,12 @@
 {% block page_content %}
 
   <h1>Ordering Information</h1>
+
+  <form name="frmOrderInformation" method="post" action="{% url "albumizer.views.get_ordering_information" %}">
+    {% csrf_token %}
+    <input type="submit" value="Show Summary">  
+  </form>
+  
+
 
 {% endblock %}

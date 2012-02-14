@@ -1,12 +1,14 @@
-{% extends "soft-error-template.html" %}
+{% extends "base-template.html" %}
 
 
 
-{% block page_title %}Unknown Resource (404){% endblock %}
+{% block page_title %}Unknown Resource{% endblock %}
 
-{% block error_page_heading %}Unknown Resource (404){% endblock %}
 
-{% block error_page_content %}
+
+{% block page_content %}
+  
+  <h1>Unknown Resource (404)</h1>
 
   {% if request_path %}
     <p>

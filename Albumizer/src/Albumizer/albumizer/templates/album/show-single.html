@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 
@@ -8,28 +9,77 @@
 
 {% block page_content %}
 
-  <h1>{{ album.title }}</h1>
-  {% if album.description %}
-  <p>
-    {{ album.description }}
-  </p>
-  {% endif %}
+  <article class="albumBrowser hlisting">
+	  <h1 class="fn">{{ album.title }}</h1>
 
-  <a href="https://twitter.com/intent/tweet?button_hashtag=Albumizer&text=Hey!%20Some%20cool%20photos:%20{{ album.title|urlencode }}" 
-     class="twitter-hashtag-button" 
-     data-related="aaltowsd2012" 
-     data-url="http://{{ site_domain }}{% url 'albumizer.views.show_single_album' album.id %}">Tweet #Albumizer</a>
-  <script>
-    !function(d, s, id) {
-    	var js, fjs = d.getElementsByTagName(s)[0];
-    	
-    	if (!d.getElementById(id)){
-    		js=d.createElement(s);
-    		js.id=id;
-    		js.src="//platform.twitter.com/widgets.js";
-    		fjs.parentNode.insertBefore(js, fjs);
-    	}
-    }(document, "script", "twitter-wjs");
-  </script>
+
+    <!--  The browsing interface here  -->
+
+
+	  {% if album.description %}
+	  <p class="description">
+	    {{ album.description }}
+	  </p>
+	  {% endif %}
+ 
+    <table class="albumDetails">
+      <tr>
+        <th>Created:</th><td><span class="dtlisted" title="{{ album.creationDate|date:"c" }}">{{ album.creationDate|date:"j.n.Y \a\t G.i" }}</span></td>
+        
+        <th>Creator:</th>
+        <td>
+	        {% if request.user == album.owner %}
+	          Yourself
+	        {% else %}
+	          {{ album.owner.username }}
+	        {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Pages:</th>
+        <td>{{ album.pages|length }}</td>
+        
+        <th>Unit Price:</th>
+        <td class="price">
+	        {% if album.price > 0 %}
+	          {{ album.price_as_2dstr }} &euro;
+	        {% else %}
+	          Not applicable, as the album has no pages.
+	        {% endif %}
+        </td>
+      </tr>
+    </table>
+
+    {% if album.isPublic or not opened_using_secret_hash %}
+    <table class="additionalInfoContainer">
+      <tr>
+        {% if album.isPublic %}
+	        <td class="urlContainer publicUrlContainer">
+            <span class="helpText">Public URL of this album:</span>
+            <a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="self bookmark" 
+                          class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</a>
+          </td>
+          <td class="tweetButtonContainer">
+            {% twitter_tweet_button_album album %}
+          </td>
+        {% else %}
+          {% if not opened_using_secret_hash %}
+	          <td class="urlContainer secretUrlContainer">
+				      <span class="helpText">
+				        If you want to let your family or friends to browse this album
+				        while it is private, give them the secret URL given below:
+				      </span>
+				      <span class="secretUrl">http://{{ site_domain }}{{ album.get_secret_url }}</span>
+	          </td>
+          {% endif %}
+        {% endif %}
+      </tr>
+    </table>
+    {% endif %}
+    
+
+    <div class="offer-sell">available for order</div>
+    <div class="lister"><span class="fn">Albumizer</span>, <span class="url">http://{{ site_domain }}{{ album.get_absolute_url }}</span></div>
+  </article>
 
 {% endblock %}
