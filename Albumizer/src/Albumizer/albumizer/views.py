@@ -122,7 +122,7 @@ def welcome_page(request):
 
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not). """
-    albums = Album.ones_visible_to(request.user)
+    albums = Album.objects.filter(isPublic = True).order_by('title')
 
     paginator = Paginator(albums, 20) # Show 20 albums per page
 

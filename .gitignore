@@ -1,1 +1,4 @@
 *.pyc
+settings_facebook.py
+*.*~
+.gitignore
