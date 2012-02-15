@@ -432,6 +432,49 @@ class Page(models.Model):
     def __unicode__(self):
         return u"%s, %s" % (self.album, self.pageNumber)
 
+    @models.permalink
+    def get_absolute_url(self):
+        view_parameters = {
+            "album_id": self.album.id,
+            "page_number": self.pageNumber
+        }
+        return ("albumizer.views.show_single_page", (), view_parameters)
+
+    @models.permalink
+    def get_secret_url(self):
+        if not self.album.secretHash:
+            self.album.secretHash = self.album.generate_secret_hash_for(self.album)
+        view_parameters = {
+            "album_id": self.album.id,
+            "secret_hash": self.album.secretHash,
+            "page_number": self.pageNumber
+        }
+        return ("albumizer.views.show_single_page_with_hash", (), view_parameters)
+
+    @staticmethod
+    def by_album_id_and_page_number(album_id, page_number):
+        """ Returns a page of an album by album's id and page number, if one exists. Otherwise returns None. """
+        page_queryset = Page.objects.filter(album__id__exact = album_id, pageNumber = page_number)
+        if not page_queryset:
+            return None
+        return page_queryset[0]
+
+    @staticmethod
+    def by_album_id_page_number_and_secret_hash(album_id, page_number, secret_hash):
+        """ 
+            Returns a page of an album by album's id, page number and a secret hash, if one exists.
+            Otherwise returns None.
+        """
+        page_queryset = Page.objects.filter(
+            album__id__exact = album_id,
+            album__secretHash__exact = secret_hash,
+            pageNumber = page_number
+        )
+
+        if not page_queryset:
+            return None
+        return page_queryset[0]
+
     class Meta():
         unique_together = ("album", "pageNumber")
         ordering = ["album", "pageNumber"]

@@ -145,12 +145,67 @@ def list_all_visible_albums(request):
 
 
 def show_single_page(request, album_id, page_number):
-    myalbum = get_object_or_404(Album, pk = album_id)
-    mypage = get_object_or_404(Page, album = album_id, pageNumber = page_number)
+    myalbum = Album.by_id(album_id)
+    if not myalbum:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    if myalbum.is_hidden_from_user(request.user):
+        return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
+
+    mypage = Page.by_album_id_and_page_number(album_id, page_number)
+    if not mypage:
+        return render_to_response('album/page-not-found.html', RequestContext(request))
+
     pageNumberInt = int(page_number)
     context = {"pageNumber":mypage.pageNumber,
           "albumTitle":myalbum.title,
           "layoutCssClass":mypage.layout.cssClass}
+    images = []
+    texts = []
+
+    for pagecontent in mypage.pagecontents.all():
+        if pagecontent.placeHolderID.startswith("image"):
+            images.append(pagecontent.content)
+        elif pagecontent.placeHolderID.startswith("text"):
+            texts.append(pagecontent.content)
+    context["texts"] = texts
+    context["images"] = images
+    context["cssContent"] = mypage.layout.cssContent
+    if myalbum.pages().filter(pageNumber = pageNumberInt + 1).exists():
+        context["nextLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt + 1})
+    if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
+        context["previousLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt - 1})
+
+    response = render_to_response_as_public('album/view-album-page-single.html', RequestContext(request, context))
+    if not myalbum.isPublic:
+        add_caching_preventing_headers(response)
+
+    return response
+
+
+
+
+@prevent_all_caching
+def show_single_page_with_hash(request, album_id, page_number, secret_hash):
+    """ Allows user to browse a single page of an private album with a secret hash code. """
+
+    myalbum = Album.by_id(album_id)
+    if not myalbum:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    mypage = Page.by_album_id_and_page_number(album_id, page_number)
+    if not mypage:
+        return render_to_response('album/page-not-found.html', RequestContext(request))
+
+    if myalbum.isPublic or myalbum.is_owned_by(request.user):
+        return HttpResponseRedirect(mypage.get_absolute_url())
+
+    pageNumberInt = int(page_number)
+    context = {"pageNumber":mypage.pageNumber,
+          "albumTitle":myalbum.title,
+          "layoutCssClass":mypage.layout.cssClass,
+          "opened_using_secret_hash": True
+    }
     images = []
     texts = []
 
@@ -208,17 +263,18 @@ def show_single_album_GET(request, album_id):
     try:
         album_id = int(album_id)
     except:
-        return render_to_response_as_public('album/not-found.html', RequestContext(request))
+        return render_to_response_as_public('album/album-not-found.html', RequestContext(request))
 
     album = Album.by_id(album_id)
     if not album:
-        return render_to_response_as_public('album/not-found.html', RequestContext(request))
+        return render_to_response_as_public('album/album-not-found.html', RequestContext(request))
 
     if album.is_hidden_from_user(request.user):
         return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
 
     template_parameters = {
         "album": album,
+        "is_visible_to_current_user": album.is_visible_to_user(request.user),
         "current_user_can_edit": album.is_editable_to_user(request.user),
         "current_user_can_delete": album.is_editable_to_user(request.user)
     }
@@ -240,7 +296,7 @@ def show_single_album_POST(request, album_id):
     if request.POST.get("addPage"):
         album_resultset = Album.objects.filter(id__exact = album_id)
         if not album_resultset:
-            return render_to_response('album/not-found.html', RequestContext(request))
+            return render_to_response('album/album-not-found.html', RequestContext(request))
 
         album = album_resultset[0]
         if not album.is_editable_to_user(request.user):
@@ -331,12 +387,18 @@ def show_single_album_with_hash(request, album_id, secret_hash):
 
     album = Album.by_id_and_secret_hash(album_id, secret_hash)
     if not album:
-        return render_to_response('album/not-found.html', RequestContext(request))
+        return render_to_response('album/album-not-found.html', RequestContext(request))
 
     if album.isPublic or album.is_owned_by(request.user):
         return HttpResponseRedirect(album.get_absolute_url())
 
-    template_parameters = {'album': album, 'opened_using_secret_hash': True}
+    template_parameters = {
+        "album": album,
+        "opened_using_secret_hash": True,
+        "is_visible_to_current_user": album.is_visible_to_user(request.user),
+        "current_user_can_edit": album.is_editable_to_user(request.user),
+        "current_user_can_delete": album.is_editable_to_user(request.user)
+    }
     return render_to_response('album/show-single.html', RequestContext(request, template_parameters))
 
 
@@ -385,7 +447,7 @@ def edit_album_GET(request, album_id):
     """ Allows user to edit a single album. """
     album_resultset = Album.objects.filter(id__exact = album_id)
     if not album_resultset:
-        return render_to_response('album/not-found.html', RequestContext(request))
+        return render_to_response('album/album-not-found.html', RequestContext(request))
 
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
