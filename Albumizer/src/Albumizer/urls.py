@@ -13,4 +13,10 @@ urlpatterns = patterns('',
     url(r'^albumizer_manager/', include(admin.site.urls)),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^albumizer_manager/doc/', include('django.contrib.admindocs.urls')),
-)
+    )
+
+from django.conf import settings
+if settings.DEBUG:
+    urlpatterns += patterns('',
+    url(r'^uploads/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT,}),
+    )
