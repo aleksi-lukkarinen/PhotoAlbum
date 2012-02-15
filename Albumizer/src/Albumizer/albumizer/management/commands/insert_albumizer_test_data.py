@@ -100,6 +100,9 @@ class Command(BaseCommand):
     _trans_tbl_email_username_src = u"åäöÅÄÖáÁàÀèÈéÉêÊëËíÍìÌïÏîÎóÓòÒôÔúÚùÙûÛüÜýÝỳỲÿŸšŠß"
     _trans_tbl_email_username_dest = u"aaoAAOaAaAeEeEeEeEiIiIiIiIoOoOoOuUuUuUuUyYyYyYsSs"
     _trans_tbl_email_username = {}
+    _qs_layouts = None
+    _qs_layout_count = 0
+    _country_FI = None
     _ids_of_generated_users = []
 
 
@@ -179,6 +182,16 @@ class Command(BaseCommand):
             self._trans_tbl_email_username[ord(self._trans_tbl_email_username_src[i])] = \
                     self._trans_tbl_email_username_dest[i]
 
+        self._qs_layouts = Layout.objects.all()
+        self._qs_layout_count = self._qs_layouts.count()
+        if self._qs_layout_count < 1:
+            self.stdout.write(u"No layouts in the database - impossible to create albums.\n")
+            return
+
+        self._country_FI = Country.by_code("FI")
+        if not self._country_FI:
+            self.stdout.write(u"No Finnish country in the database - impossible to create addresses.\n")
+            return
 
         self.stdout.write(u"Inserting test data to Albumizer database. " +
                           u"This may take some time, so please wait patiently.\n\n")
@@ -312,21 +325,22 @@ class Command(BaseCommand):
 
 
                 if verbosity >= 2:
-                    message = u"    * pages:"
+                    message = u"    * pages:\n"
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
                 number_of_pages = self._albumRandomizer.randrange(0, 20)
                 for page_number in range(1, number_of_pages + 1):
-                    #page_data = self.generate_page_data()
+                    layout = self._qs_layouts[self._albumRandomizer.randrange(0, self._qs_layout_count)]
 
                     new_page = Page(
                         album = new_album,
-                        pageNumber = page_number
+                        pageNumber = page_number,
+                        layout = layout
                     )
                     new_page.save()
 
                     if verbosity >= 2:
-                        message = u" %d" % page_number
+                        message = u"            (%s) %s\n" % (unicode(page_number).rjust(3, "0"), unicode(layout))
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     elif verbosity == 1:
                         self.stdout.write(u"p ")
@@ -342,13 +356,22 @@ class Command(BaseCommand):
 
 
 
+
+
+
+
+
+
+
+
             shopping_cart_data = self.generate_shopping_cart_data(new_user)
             if not shopping_cart_data["success"] and verbosity >= 2:
                 message = u"  - no valid albums to create shopping cart with\n\n"
                 self.stdout.write(message.encode("ascii", "backslashreplace"))
             else:
-                message = u"  - shopping cart:\n"
-                self.stdout.write(message.encode("ascii", "backslashreplace"))
+                if verbosity >= 2:
+                    message = u"  - shopping cart:\n"
+                    self.stdout.write(message.encode("ascii", "backslashreplace"))
 
                 item_counter = 0
                 for item in shopping_cart_data["items"]:
@@ -363,9 +386,9 @@ class Command(BaseCommand):
                     new_shopping_cart_item.save()
 
                     if verbosity >= 2:
-                        message = u"            (%d) %s, %d, %s\n" % \
-                                        (item_counter, new_shopping_cart_item.album, new_shopping_cart_item.count,
-                                         new_shopping_cart_item.additionDate)
+                        message = u"            (%s) %s, %d, %s\n" % \
+                                        (unicode(item_counter).rjust(3, "0"), new_shopping_cart_item.album,
+                                         new_shopping_cart_item.count, new_shopping_cart_item.additionDate)
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     elif verbosity == 1:
                         self.stdout.write(u"c ")
@@ -376,6 +399,9 @@ class Command(BaseCommand):
                     self.stdout.write("\n".encode("ascii", "backslashreplace"))
 
             del shopping_cart_data
+
+
+
 
 
 
@@ -427,9 +453,9 @@ class Command(BaseCommand):
                     new_order_item.save()
 
                     if verbosity >= 2:
-                        message = u"            (%d) %s, %d, %s\n" % \
-                                        (order_item_counter, new_order_item.album, new_order_item.count,
-                                         unicode(new_order_item.deliveryAddress))
+                        message = u"            (%s) %s, %d, %s\n" % \
+                                        (unicode(order_item_counter).rjust(3, "0"), new_order_item.album,
+                                         new_order_item.count, unicode(new_order_item.deliveryAddress))
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     elif verbosity == 1:
                         self.stdout.write(u"i ")
@@ -1042,7 +1068,7 @@ class Command(BaseCommand):
 
         state = None
 
-        country = Country.objects.get(code__exact = "FI")
+        country = self._country_FI
 
         return {
             "postAddressLine1": postAddressLine1,

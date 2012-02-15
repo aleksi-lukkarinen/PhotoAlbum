@@ -523,6 +523,14 @@ class Country(models.Model):
     def __unicode__(self):
         return self.name
 
+    @staticmethod
+    def by_code(country_code):
+        """ Returns a country having given code, if one exists. Otherwise returns None. """
+        country_resultset = Country.objects.filter(code__exact = country_code)
+        if not country_resultset:
+            return None
+        return country_resultset[0]
+
     class Meta():
         ordering = ["name"]
         verbose_name = u"country"
