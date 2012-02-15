@@ -254,6 +254,21 @@ def edit_album(request, album_id):
 
 
 
+@login_required
+@prevent_all_caching
+def add_page(request, album_id):
+    """ Allows user to edit a single album. """
+    album_resultset = Album.objects.filter(id__exact = album_id)
+    if not album_resultset:
+	return render_to_response('album/not-found.html', RequestContext(request))
+
+    album = album_resultset[0]
+    if not album.is_editable_to_user(request.user):
+	return render_to_response('album/edit-access-denied.html', RequestContext(request))
+
+    return render_to_response('album/add-page.html', RequestContext(request, {'album': album}))
+
+
 
 @login_required
 @prevent_all_caching

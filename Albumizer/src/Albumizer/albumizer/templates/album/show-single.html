@@ -5,7 +5,13 @@
 
 {% block page_title %}Album "{{ album.title }}"{% endblock %}
 
+{% block page_scripts_after %}
 
+    $(function() {
+      $("#addPageButton").button();
+    });
+
+{% endblock %}
 
 {% block page_content %}
 
@@ -13,11 +19,15 @@
 	  <h1 class="fn">{{ album.title }}</h1>
 
 
+	  {% if request.user == album.owner %}
+	  <a id="addPageButton" href="{{ album.get_absolute_url }}add_page/">Add page</a>
+	  <div class="clear"></div>
+	  {% endif %}
+
 	  <!--  The browsing interface here  -->
+	  <div class="albumList"> 
 	  {% if album.pages|length > 0 %}
-	  
 	  {% for page in album.pages %}
-	  <div class="albumList">
 	    <a href="{{ album.get_absolute_url }}{{ page.pageNumber }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
 	      <img src="" alt="" class="albumListItemImage" />
 	      <p class="albumListItemTitle">Page {{ page.pageNumber }}</p>
@@ -25,12 +35,11 @@
 	    {% if forloop.counter|divisibleby:"5" %}
 	    <div class="clear"></div>
 	    {% endif %}
-	  </div>
 	  {% endfor %}
-
 	  {% else %}
 	  <p>There are no pages.</p>
 	  {% endif %}
+	  </div>
 
 	  <div class="clear"></div>
 

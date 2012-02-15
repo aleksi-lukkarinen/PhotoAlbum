@@ -363,6 +363,16 @@ clear:both;
 
 
 
+.albumBrowser h1 {
+float:left;
+}
+
+.albumBrowser #addPageButton {
+float:right;
+}
+
+
+
 
 
 .show-twitter-tweet {
