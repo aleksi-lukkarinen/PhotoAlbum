@@ -18,7 +18,6 @@ urlpatterns = patterns('albumizer.views',
 
     (r'^album/$', 'list_all_visible_albums'),
     (r'^album/(?P<album_id>\d+)/s/(?P<secret_hash>[a-z0-9]{64})/$', 'show_single_album_with_hash'),
-    (r'^album/(?P<album_id>\d+)/edit/$', 'edit_album'),
     (r'^album/(?P<album_id>\d{1,})/(?P<page_number>\d{1,})$', 'show_single_page'),
 
     (r'^accounts/$', redirect_to, {'url': "/accounts/profile/"}),
@@ -51,6 +50,8 @@ urlpatterns += patterns('',
         {"GET": views.create_album_GET, "POST": views.create_album_POST}, "create_album"),
     (r'^album/(?P<album_id>\d+)/$', views.dispatch_by_method,
         {"GET": views.show_single_album_GET, "POST": views.show_single_album_POST}, 'show_single_album'),
+    (r'^album/(?P<album_id>\d+)/edit/$', views.dispatch_by_method,
+        {"GET": views.edit_album_GET, "POST": views.edit_album_POST}, 'edit_album'),
     (r'^accounts/login/$', views.dispatch_by_method, {"GET": views.log_in_GET, "POST": views.log_in_POST}, "log_in"),
     (r'^accounts/register/$', views.dispatch_by_method, {
         "GET": views.get_registration_information_GET, "POST": views.get_registration_information_POST},

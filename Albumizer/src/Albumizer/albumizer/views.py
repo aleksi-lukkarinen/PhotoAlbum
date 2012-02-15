@@ -219,7 +219,8 @@ def show_single_album_GET(request, album_id):
 
     template_parameters = {
         "album": album,
-        "current_user_is_owner": album.is_owned_by(request.user)
+        "current_user_can_edit": album.is_editable_to_user(request.user),
+        "current_user_can_delete": album.is_editable_to_user(request.user)
     }
     response = render_to_response_as_public('album/show-single.html', RequestContext(request, template_parameters))
     if not album.isPublic:
@@ -232,7 +233,11 @@ def show_single_album_POST(request, album_id):
     """ Performs an action related to an album. """
     assert request.method == "POST"
 
-    if request.POST.get("add"):
+    if request.POST.get("Album"):
+        return HttpResponseRedirect(reverse("edit_album", args = [album_id]))
+
+
+    if request.POST.get("addToShoppingCart"):
         try:
             album_id = int(album_id)
         except:
@@ -362,7 +367,7 @@ def create_album_POST(request):
 
 @login_required
 @prevent_all_caching
-def edit_album(request, album_id):
+def edit_album_GET(request, album_id):
     """ Allows user to edit a single album. """
     album_resultset = Album.objects.filter(id__exact = album_id)
     if not album_resultset:
@@ -373,6 +378,12 @@ def edit_album(request, album_id):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
 
     return render_to_response('album/edit.html', RequestContext(request, {'album': album}))
+
+@login_required
+@prevent_all_caching
+def edit_album_POST(request, album_id):
+    """  """
+    return render_to_response('album/edit.html', RequestContext(request, {'album': album_id}))
 
 
 
