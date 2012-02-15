@@ -233,8 +233,20 @@ def show_single_album_POST(request, album_id):
     """ Performs an action related to an album. """
     assert request.method == "POST"
 
-    if request.POST.get("Album"):
+    if request.POST.get("editAlbum"):
         return HttpResponseRedirect(reverse("edit_album", args = [album_id]))
+
+
+    if request.POST.get("addPage"):
+        album_resultset = Album.objects.filter(id__exact = album_id)
+        if not album_resultset:
+            return render_to_response('album/not-found.html', RequestContext(request))
+
+        album = album_resultset[0]
+        if not album.is_editable_to_user(request.user):
+            return render_to_response('album/edit-access-denied.html', RequestContext(request))
+
+        return render_to_response('album/add-page.html', RequestContext(request, {'album': album}))
 
 
     if request.POST.get("addToShoppingCart"):
@@ -378,6 +390,9 @@ def edit_album_GET(request, album_id):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
 
     return render_to_response('album/edit.html', RequestContext(request, {'album': album}))
+
+
+
 
 @login_required
 @prevent_all_caching

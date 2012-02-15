@@ -5,9 +5,11 @@
 
 {% block page_title %}Album "{{ album.title }}"{% endblock %}
 
-
-
 {% block page_scripts_after %}
+
+    $(function() {
+      $("#addPageButton").button();
+    });
 
   $(function() {
     $(".actionButtonContainer input").button();
@@ -21,15 +23,16 @@
 
   <article class="albumBrowser hlisting">
     {% show_messages %}
-    
+
     <div>
 		  <h1 class="fn">{{ album.title }}</h1>
-	    
+
 	    {% if request.user.is_authenticated %}
 	    <div class="actionButtonContainer">
 	      <form name="frmAlbumAction" method="post" action="{% url "show_single_album" album.id %}">
 	        {% csrf_token %}
           {% if current_user_can_edit %}
+            <input type="submit" name="addPage" name="id_cmdAddPage" value="Add Page">
             <input type="submit" name="editAlbum" name="id_cmdEdit" value="Edit Album">
           {% endif %}
 	        <input type="submit" name="addToShoppingCart" name="id_cmdAdd" value="Add to Shopping Cart">
@@ -40,7 +43,7 @@
 	    </div>
 	    {% endif %}
     </div>
-        
+
     <div class="detailRow">
       Created <span class="dtlisted" title="{{ album.creationDate|date:"c" }}">{{ album.creationDate|date:"j.n.Y \a\t G.i" }}</span> by
       {% if request.user == album.owner %}
@@ -74,11 +77,12 @@
     {% endif %}
 
 
+
+
 	  <!--  The browsing interface here  -->
+	  <div class="albumList"> 
 	  {% if album.pages|length > 0 %}
-	  
 	  {% for page in album.pages %}
-	  <div class="albumList">
 	    <a href="{{ album.get_absolute_url }}{{ page.pageNumber }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
 	      <img src="" alt="" class="albumListItemImage" />
 	      <p class="albumListItemTitle">Page {{ page.pageNumber }}</p>
@@ -86,12 +90,11 @@
 	    {% if forloop.counter|divisibleby:"5" %}
 	    <div class="clear"></div>
 	    {% endif %}
-	  </div>
 	  {% endfor %}
-
 	  {% else %}
 	    <div class="noPagesNotice">This album is currently empty.</div>
 	  {% endif %}
+	  </div>
 
 	  <div class="clear"></div>
 
