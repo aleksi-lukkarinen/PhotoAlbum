@@ -13,8 +13,26 @@
 	  <h1 class="fn">{{ album.title }}</h1>
 
 
-    <!--  The browsing interface here  -->
+	  <!--  The browsing interface here  -->
+	  {% if album.pages|length > 0 %}
+	  
+	  {% for page in album.pages %}
+	  <div class="albumList">
+	    <a href="{{ album.get_absolute_url }}{{ page.pageNumber }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+	      <img src="" alt="" class="albumListItemImage" />
+	      <p class="albumListItemTitle">Page {{ page.pageNumber }}</p>
+	    </a>
+	    {% if forloop.counter|divisibleby:"5" %}
+	    <div class="clear"></div>
+	    {% endif %}
+	  </div>
+	  {% endfor %}
 
+	  {% else %}
+	  <p>There are no pages.</p>
+	  {% endif %}
+
+	  <div class="clear"></div>
 
 	  {% if album.description %}
 	  <p class="description">
