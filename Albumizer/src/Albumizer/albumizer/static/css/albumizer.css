@@ -650,26 +650,18 @@ clear:both;
 
 
 
+.albumBrowser h1 {
+  margin-bottom:             0.5em;
+}
 
+.albumBrowser .detailRow {
+  margin-bottom:             0.2em;
+}
 
-.albumBrowser .albumDetails {
+.albumBrowser .description {
   margin-bottom:             1em;
-}
-
-.albumBrowser .albumDetails th {
-  padding:                   0.2em 0.7em 0.2em 0.7em;
-  vertical-align:            top; 
-	text-align:                left;
-	width:                     7em;
-	background:                #ccddbb;
-  color:                     #000000;
-}
-
-.albumBrowser .albumDetails td {
-  padding:                   0.2em 0.7em 0.2em 0.7em; 
-  vertical-align:            top; 
-  background:                #ccddbb;
-  color:                     #000000;
+  width:                     50em;
+  float:                     right;
 }
 
 .albumBrowser .offer-sell,
@@ -678,18 +670,22 @@ clear:both;
 }
 
 .albumBrowser .additionalInfoContainer {
-	width:                     100%;
-	padding-right:             3em;
   vertical-align:            top;
   text-align:                left;
 }
 
-.albumBrowser .additionalInfoContainer .publicUrlContainer {
-  width:                     30%;
+.albumBrowser .additionalInfoContainer .actionButtonContainer {
+	padding-right:             3em;
+}
+
+.albumBrowser .additionalInfoContainer .twitter-tweet-button-album-container {
+  margin-top:                2em;
 }
 
 .albumBrowser .additionalInfoContainer .urlContainer {
-	font-size:                 90%;
+	display:                   block;
+  margin-top:                1em;
+  font-size:                 90%;
   background:                #ffffff;
   color:                     #666666;
 }
@@ -701,11 +697,8 @@ clear:both;
 }
 
 .albumBrowser .additionalInfoContainer .urlContainer a:hover {
-  color:                     #446644;
-}
-
-.albumBrowser .additionalInfoContainer .urlContainer .helpText {
-	display:                   block;
+  background:                #ffffff;
+	color:                     #446644;
 }
 
 .albumBrowser .additionalInfoContainer .urlContainer .secretUrl {
@@ -714,9 +707,18 @@ clear:both;
   color:                     #779977;
 }
 
-.albumBrowser .additionalInfoContainer .twitter-tweet-button-album-container {
-	margin-top: 0em;
+.albumBrowser .additionalInfoContainer .publicUrlContainer .url {
+  white-space:               nowrap;
 }
+
+.albumBrowser .additionalInfoContainer .secretUrlContainer .secretUrl {
+  white-space:               nowrap;
+}
+
+.albumBrowser .additionalInfoContainer .secretUrlContainer .helpText {
+  display:                   block;
+}
+
 
 
 
@@ -754,6 +756,25 @@ clear:both;
 
 #id_frmShoppingCart .commonActions input {
   margin:                    0em 0em 0em 1em;
+}
+
+#id_frmShoppingCart .commonActions .commonActionLinkButton {
+  display:                   inline-block;
+  border:                    none;
+  background:                #ffffff;
+  color:                     #336699;
+  text-decoration:           underline;
+  cursor:                    pointer;
+  margin:                    0em;
+  padding:                   0em;
+}
+
+#id_frmShoppingCart .disclaimer {
+	margin-top:                1em;
+	margin-bottom:             4em;
+	text-align:                right;
+  background:                #ffffff;
+  color:                     #555555;
 }
 
 .shoppingCart table {
@@ -816,21 +837,25 @@ clear:both;
   font-size:                 120%;
   font-weight:               bold;
   text-decoration:           none;
+  background:                #ffffff;
   color:                     #336699;
 }
 
 .shoppingCart .itemColumn .item1stRow a:hover {
   text-decoration:           underline;
+  background:                #ffffff;
   color:                     #aa0000;
 }
 
 .shoppingCart .itemColumn .item1stRow .creator {
+  background:                #ffffff;
   color:                     #444444;
 }
 
 .shoppingCart .itemColumn .item2ndRow {
   margin:                    0em 0em 0em 10.5em;
-	color:                     #444444;
+	background:                #ffffff;
+  color:                     #444444;
 }
 
 .shoppingCart .itemColumn .item3rdRow {
@@ -840,8 +865,8 @@ clear:both;
 .shoppingCart .itemColumn .item3rdRow input {
 	display:                   inline-block;
 	background:                #ffffff;
-	border:                    none;
-	color:                     #336699;
+  color:                     #336699;
+  border:                    none;
 	text-decoration:           underline;
 	cursor:                    pointer;
 	margin:                    0em;
@@ -864,6 +889,7 @@ clear:both;
 }
 
 .shoppingCart .itemRowTable .rowTotalColumn {
+  background:                #ffffff;
   color:                     #aa0000;
   font-weight:               bold;
 }
@@ -893,6 +919,7 @@ clear:both;
 }
 
 .shoppingCart .subtotalRowTable .subTotal {
+  background:                #ffffff;
   color:                     #880000;
 }
 

@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 
@@ -26,6 +27,7 @@
 {% block page_content %}
 
   <h1>Register</h1>
+  {% show_messages %}
 
   <p>If you want to register into the service, please enter the necessary information below. The fields with a star next to their label are required.</p>
 

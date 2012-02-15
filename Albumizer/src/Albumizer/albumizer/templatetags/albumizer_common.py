@@ -97,3 +97,13 @@ def albumizer_usage_notice():
     }
 
 
+
+
+@register.inclusion_tag("custom-tags/show-messages.html", takes_context = True)
+def show_messages(context):
+    """ Outputs HTML and JavaScript code needed to render any messages stored in the Django's message facility. """
+    return {
+        "messages": context.get("messages")
+    }
+
+

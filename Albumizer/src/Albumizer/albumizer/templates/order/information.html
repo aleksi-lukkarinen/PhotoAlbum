@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 
@@ -10,6 +11,7 @@
 {% block page_content %}
 
   <h1>Ordering Information</h1>
+  {% show_messages %}
 
   <form name="frmOrderInformation" method="post" action="{% url "albumizer.views.get_ordering_information" %}">
     {% csrf_token %}

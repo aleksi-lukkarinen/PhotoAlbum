@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 
 
 
@@ -9,6 +10,7 @@
 {% block page_content %}
   
   <h1>The requested album cannot be viewed</h1>
+  {% show_messages %}
 
   <p>
     Because the requested album is not public and is not owned by you, it cannot be viewed.

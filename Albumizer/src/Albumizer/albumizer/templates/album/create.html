@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 
@@ -40,6 +41,8 @@
 {% block page_content %}
 
   <h1>Create New Album</h1>
+
+  {% show_messages %}
 
   <p>To create a new album, please fill the form below. At least album title is required.</p>
 

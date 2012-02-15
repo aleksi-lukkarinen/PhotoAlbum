@@ -7,79 +7,100 @@
 
 
 
+{% block page_scripts_after %}
+
+  $(function() {
+    $(".actionButtonContainer input").button();
+  });
+
+{% endblock %}
+
+
+
 {% block page_content %}
 
   <article class="albumBrowser hlisting">
+    {% show_messages %}
+    
 	  <h1 class="fn">{{ album.title }}</h1>
+    
+    {% if album.description %}
+    <div class="description">
+      {{ album.description }}
+    </div>
+    {% endif %}
+    <div class="detailRow">
+      Created <span class="dtlisted" title="{{ album.creationDate|date:"c" }}">{{ album.creationDate|date:"j.n.Y \a\t G.i" }}</span> by
+      {% if request.user == album.owner %}
+        yourself,
+      {% else %}
+        {{ album.owner.username }},
+      {% endif %}
+      
+      {% if not album.has_pages %}
+        currently empty
+      {% else %}
+        {{ album.pages|length }} page{{ album.pages|length|pluralize }}
+      {% endif %}
+    </div>
+    <div class="detailRow">
+      <td class="price">
+        {% if album.price > 0 %}
+          {{ album.price|floatformat:"2" }} &euro; / piece + shipping
+        {% endif %}
+      </td>
+    </div>
+    {% if album.isPublic %}
+      <div class="tweetButtonContainer">
+        {% twitter_tweet_button_album album %}
+      </div>
+    {% endif %}
+ 
+
+
 
 
     <!--  The browsing interface here  -->
 
 
-	  {% if album.description %}
-	  <p class="description">
-	    {{ album.description }}
-	  </p>
-	  {% endif %}
- 
-    <table class="albumDetails">
-      <tr>
-        <th>Created:</th><td><span class="dtlisted" title="{{ album.creationDate|date:"c" }}">{{ album.creationDate|date:"j.n.Y \a\t G.i" }}</span></td>
-        
-        <th>Creator:</th>
-        <td>
-	        {% if request.user == album.owner %}
-	          Yourself
-	        {% else %}
-	          {{ album.owner.username }}
-	        {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Pages:</th>
-        <td>{{ album.pages|length }}</td>
-        
-        <th>Unit Price:</th>
-        <td class="price">
-	        {% if album.price > 0 %}
-	          {{ album.price_as_2dstr }} &euro;
-	        {% else %}
-	          Not applicable, as the album has no pages.
-	        {% endif %}
-        </td>
-      </tr>
-    </table>
 
-    {% if album.isPublic or not opened_using_secret_hash %}
-    <table class="additionalInfoContainer">
-      <tr>
-        {% if album.isPublic %}
-	        <td class="urlContainer publicUrlContainer">
-            <span class="helpText">Public URL of this album:</span>
-            <a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="self bookmark" 
-                          class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</a>
-          </td>
-          <td class="tweetButtonContainer">
-            {% twitter_tweet_button_album album %}
-          </td>
-        {% else %}
-          {% if not opened_using_secret_hash %}
-	          <td class="urlContainer secretUrlContainer">
-				      <span class="helpText">
-				        If you want to let your family or friends to browse this album
-				        while it is private, give them the secret URL given below:
-				      </span>
-				      <span class="secretUrl">http://{{ site_domain }}{{ album.get_secret_url }}</span>
-	          </td>
+
+    <div class="additionalInfoContainer">
+      {% if request.user.is_authenticated %}
+      <div class="actionButtonContainer">
+        <form name="frmAlbumAction" method="post" action="{% url "show_single_album" album.id %}">
+          {% csrf_token %}
+          <input type="submit" name="add" name="id_cmdAdd" value="Add to Shopping Cart">
+          {% if current_user_is_owner %}
+            <input type="submit" name="delete" name="id_cmdDelete" value="Delete">
           {% endif %}
-        {% endif %}
-      </tr>
-    </table>
-    {% endif %}
-    
+        </form>
+      </div>
+      {% endif %}
+	    {% if album.isPublic %}
+	     <div class="urlContainer publicUrlContainer">
+	        <span class="helpText">Public URL of this album:</span>
+	        <nobr><a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="self bookmark" 
+	                      class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</a></nobr>
+	      </div>
+	    {% else %}
+	      {% if not opened_using_secret_hash %}
+	        <div class="urlContainer secretUrlContainer">
+	          <span class="helpText">
+	            If you wish to let your family or friends to browse this album
+	            while it is private, please give them the secret URL given below:
+	          </span>
+	          <nobr><span class="secretUrl">http://{{ site_domain }}{{ album.get_secret_url }}</span></nobr>
+	        </div>
+	      {% endif %}
+	    {% endif %}
+    </div>    
 
     <div class="offer-sell">available for order</div>
-    <div class="lister"><span class="fn">Albumizer</span>, <span class="url">http://{{ site_domain }}{{ album.get_absolute_url }}</span></div>
+    <div class="lister">
+      <span class="fn">Albumizer</span>, 
+      <span class="url">http://{{ site_domain }}{{ album.get_absolute_url }}</span>
+    </div>
   </article>
 
 {% endblock %}

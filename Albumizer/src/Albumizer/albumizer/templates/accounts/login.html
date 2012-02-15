@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 
@@ -27,6 +28,7 @@
 {% block page_content %}
 
   <h1>Log In</h1>
+  {% show_messages %}
 
   <p>Please enter your credentials to the fields below.</p>
 

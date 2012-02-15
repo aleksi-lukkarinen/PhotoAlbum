@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 {% block page_title %}{{ albumTitle }}{% endblock %}
@@ -13,6 +14,7 @@
 
 	<div>
 		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
+    {% show_messages %}
 		<div class="albumpagewrapper">
 			<div class="albumpagecontainer {{layoutCssClass}}">
 				{% for text in texts %}

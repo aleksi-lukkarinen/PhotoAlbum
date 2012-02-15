@@ -37,7 +37,7 @@
 				  {% endfor %}
 				);
 				
-				var albumUrlSample_{{ id }} = "{% url "albumizer.views.show_single_album" "0000000000000000000" %}";
+				var albumUrlSample_{{ id }} = "{% url "show_single_album" "0000000000000000000" %}";
 				var albumUrlPattern_{{ id }} = albumUrlSample_{{ id }}.replace("0000000000000000000", "{0}"); 
 
 				function updateRandomPics_{{ id }}() {

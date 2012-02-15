@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 
@@ -28,22 +29,22 @@
 {% block page_content %}
 
   <h1>Your Shopping Cart</h1>
-  
+
+  {% show_messages %}
+
   {% if not item_info %}
     <p>Your shopping cart is empty.</p>
   {% else %}
-    {% if messages %}
-      {% for message in messages %}
-        <div>{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  
     <form name="frmShoppingCart" id="id_frmShoppingCart"
           method="post" action="{% url "edit_shopping_cart" %}">
       {% csrf_token %}
       <div class="commonActions">
-        <input type="submit" class="updateButton" name="submit.update" value="Update Shopping Cart" />
-        <input type="submit" class="proceedButton" name="submit.proceed" value="Proceed to Checkout" />
+          <input type="submit" name="submit.remove.all" class="commonActionLinkButton" 
+                           value="Remove All Items" title="Remove all items from your shopping cart" />
+          <input type="submit" class="commonActionLinkButton" name="submit.save" value="Save Quantities"
+                            title="Save any modifications made to the quantities below" />
+          <input type="submit" class="proceedButton" name="submit.proceed" value="Proceed to Checkout" 
+                            title="Accept the current content of shopping cart and start the checking-out process" />
       </div>
 	    <div class="shoppingCart">
 		    <table class="headerRowTable">
@@ -67,7 +68,10 @@
 			              <span class="creator">{{ item.creator }}</span>
 			            </div>
 			            <div class="item2ndRow">{{ item.description }}</div>
-                  <div class="item3rdRow"><input type="submit" name="submit.remove.{{ item.id }}" value="Remove" /></div>
+                  <div class="item3rdRow">
+                    <input type="submit" name="submit.remove.{{ item.id }}" 
+                           value="Remove" title="Remove '{{ item.title }}' from your shopping cart" />
+                  </div>
 			          </td>
 			          <td class="quantityColumn">
 			            <input type="text" name="itemcount.{{ item.id }}" value="{{ item.number_of_units }}" size="2" />
@@ -86,14 +90,14 @@
 			      </td>
 		      </tr>
 		    </table>
-		    <div class="commonActions">
-          <input type="submit" class="updateButton" name="submit.update" value="Update Shopping Cart" />
-		      <input type="submit" class="proceedButton" name="submit.proceed" value="Proceed to Checkout" />
-		    </div>
 		  </div>
+	    <div class="disclaimer">
+	      The price and availability of albums at {{ site_name }} are subject to change.
+	    </div>
 		</form>
-		
-		The price and availability of albums at {{ site_name }} are subject to change.
   {% endif %}
 
+
+  {% random_picks_album_list 8 %}
+  
 {% endblock %}
