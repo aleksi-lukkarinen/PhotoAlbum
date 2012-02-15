@@ -3,6 +3,8 @@
 DEBUG = True
 
 
+MEDIA_ROOT = "D:/djangomedia/"
+
 
 DATABASES = {
 #    "default": {
