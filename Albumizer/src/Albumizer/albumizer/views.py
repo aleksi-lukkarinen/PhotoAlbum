@@ -279,6 +279,8 @@ def show_single_album_POST(request, album_id):
 
         try:
             ShoppingCartItem.add(request.user, album_id)
+            request.user.message_set.create(
+                        message = u"Album \"%s\" has been added to your shopping cart." % album.title)
         except Album.DoesNotExist:
             request.user.message_set.create(message = ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_UI)
             commonLogger.warning(ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG % \
