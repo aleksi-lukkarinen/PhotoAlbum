@@ -10,3 +10,5 @@ DATABASES = {
       'PORT': "", # Set to empty string for default. Not used with sqlite3.
       }
     }
+
+MEDIA_ROOT = '/home/tomas/Desktop/uploads/'
