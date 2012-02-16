@@ -481,8 +481,13 @@ def edit_album_GET(request, album_id):
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
-
-    return render_to_response('album/edit.html', RequestContext(request, {'album': album}))
+    
+    data = {'txtAlbumTitle' : album.title, 
+            'txtAlbumDescription' : album.description, 
+            'chkPublicAlbum' : album.isPublic
+            }
+    form = AlbumCreationForm(request, initial=data)
+    return render_to_response("album/edit.html",RequestContext(request, {'album': album_id,"form": form}))
 
 
 
@@ -491,7 +496,31 @@ def edit_album_GET(request, album_id):
 @prevent_all_caching
 def edit_album_POST(request, album_id):
     """  """
-    return render_to_response('album/edit.html', RequestContext(request, {'album': album_id}))
+    form = AlbumCreationForm(request, request.POST)
+    if not form.is_valid():
+        return render_to_response("album/edit.html", RequestContext(request, {'album': album_id,"form": form}))
+        
+    album_title = form.cleaned_data.get("txtAlbumTitle")
+    album_description = form.cleaned_data.get("txtAlbumDescription") or ""
+    album_publicity = form.cleaned_data.get("chkPublicAlbum")
+    
+    album_resultset = Album.objects.filter(id__exact = album_id)
+    if not album_resultset:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    album = album_resultset[0]
+    if not album.is_editable_to_user(request.user):
+        return render_to_response('album/edit-access-denied.html', RequestContext(request))
+        
+    album.title = album_title
+    album.description = album_description
+    album.isPublic = album_publicity
+    
+    album.save()
+
+    userActionLogger.info("User %s edited an album called \"%s\"." % (request.user.username, album.title))
+        
+    return HttpResponseRedirect(album.get_absolute_url())
 
 
 

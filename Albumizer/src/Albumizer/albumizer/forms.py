@@ -422,9 +422,10 @@ class AlbumCreationForm(CommonAlbumizerForm):
             raise ValidationError(ERR_ALBUM_TITLE_MISSING)
 
         current_user = self.request.user
-        if Album.objects.filter(owner = current_user, title = album_title):
-            raise ValidationError(u"You cannot have two albums with the same name. " +
-                                  u"Please change the name to something different.")
+        if not self.request.POST.get("cmdEdit"):
+            if Album.objects.filter(owner = current_user, title = album_title):
+                raise ValidationError(u"You cannot have two albums with the same name. " +
+                                      u"Please change the name to something different.")
 
         return album_title
 
@@ -504,4 +505,4 @@ class AddPageForm(CommonAlbumizerForm):
 		super(AddPageForm, self).__init__(*args, **kwargs)
 		layouts = Layout.objects.all()
 		self.fields['chcPageLayout'].queryset = layouts
-
+		
