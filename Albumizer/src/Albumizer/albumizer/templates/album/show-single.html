@@ -31,7 +31,7 @@
             <input type="submit" name="addPage" name="id_cmdAddPage" value="Add Page">
             <input type="submit" name="editAlbum" name="id_cmdEdit" value="Edit Album">
           {% endif %}
-          {% if is_visible_to_current_user %}
+          {% if is_visible_to_current_user and album.has_pages %}
 	          <input type="submit" name="addToShoppingCart" name="id_cmdAdd" value="Add to Shopping Cart">
           {% endif %}
 	        {% if current_user_can_delete %}

@@ -820,11 +820,11 @@ class Command(BaseCommand):
 
     def generate_album_data(self, user):
         """ Generates information related to a single photo album """
-        title = self.generate_album_title()
+        title = self.generate_album_title().strip()
         title_generation_tries = 1
         while len(title) < 5 and title_generation_tries < 5:
             title_generation_tries += 1
-            title = self.generate_album_title()
+            title = self.generate_album_title().strip()
         if len(title) < 5:
             title = "<Title generation failed>"
         if len(title) > 255:
