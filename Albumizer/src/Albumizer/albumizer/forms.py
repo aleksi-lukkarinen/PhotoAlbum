@@ -493,7 +493,12 @@ class LoginForm(CommonAlbumizerForm):
 
 
 class AddPageForm(CommonAlbumizerForm):
-	chcPageLayout = forms.ModelChoiceField(queryset='',empty_label=None,label= u'Layout')
+	chcPageLayout = forms.ModelChoiceField(
+        queryset='',
+        empty_label=None,
+        label= u'Layout',
+        help_text= u'Select layout for page'
+    )
 
 	def __init__(self, *args, **kwargs):
 		super(AddPageForm, self).__init__(*args, **kwargs)
