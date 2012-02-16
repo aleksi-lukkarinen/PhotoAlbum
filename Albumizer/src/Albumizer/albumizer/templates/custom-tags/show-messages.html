@@ -1,0 +1,10 @@
+  {% if messages %}
+    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+      {% for message in messages %}
+        <tr>
+          <td><span class="ui-icon ui-icon-info"></span></td>
+          <td><span class="errorMessage">{{ message }}</span></td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}

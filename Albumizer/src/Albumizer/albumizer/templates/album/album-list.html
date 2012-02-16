@@ -1,9 +1,11 @@
 {% extends "base-template.html" %}
+{% load albumizer_common %}
 {% load url from future %}
 
 {% block page_content %}
 
 {% block page_heading %}{% endblock %}
+{% show_messages %}
 
 <div class="albumList">
   {% if albums.object_list %}

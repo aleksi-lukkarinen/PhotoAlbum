@@ -365,6 +365,7 @@ clear:both;
 
 
 
+
 .show-twitter-tweet {
   display:                   none;
 	margin-top:                6em;
@@ -650,26 +651,32 @@ clear:both;
 
 
 
+.albumBrowser h1 {
+  float:                     left;
+	width:                     25em;
+	margin-bottom:             0.5em;
+  margin-right:              1.5em;
+}
 
+.albumBrowser .actionButtonContainer {
+  float:                     right;
+} 
 
-.albumBrowser .albumDetails {
+.albumBrowser .detailRow {
+  clear:                     both;
+	margin-bottom:             0.2em;
+  background:                #ffffff;
+  color:                     #666666;
+}
+
+.albumBrowser .description {
+	width:                     50em;
+	margin-top:                1em;
   margin-bottom:             1em;
 }
 
-.albumBrowser .albumDetails th {
-  padding:                   0.2em 0.7em 0.2em 0.7em;
-  vertical-align:            top; 
-	text-align:                left;
-	width:                     7em;
-	background:                #ccddbb;
-  color:                     #000000;
-}
-
-.albumBrowser .albumDetails td {
-  padding:                   0.2em 0.7em 0.2em 0.7em; 
-  vertical-align:            top; 
-  background:                #ccddbb;
-  color:                     #000000;
+.albumBrowser .twitter-tweet-button-album-container {
+  margin-top:                0em;
 }
 
 .albumBrowser .offer-sell,
@@ -677,47 +684,51 @@ clear:both;
 	display:                   none;
 }
 
-.albumBrowser .additionalInfoContainer {
-	width:                     100%;
-	padding-right:             3em;
-  vertical-align:            top;
-  text-align:                left;
-}
-
-.albumBrowser .additionalInfoContainer .publicUrlContainer {
-  width:                     30%;
-}
-
-.albumBrowser .additionalInfoContainer .urlContainer {
-	font-size:                 90%;
+.albumBrowser .urlContainer {
+	display:                   block;
+  margin-top:                1em;
+  font-size:                 90%;
   background:                #ffffff;
   color:                     #666666;
 }
 
-.albumBrowser .additionalInfoContainer .urlContainer a {
+.albumBrowser .urlContainer a {
   background:                #ffffff;
   color:                     #779977;
   text-decoration:           none;
 }
 
-.albumBrowser .additionalInfoContainer .urlContainer a:hover {
-  color:                     #446644;
+.albumBrowser .urlContainer a:hover {
+  background:                #ffffff;
+	color:                     #446644;
 }
 
-.albumBrowser .additionalInfoContainer .urlContainer .helpText {
-	display:                   block;
-}
-
-.albumBrowser .additionalInfoContainer .urlContainer .secretUrl {
+.albumBrowser .urlContainer .secretUrl {
   display:                   block;
   background:                #ffffff;
   color:                     #779977;
 }
 
-.albumBrowser .additionalInfoContainer .twitter-tweet-button-album-container {
-	margin-top: 0em;
+.albumBrowser .publicUrlContainer .url {
+  white-space:               nowrap;
 }
 
+.albumBrowser .secretUrlContainer .secretUrl {
+  white-space:               nowrap;
+}
+
+.albumBrowser .secretUrlContainer .helpText {
+  display:                   block;
+}
+
+.albumBrowser .noPagesNotice {
+	margin-top:                4em;
+	margin-bottom:             7em;
+	font-size:                 110%;
+	font-weight:               bold;
+  background:                #ffffff;
+  color:                     #779977;
+}
 
 
 
@@ -754,6 +765,25 @@ clear:both;
 
 #id_frmShoppingCart .commonActions input {
   margin:                    0em 0em 0em 1em;
+}
+
+#id_frmShoppingCart .commonActions .commonActionLinkButton {
+  display:                   inline-block;
+  border:                    none;
+  background:                #ffffff;
+  color:                     #336699;
+  text-decoration:           underline;
+  cursor:                    pointer;
+  margin:                    0em;
+  padding:                   0em;
+}
+
+#id_frmShoppingCart .disclaimer {
+	margin-top:                1em;
+	margin-bottom:             4em;
+	text-align:                right;
+  background:                #ffffff;
+  color:                     #555555;
 }
 
 .shoppingCart table {
@@ -816,21 +846,25 @@ clear:both;
   font-size:                 120%;
   font-weight:               bold;
   text-decoration:           none;
+  background:                #ffffff;
   color:                     #336699;
 }
 
 .shoppingCart .itemColumn .item1stRow a:hover {
   text-decoration:           underline;
+  background:                #ffffff;
   color:                     #aa0000;
 }
 
 .shoppingCart .itemColumn .item1stRow .creator {
+  background:                #ffffff;
   color:                     #444444;
 }
 
 .shoppingCart .itemColumn .item2ndRow {
   margin:                    0em 0em 0em 10.5em;
-	color:                     #444444;
+	background:                #ffffff;
+  color:                     #444444;
 }
 
 .shoppingCart .itemColumn .item3rdRow {
@@ -840,8 +874,8 @@ clear:both;
 .shoppingCart .itemColumn .item3rdRow input {
 	display:                   inline-block;
 	background:                #ffffff;
-	border:                    none;
-	color:                     #336699;
+  color:                     #336699;
+  border:                    none;
 	text-decoration:           underline;
 	cursor:                    pointer;
 	margin:                    0em;
@@ -864,6 +898,7 @@ clear:both;
 }
 
 .shoppingCart .itemRowTable .rowTotalColumn {
+  background:                #ffffff;
   color:                     #aa0000;
   font-weight:               bold;
 }
@@ -893,6 +928,7 @@ clear:both;
 }
 
 .shoppingCart .subtotalRowTable .subTotal {
+  background:                #ffffff;
   color:                     #880000;
 }
 

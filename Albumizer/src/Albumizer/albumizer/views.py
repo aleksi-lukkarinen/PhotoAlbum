@@ -31,7 +31,7 @@ VALID_SPS_PAYMENT_STATUSES = [SPS_STATUS_SUCCESSFUL, SPS_STATUS_CANCELED, SPS_ST
 
 
 
-commonLogger = logging.getLogger(__name__)
+commonLogger = logging.getLogger("albumizer")
 userActionLogger = logging.getLogger("albumizer.userActions")
 paymentLogger = logging.getLogger("albumizer.payments")
 
@@ -141,9 +141,21 @@ def list_all_visible_albums(request):
     template_parameters = {'albums': albums, 'is_album_list_page': True}
     return render_to_response_as_public('album/list-all.html', RequestContext(request, template_parameters))
 
+
+
+
 def show_single_page(request, album_id, page_number):
-    myalbum = get_object_or_404(Album, pk = album_id)
-    mypage = get_object_or_404(Page, album = album_id, pageNumber = page_number)
+    myalbum = Album.by_id(album_id)
+    if not myalbum:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    if myalbum.is_hidden_from_user(request.user):
+        return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
+
+    mypage = Page.by_album_id_and_page_number(album_id, page_number)
+    if not mypage:
+        return render_to_response('album/page-not-found.html', RequestContext(request))
+
     pageNumberInt = int(page_number)
     context = {"pageNumber":mypage.pageNumber,
           "albumTitle":myalbum.title,
@@ -163,23 +175,208 @@ def show_single_page(request, album_id, page_number):
         context["nextLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt + 1})
     if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
         context["previousLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt - 1})
+
+    response = render_to_response_as_public('album/view-album-page-single.html', RequestContext(request, context))
+    if not myalbum.isPublic:
+        add_caching_preventing_headers(response)
+
+    return response
+
+
+
+
+@prevent_all_caching
+def show_single_page_with_hash(request, album_id, page_number, secret_hash):
+    """ Allows user to browse a single page of an private album with a secret hash code. """
+
+    myalbum = Album.by_id(album_id)
+    if not myalbum:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    mypage = Page.by_album_id_and_page_number(album_id, page_number)
+    if not mypage:
+        return render_to_response('album/page-not-found.html', RequestContext(request))
+
+    if myalbum.isPublic or myalbum.is_owned_by(request.user):
+        return HttpResponseRedirect(mypage.get_absolute_url())
+
+    pageNumberInt = int(page_number)
+    context = {"pageNumber":mypage.pageNumber,
+          "albumTitle":myalbum.title,
+          "layoutCssClass":mypage.layout.cssClass,
+          "opened_using_secret_hash": True
+    }
+    images = []
+    texts = []
+
+    for pagecontent in mypage.pagecontents.all():
+        if pagecontent.placeHolderID.startswith("image"):
+            images.append(pagecontent.content)
+        elif pagecontent.placeHolderID.startswith("text"):
+            texts.append(pagecontent.content)
+    context["texts"] = texts
+    context["images"] = images
+    context["cssContent"] = mypage.layout.cssContent
+    if myalbum.pages().filter(pageNumber = pageNumberInt + 1).exists():
+        context["nextLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt + 1})
+    if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
+        context["previousLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt - 1})
     return render_to_response('album/view-album-page-single.html', RequestContext(request, context))
 
 
-def show_single_album(request, album_id):
+
+
+ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_UI = \
+    u"We are sorry. You tried to add your shopping cart an album, which does " + \
+    u"not exist. If the album in question has previously been available, " + \
+    u"it has been changed to private or removed from our collection since."
+ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG = \
+    u"POST request to add album to shopping cart of user %s referenced to a missing album: %s."
+ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_EMPTY_ALBUM_UI = \
+    u"We are sorry. You tried to add your shopping cart an album, which " + \
+    u"currently is empty and thus cannot be ordered."
+ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_PRIVATE_ALBUM_UI = \
+    u"We are sorry. You tried to add your shopping cart an album, which is declared as private " + \
+    u"and which you do not own. If the album in question has previously been public, " + \
+    u"it has been changed to private since."
+ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_PRIVATE_ALBUM_LOG = \
+    u"POST request to add album to shopping cart of user %s referenced to a private album: %s."
+ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_ALREADY_THERE_UI = \
+    u"The album you tried to add your shopping cart was there already. " + \
+    u"If you wish to order more than one piece, please edit the quantities in the shopping cart."
+DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_UI = \
+    u"We are sorry. You tried to delete an album, which does not exist. " + \
+    u"If the album in question has previously been available, " + \
+    u"it has been removed from our collection since."
+DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_LOG = \
+    u"POST request to delete album from user %s referenced to a missing album: %s."
+DELETE_ALBUM_ERR_MSG_NOT_OWNED_UI = \
+    u"We are sorry. You tried to delete an album, which you do not own. " + \
+    u"Consequently, you do not have the permission to perform the deletion."
+DELETE_ALBUM_ERR_MSG_NOT_OWNED_LOG = \
+    u"POST request to delete album from user %s referenced to an album, which he/she does not own: %s."
+
+def show_single_album_GET(request, album_id):
     """ Allows user to browse a single album. """
+    assert request.method == "GET"
+
+    try:
+        album_id = int(album_id)
+    except:
+        return render_to_response_as_public('album/album-not-found.html', RequestContext(request))
+
     album = Album.by_id(album_id)
     if not album:
-        return render_to_response_as_public('album/not-found.html', RequestContext(request))
+        return render_to_response_as_public('album/album-not-found.html', RequestContext(request))
 
     if album.is_hidden_from_user(request.user):
         return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
 
-    response = render_to_response_as_public('album/show-single.html', RequestContext(request, {'album': album}))
+    template_parameters = {
+        "album": album,
+        "is_visible_to_current_user": album.is_visible_to_user(request.user),
+        "current_user_can_edit": album.is_editable_to_user(request.user),
+        "current_user_can_delete": album.is_editable_to_user(request.user)
+    }
+    response = render_to_response_as_public('album/show-single.html', RequestContext(request, template_parameters))
     if not album.isPublic:
         add_caching_preventing_headers(response)
 
     return response
+
+@login_required
+def show_single_album_POST(request, album_id):
+    """ Performs an action related to an album. """
+    assert request.method == "POST"
+
+    if request.POST.get("editAlbum"):
+        return HttpResponseRedirect(reverse("edit_album", args = [album_id]))
+
+
+    if request.POST.get("addPage"):
+        album_resultset = Album.objects.filter(id__exact = album_id)
+        if not album_resultset:
+            return render_to_response('album/album-not-found.html', RequestContext(request))
+
+        album = album_resultset[0]
+        if not album.is_editable_to_user(request.user):
+            return render_to_response('album/edit-access-denied.html', RequestContext(request))
+
+        return render_to_response('album/add-page.html', RequestContext(request, {'album': album}))
+
+
+    if request.POST.get("addToShoppingCart"):
+        try:
+            album_id = int(album_id)
+        except:
+            request.user.message_set.create(message = ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_UI)
+            commonLogger.warning(ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG % \
+                                 (request.user.username, album_id))
+
+        album = Album.by_id(album_id)
+        if not album:
+            request.user.message_set.create(message = DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_UI)
+            commonLogger.warning(DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_LOG % (request.user.username, album_id))
+            return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+        if album.is_hidden_from_user(request.user):
+            request.user.message_set.create(message = ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_PRIVATE_ALBUM_UI)
+            commonLogger.warning(ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_PRIVATE_ALBUM_LOG % \
+                                 (request.user.username, album_id))
+            return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+        if not album.has_pages():
+            request.user.message_set.create(message = ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_EMPTY_ALBUM_UI)
+            return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+        if ShoppingCartItem.does_exist(request.user, album_id):
+            request.user.message_set.create(message = ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_ALREADY_THERE_UI)
+            return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+        try:
+            ShoppingCartItem.add(request.user, album_id)
+            request.user.message_set.create(
+                        message = u"Album \"%s\" has been added to your shopping cart." % album.title)
+        except Album.DoesNotExist:
+            request.user.message_set.create(message = ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_UI)
+            commonLogger.warning(ADD_ALBUM_TO_SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG % \
+                                 (request.user.username, unicode(album_id)))
+
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+
+    if request.POST.get("delete"):
+        try:
+            album_id = int(album_id)
+        except:
+            request.user.message_set.create(message = DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_UI)
+            commonLogger.warning(DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_LOG % (request.user.username, album_id))
+
+        album = Album.by_id(album_id)
+        if not album:
+            request.user.message_set.create(message = DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_UI)
+            commonLogger.warning(DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_LOG % (request.user.username, album_id))
+            return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
+
+        if not album.is_owned_by(request.user):
+            request.user.message_set.create(message = DELETE_ALBUM_ERR_MSG_NOT_OWNED_UI)
+            commonLogger.warning(DELETE_ALBUM_ERR_MSG_NOT_OWNED_LOG % (request.user.username, album_id))
+            return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
+
+        album_title = album.title
+
+        album.delete()
+
+        request.user.message_set.create(message = u"Album \"%s\" has been deleted." % album_title)
+        userActionLogger.info("User %s deleted an album called \"%s\"." % (request.user.username, album_title))
+        return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
+
+
+    request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
+    commonLogger.warning("User %s tried to perform an action to album %s without specifying which one." % \
+                         (request.user.username, album_id))
+
+    return HttpResponseRedirect(reverse("show_single_album", args = [album_id]))
 
 
 
@@ -190,12 +387,18 @@ def show_single_album_with_hash(request, album_id, secret_hash):
 
     album = Album.by_id_and_secret_hash(album_id, secret_hash)
     if not album:
-        return render_to_response('album/not-found.html', RequestContext(request))
+        return render_to_response('album/album-not-found.html', RequestContext(request))
 
     if album.isPublic or album.is_owned_by(request.user):
         return HttpResponseRedirect(album.get_absolute_url())
 
-    template_parameters = {'album': album, 'opened_using_secret_hash': True}
+    template_parameters = {
+        "album": album,
+        "opened_using_secret_hash": True,
+        "is_visible_to_current_user": album.is_visible_to_user(request.user),
+        "current_user_can_edit": album.is_editable_to_user(request.user),
+        "current_user_can_delete": album.is_editable_to_user(request.user)
+    }
     return render_to_response('album/show-single.html', RequestContext(request, template_parameters))
 
 
@@ -240,11 +443,11 @@ def create_album_POST(request):
 
 @login_required
 @prevent_all_caching
-def edit_album(request, album_id):
+def edit_album_GET(request, album_id):
     """ Allows user to edit a single album. """
     album_resultset = Album.objects.filter(id__exact = album_id)
     if not album_resultset:
-        return render_to_response('album/not-found.html', RequestContext(request))
+        return render_to_response('album/album-not-found.html', RequestContext(request))
 
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
@@ -257,10 +460,9 @@ def edit_album(request, album_id):
 
 @login_required
 @prevent_all_caching
-def add_album_to_shopping_cart(request):
-    """ Allows user to add items into his/her shopping cart. """
-    if request.method != "POST":
-        return HttpResponseNotFound()
+def edit_album_POST(request, album_id):
+    """  """
+    return render_to_response('album/edit.html', RequestContext(request, {'album': album_id}))
 
 
 
@@ -526,13 +728,14 @@ def edit_account_information(request):
 
 SHOPPING_CART_ERR_MSG_MISSING_ALBUM_UI = \
     u"We are sorry. Your shopping cart referenced to at least one album, which does " + \
-    u"not exist. If the items in question have previously existed, " + \
-    u"they have been remove from our collection since."
+    u"not exist. If the items in question have previously been available, " + \
+    u"they have been changed to private or removed from our collection since."
 SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG = \
     u"POST request from shopping cart of user %s referenced to a missing album: %d."
 SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_UI = \
     u"We are sorry. The request you sent us referenced to at least one item, which " + \
-    u"actually is not in your shopping cart."
+    u"actually is not in your shopping cart. Please ensure that the content of your cart " + \
+    u"is what you would like it to be."
 SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_LOG = \
     u"POST request from shopping cart of user %s referenced to an item, which actually is not in that user's cart: %d."
 SHOPPING_CART_ERR_MSG_INVALID_QUANTITY_UI = \
@@ -576,8 +779,14 @@ def edit_shopping_cart_POST(request):
     """ Updates the contents of user's shopping cart and proceeds to checkout if so desired. """
     assert request.method == "POST"
 
-    missing_item_error_already_given = False
+    if "submit.remove.all" in request.POST.keys():
+        ShoppingCartItem.remove_all_items_of_user(request.user)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
     has_errors = False
+    missing_album_error_already_given = False
+    missing_cart_item_error_already_given = False
+
     proceed_to_checkout = False
     cart_content_to_remove = []
     cart_content_to_update = {}
@@ -601,8 +810,8 @@ def edit_shopping_cart_POST(request):
 
             id_int = int(id_str)
             if not Album.does_exist(id_int):
-                missing_item_error_already_given = shopping_cart_report_missing_album(
-                                                        id_int, request.user, missing_item_error_already_given)
+                missing_album_error_already_given = shopping_cart_report_missing_album(
+                                                        id_int, request.user, missing_album_error_already_given)
                 has_errors = True
                 continue
 
@@ -641,8 +850,8 @@ def edit_shopping_cart_POST(request):
         try:
             ShoppingCartItem.remove(request.user, item_id)
         except ShoppingCartItem.DoesNotExist:
-            missing_item_error_already_given = shopping_cart_report_missing_album(
-                                                    item_id, request.user, missing_item_error_already_given)
+            missing_cart_item_error_already_given = shopping_cart_report_missing_cart_item(
+                                                        item_id, request.user, missing_cart_item_error_already_given)
             has_errors = True
 
 
@@ -650,8 +859,8 @@ def edit_shopping_cart_POST(request):
         try:
             ShoppingCartItem.update_count(request.user, item_id, cart_content_to_update[item_id])
         except ShoppingCartItem.DoesNotExist:
-            missing_item_error_already_given = shopping_cart_report_missing_album(
-                                                    item_id, request.user, missing_item_error_already_given)
+            missing_cart_item_error_already_given = shopping_cart_report_missing_cart_item(
+                                                        item_id, request.user, missing_cart_item_error_already_given)
             has_errors = True
 
 
@@ -670,7 +879,7 @@ def shopping_cart_report_invalid_quantity(item_id, user):
 
 def shopping_cart_report_missing_album(item_id, user, error_already_given):
     if not error_already_given:
-        user.message_set.create(message = SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_UI)
+        user.message_set.create(message = SHOPPING_CART_ERR_MSG_MISSING_ALBUM_UI)
         error_already_given = True
 
     commonLogger.warning(SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG % (user.username, item_id))
@@ -681,7 +890,7 @@ def shopping_cart_report_missing_cart_item(item_id, user, error_already_given):
         user.message_set.create(message = SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_UI)
         error_already_given = True
 
-    commonLogger.warning(SHOPPING_CART_ERR_MSG_MISSING_ALBUM_LOG % (user.username, item_id))
+    commonLogger.warning(SHOPPING_CART_ERR_MSG_MISSING_CART_ITEM_LOG % (user.username, item_id))
     return error_already_given
 
 

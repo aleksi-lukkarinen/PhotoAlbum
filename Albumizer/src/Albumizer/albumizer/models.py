@@ -233,7 +233,7 @@ class Album(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ("albumizer.views.show_single_album", (), {"album_id": self.id})
+        return ("show_single_album", (), {"album_id": self.id})
 
     @models.permalink
     def get_secret_url(self):
@@ -292,6 +292,10 @@ class Album(models.Model):
     def pages(self):
         """ Return a queryset of all pages of this album. """
         return Page.objects.filter(album__exact = self)
+
+    def has_pages(self):
+        """ Return True if this album has at least one page. Otherwise returns False. """
+        return Page.objects.filter(album__exact = self).exists()
 
     def price(self):
         """ Calculates and returns the price of this album. """
@@ -353,7 +357,7 @@ class Album(models.Model):
         missed_tries = 0
         while len(albums) < how_many and missed_tries < 10:
             base_album_id = cls._randomizer.randrange(0, max_album_id)
-            album = Album.objects.filter(id__gte = base_album_id).order_by("id")[0]
+            album = Album.objects.filter(id__gte = base_album_id, isPublic__exact = True).order_by("id")[0]
             if not album.id in album_ids:
                 albums.append(album)
                 album_ids.append(album.id)
@@ -428,6 +432,49 @@ class Page(models.Model):
     def __unicode__(self):
         return u"%s, %s" % (self.album, self.pageNumber)
 
+    @models.permalink
+    def get_absolute_url(self):
+        view_parameters = {
+            "album_id": self.album.id,
+            "page_number": self.pageNumber
+        }
+        return ("albumizer.views.show_single_page", (), view_parameters)
+
+    @models.permalink
+    def get_secret_url(self):
+        if not self.album.secretHash:
+            self.album.secretHash = self.album.generate_secret_hash_for(self.album)
+        view_parameters = {
+            "album_id": self.album.id,
+            "secret_hash": self.album.secretHash,
+            "page_number": self.pageNumber
+        }
+        return ("albumizer.views.show_single_page_with_hash", (), view_parameters)
+
+    @staticmethod
+    def by_album_id_and_page_number(album_id, page_number):
+        """ Returns a page of an album by album's id and page number, if one exists. Otherwise returns None. """
+        page_queryset = Page.objects.filter(album__id__exact = album_id, pageNumber = page_number)
+        if not page_queryset:
+            return None
+        return page_queryset[0]
+
+    @staticmethod
+    def by_album_id_page_number_and_secret_hash(album_id, page_number, secret_hash):
+        """ 
+            Returns a page of an album by album's id, page number and a secret hash, if one exists.
+            Otherwise returns None.
+        """
+        page_queryset = Page.objects.filter(
+            album__id__exact = album_id,
+            album__secretHash__exact = secret_hash,
+            pageNumber = page_number
+        )
+
+        if not page_queryset:
+            return None
+        return page_queryset[0]
+
     class Meta():
         unique_together = ("album", "pageNumber")
         ordering = ["album", "pageNumber"]
@@ -475,6 +522,14 @@ class Country(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @staticmethod
+    def by_code(country_code):
+        """ Returns a country having given code, if one exists. Otherwise returns None. """
+        country_resultset = Country.objects.filter(code__exact = country_code)
+        if not country_resultset:
+            return None
+        return country_resultset[0]
 
     class Meta():
         ordering = ["name"]
@@ -582,27 +637,47 @@ class ShoppingCartItem(models.Model):
     )
 
     @staticmethod
+    def add(user, album_id):
+        """ 
+            Adds given item to given user's shopping cart, if it is not there already.
+            Caller handles all exceptions (e.g. Album.DoesNotExist).
+        """
+        if not ShoppingCartItem.does_exist(user, album_id):
+            album = Album.objects.get(id__exact = album_id)
+            item = ShoppingCartItem(
+                user = user,
+                album = album,
+                count = 1
+            )
+            item.save()
+
+    @staticmethod
     def items_of_user(user):
         """ Return a queryset of all items in given user's shopping cart. """
         return ShoppingCartItem.objects.filter(user__exact = user)
 
     @staticmethod
-    def update_count(user, item_id, new_count):
+    def does_exist(user, album_id):
+        """ Returns True, if given item exist in given user's shopping cart. Otherwise returns False. """
+        return ShoppingCartItem.objects.filter(user = user, album = album_id).exists()
+
+    @staticmethod
+    def update_count(user, album_id, new_count):
         """ 
             Updates count of given item of given user's shopping cart. 
             Caller handles all exceptions (e.g. ShoppingCartItem.DoesNotExist).
         """
-        sc_item = ShoppingCartItem.objects.get(user = user, album = item_id)
+        sc_item = ShoppingCartItem.objects.get(user = user, album = album_id)
         sc_item.count = new_count
         sc_item.save()
 
     @staticmethod
-    def remove(user, item_id):
+    def remove(user, album_id):
         """ 
             Removes given item of given user from user's shopping cart. 
             Caller handles all exceptions (e.g. ShoppingCartItem.DoesNotExist).
         """
-        ShoppingCartItem.objects.get(user = user, album = item_id).delete()
+        ShoppingCartItem.objects.get(user = user, album = album_id).delete()
 
     @staticmethod
     def remove_all_items_of_user(user):
@@ -610,13 +685,13 @@ class ShoppingCartItem(models.Model):
             Removes all items of given user from user's shopping cart. 
             Caller handles all exceptions (e.g. ShoppingCartItem.DoesNotExist).
         """
-        ShoppingCartItem.objects.get(user = user).delete()
+        ShoppingCartItem.objects.filter(user__exact = user).delete()
 
     def __unicode__(self):
         return u"%s, %s, %d, %s" % (self.user, self.album, self.count, self.additionDate)
 
     class Meta():
-        unique_together = ("user", "album")
+        unique_together = ("additionDate", "user", "album")
         ordering = ["user", "album"]
         verbose_name = u"shopping cart item"
         verbose_name_plural = u"shopping cart items"
