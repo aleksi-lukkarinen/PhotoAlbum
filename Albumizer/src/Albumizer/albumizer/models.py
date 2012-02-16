@@ -357,7 +357,10 @@ class Album(models.Model):
         missed_tries = 0
         while len(albums) < how_many and missed_tries < 10:
             base_album_id = cls._randomizer.randrange(0, max_album_id)
-            album = Album.objects.filter(id__gte = base_album_id, isPublic__exact = True).order_by("id")[0]
+            albumQuery = Album.objects.filter(id__gte = base_album_id, isPublic__exact = True).order_by("id")[:1]
+            album = albumQuery[0] if albumQuery else None
+            if album is None:
+                break
             if not album.id in album_ids:
                 albums.append(album)
                 album_ids.append(album.id)

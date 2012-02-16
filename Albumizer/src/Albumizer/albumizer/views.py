@@ -16,7 +16,7 @@ from django.views.decorators.cache import cache_control
 from Albumizer.albumizer import facebook_api
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
-from forms import AlbumCreationForm, LoginForm, RegistrationForm
+from forms import AlbumCreationForm, LoginForm, RegistrationForm, AddPageForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
         HttpResponseForbidden, HttpResponseNotFound, HttpResponse
 
@@ -302,7 +302,37 @@ def show_single_album_POST(request, album_id):
         if not album.is_editable_to_user(request.user):
             return render_to_response('album/edit-access-denied.html', RequestContext(request))
 
-        return render_to_response('album/add-page.html', RequestContext(request, {'album': album}))
+        form = AddPageForm()
+
+        return render_to_response('album/add-page.html', RequestContext(request, {'album': album, 'form': form}))
+
+    if request.POST.get("cmdAdd"):
+        form = AddPageForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("album/add-page.html", RequestContext(request, {"form": form}))
+
+        album_resultset = Album.objects.filter(id__exact = album_id)
+        if not album_resultset:
+            return render_to_response('album/album-not-found.html', RequestContext(request))
+
+        album = album_resultset[0]
+        if not album.is_editable_to_user(request.user):
+            return render_to_response('album/edit-access-denied.html', RequestContext(request))
+
+        page_album = album
+        page_pageNumber = album.page_set.count()
+        page_layout = form.cleaned_data.get("chcPageLayout")
+
+        new_page = Page(
+            album = page_album,
+            pageNumber = page_pageNumber,
+            layout = page_layout
+        )
+        new_page.save()
+
+        userActionLogger.info("User %s created a new page in album \"%s\"." % (request.user.username, album.title))
+
+        return HttpResponseRedirect(album.get_absolute_url())
 
 
     if request.POST.get("addToShoppingCart"):
