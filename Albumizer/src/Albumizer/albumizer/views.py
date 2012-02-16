@@ -119,7 +119,7 @@ def welcome_page(request):
 
 
 
-
+@prevent_all_caching
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not). """
     albums = Album.objects.filter(isPublic = True).order_by('title')
@@ -159,7 +159,11 @@ def show_single_page(request, album_id, page_number):
     pageNumberInt = int(page_number)
     context = {"pageNumber":mypage.pageNumber,
           "albumTitle":myalbum.title,
-          "layoutCssClass":mypage.layout.cssClass}
+          "layoutCssClass":mypage.layout.cssClass,
+          "current_user_can_edit": myalbum.is_editable_to_user(request.user),
+          "current_user_can_delete": myalbum.is_editable_to_user(request.user),
+          "album_id": album_id
+          }
     images = []
     texts = []
 
