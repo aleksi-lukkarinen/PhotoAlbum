@@ -2,7 +2,21 @@
 {% load url from future %}
 
 {% block page_title %}{{ albumTitle }}{% endblock %}
-
+      {% block page_scripts_after %}
+        $(function() {
+            $(".previousLink a, .nextLink a").click(function(evt) {
+                evt.preventDefault();
+                var myUrl=$(this).attr("href");
+                $("#ajaxContainer").load(myUrl+" #ajaxContainer", function() {
+                    try {
+                        window.history.pushState(null, document.title, myUrl);
+                        } catch (err) {
+                        alert("error: "+err);
+                        }
+                    });                
+            });
+        });
+      {% endblock %}
 {% block header_definitions_before %}
 	<style type="text/css">
 	{{ cssContent }}
@@ -11,9 +25,9 @@
 
 {% block page_content %}
 
-	<div>
+	<div id="ajaxContainer">
 		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
-		<div class="albumpagewrapper">
+		<div id="albumpagewrapper">
 			<div class="albumpagecontainer {{layoutCssClass}}">
 				{% for text in texts %}
 				<span id="text{{ forloop.counter}}">{{ text }}</span>
