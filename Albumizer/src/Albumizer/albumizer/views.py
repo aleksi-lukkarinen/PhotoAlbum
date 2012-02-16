@@ -989,6 +989,7 @@ def report_sps_payment_status(request, status):
 
     template_parameters = {
         "order": order,
+        "":
         "payment_id": payment_id
     }
     return render_to_response('payment/sps/%s.html' % status,

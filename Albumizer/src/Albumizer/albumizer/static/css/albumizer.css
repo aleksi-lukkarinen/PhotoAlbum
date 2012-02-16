@@ -142,6 +142,79 @@ img {
 	border:                    0em;
 }
 
+.simpleMessagePageHeading {
+  margin-bottom:             2em;
+}
+
+.simpleMessagePageContent {
+	margin-bottom:             7em;
+}
+
+.simpleMessagePageHeading.success {
+  background:                #ddfacc;
+  border:                    1px solid #bbeaaa;
+	margin-top:                2em;
+  margin-bottom:             2em;
+  padding:                   0.5em 0.5em;
+  font-size:                 200%;
+                    
+}
+
+.simpleMessagePageContent.error {
+  background:                #faccbb;
+  border:                    1px solid #eabbaa;
+  padding:                   2em 1em;
+  width:                     50em;
+}
+
+.simpleMessagePageContent.success {
+  font-size:                 110%;
+}
+
+
+
+
+
+
+
+
+
+.paymentInfo {
+  border-top:                1px solid #bbbbbb;
+  border-bottom:             1px solid #bbbbbb;
+  padding:                   1em 0em;
+}
+
+.paymentInfo .paymentDetails {
+  margin:                    1em 0em;
+  padding:                   1em 2em;
+	background:                #f8f8f8;
+	border:                    1px solid #eeeeee;
+}
+
+.paymentInfo .paymentDetails th {
+	padding:                   0.2em;
+  text-align:                left;
+  color:                     #888888;
+  width:                     12em;
+}
+
+.paymentInfo .orderInfo {
+	margin:                    2em 0em;
+}
+
+.paymentInfo .closing {
+  margin-top:                3em;
+  font-size:                 120%;
+  font-style:                italic;
+}
+
+
+
+
+
+
+
 
 
 
@@ -162,6 +235,19 @@ img {
 .nextLink {
 	float:right;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -322,6 +408,7 @@ img {
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
 }
+
 
 
 

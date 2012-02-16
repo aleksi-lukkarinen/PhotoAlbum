@@ -32,7 +32,7 @@ urlpatterns = patterns('albumizer.views',
     (r'^order/summary/$', 'show_order_summary'),
     (r'^order/successful/$', 'report_order_as_successful'),
 
-    (r'^"payment/sps/(?P<status>\w+)/$', 'report_sps_payment_status'),
+    (r'^payment/sps/(?P<status>\w+)/$', 'report_sps_payment_status'),
 
     (r'^api/json/album/latest/$', redirect_to, {'url': '/api/json/album/latest/20/'}),
     (r'^api/json/album/latest/(?P<how_many>\d{1,2})/$', 'api_json_get_latest_albums'),

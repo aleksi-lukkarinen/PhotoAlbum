@@ -1,0 +1,18 @@
+{% extends "base-template.html" %}
+{% load albumizer_common %}
+
+
+
+{% block page_content %}
+  
+  <h1 class="simpleMessagePageHeading error">{% block message_page_heading %}{% endblock %}</h1>
+
+  {% show_messages %}
+
+  <div class="simpleMessagePageContent error">
+    {% block message_page_content %}{% endblock %}
+  </div>
+
+  {% random_picks_album_list 8 %}
+
+{% endblock %}
