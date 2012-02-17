@@ -32,8 +32,6 @@ urlpatterns = patterns('albumizer.views',
     (r'^order/summary/$', 'show_order_summary'),
     (r'^order/successful/$', 'report_order_as_successful'),
 
-    (r'^payment/sps/(?P<status>\w+)/$', 'report_sps_payment_status'),
-
     (r'^api/json/album/latest/$', redirect_to, {'url': '/api/json/album/latest/20/'}),
     (r'^api/json/album/latest/(?P<how_many>\d{1,2})/$', 'api_json_get_latest_albums'),
     (r'^api/json/album/random/$', redirect_to, {'url': '/api/json/album/random/4/'}),
@@ -60,6 +58,11 @@ urlpatterns += patterns('',
     (r'^cart/$', views.dispatch_by_method, {
         "GET": views.edit_shopping_cart_GET, "POST": views.edit_shopping_cart_POST},
         "edit_shopping_cart"),
+    (r'^order/(?P<order_id>\d+)/$', views.dispatch_by_method, {
+        "GET": views.show_single_order_GET, "POST": views.show_single_order_POST},
+        'show_single_order'),
+    (r'^payment/sps/(?P<status>\w+)/$', views.dispatch_by_method, {
+        "GET": views.report_sps_payment_status_GET}, 'report_sps_payment_status')
 )
 
 

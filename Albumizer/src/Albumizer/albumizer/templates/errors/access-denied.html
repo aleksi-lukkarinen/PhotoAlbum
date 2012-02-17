@@ -1,0 +1,19 @@
+{% extends "base-template.html" %}
+{% load albumizer_common %}
+
+
+
+{% block page_title %}The requested {{ resource }} cannot be shown{% endblock %}
+
+
+
+{% block page_content %}
+  
+  <h1>The requested {{ resource }} cannot be shown</h1>
+  {% show_messages %}
+
+  <p>
+    You don't have a permission to see the requested {{ resource }}.
+  </p>
+
+{% endblock %}

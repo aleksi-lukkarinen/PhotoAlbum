@@ -142,34 +142,10 @@ img {
 	border:                    0em;
 }
 
-.simpleMessagePageHeading {
-  margin-bottom:             2em;
-}
-
 .simpleMessagePageContent {
 	margin-bottom:             7em;
 }
 
-.simpleMessagePageHeading.success {
-  background:                #ddfacc;
-  border:                    1px solid #bbeaaa;
-	margin-top:                2em;
-  margin-bottom:             2em;
-  padding:                   0.5em 0.5em;
-  font-size:                 200%;
-                    
-}
-
-.simpleMessagePageContent.error {
-  background:                #faccbb;
-  border:                    1px solid #eabbaa;
-  padding:                   2em 1em;
-  width:                     50em;
-}
-
-.simpleMessagePageContent.success {
-  font-size:                 110%;
-}
 
 
 
@@ -177,17 +153,10 @@ img {
 
 
 
-
-
-.paymentInfo {
-  border-top:                1px solid #bbbbbb;
-  border-bottom:             1px solid #bbbbbb;
-  padding:                   1em 0em;
-}
 
 .paymentInfo .paymentDetails {
   margin:                    1em 0em;
-  padding:                   1em 2em;
+  padding:                   1em 3em;
 	background:                #f8f8f8;
 	border:                    1px solid #eeeeee;
 }

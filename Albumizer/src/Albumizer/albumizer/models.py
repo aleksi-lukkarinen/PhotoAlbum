@@ -243,7 +243,7 @@ class Album(models.Model):
                         {"album_id": self.id, "secret_hash": self.secretHash})
 
     def is_owned_by(self, user):
-        """ Checks if this album is owner by a given user. """
+        """ Checks if this album is owned by a given user. """
         return user == self.owner
 
     def is_editable_to_user(self, user):
@@ -766,6 +766,14 @@ class Order(models.Model):
         help_text = u"clarification of the current state of the order and the reasons for it, if necessary"
     )
 
+    @staticmethod
+    def by_id(order_id):
+        """ Returns an order having given id, if one exists. Otherwise returns None. """
+        order_resultset = Order.objects.filter(id__exact = order_id)
+        if not order_resultset:
+            return None
+        return order_resultset[0]
+
     def total_price(self):
         """ Calculates and returns the total price for this order. """
         items = self.items()
@@ -778,6 +786,15 @@ class Order(models.Model):
     def total_price_as_2dstr(self):
         """ Calculates and returns the total price for this order as a string with two decimal places. """
         return convert_money_into_two_decimal_string(self.total_price())
+
+    @models.permalink
+    def get_absolute_url(self):
+        view_parameters = {"order_id": self.id}
+        return ("show_single_order", (), view_parameters)
+
+    def is_made_by(self, user):
+        """ Checks if this order is made by a given user. """
+        return user == self.orderer
 
     def is_paid(self):
         """ Returns True if this order is paid, otherwise False. """
@@ -835,7 +852,7 @@ class SPSPayment(models.Model):
     @staticmethod
     def exists_for_order(order):
         """ Checks if a payment for given order exists. """
-        return ShoppingCartItem.objects.filter(order__exact = order).exists()
+        return SPSPayment.objects.filter(order__exact = order).exists()
 
     def amount_as_2dstr(self):
         """ Returns the amount of this payment as a string with two decimal places. """

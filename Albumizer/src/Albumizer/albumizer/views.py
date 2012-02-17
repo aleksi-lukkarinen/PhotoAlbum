@@ -112,6 +112,33 @@ def prevent_all_caching(view_function):
 
 
 
+@prevent_all_caching
+def simple_message(request, title, content):
+    """ Renders a simple message. """
+    template_parameters = {"title": title, "content": content}
+    return render_to_response_as_public("simple-message.html", RequestContext(request, template_parameters))
+
+
+
+
+@prevent_all_caching
+def resource_not_found_message(request, resource_name):
+    """ Renders a message informing user that given resource cannot be found. """
+    return render_to_response_as_public("errors/resource-not-found.html",
+                                        RequestContext(request, {"resource": resource_name}))
+
+
+
+
+@prevent_all_caching
+def access_denied_message(request, resource_name):
+    """ Renders a message informing user that given resource cannot be shown. """
+    return render_to_response_as_public("errors/access-denied.html",
+                                        RequestContext(request, {"resource": resource_name}))
+
+
+
+
 def welcome_page(request):
     """ The first view of this application. """
     template_parameters = {'latest_albums': Album.latest_public_ones()}
@@ -989,16 +1016,16 @@ def report_order_as_successful(request):
 
 
 
-@login_required
 @prevent_all_caching
-def report_sps_payment_status(request, status):
+def report_sps_payment_status_GET(request, status):
     """
         Verifies correctness of the payment details the Simple Payments service
         sent. If everything is ok, the payment is registered as done and the user 
         is acknowledged about success of the payment.
     """
-    if request.method != "GET" or not status in VALID_SPS_PAYMENT_STATUSES:
-        return HttpResponseBadRequest()
+    assert request.method == "GET"
+    if not status in VALID_SPS_PAYMENT_STATUSES:
+        return HttpResponseNotFound()
 
     payment_id = request.GET.get("pid")
     reference = request.GET.get("ref")
@@ -1017,13 +1044,59 @@ def report_sps_payment_status(request, status):
         return HttpResponseServerError()
     order = order_qs[0]
 
+    if status == SPS_STATUS_SUCCESSFUL:
+        if SPSPayment.exists_for_order(order):
+            return HttpResponseRedirect(order.get_absolute_url())
+
+        new_payment = SPSPayment(
+            order = order,
+            amount = order.total_price(),
+            referenceCode = reference,
+            clarification = ""
+        )
+        new_payment.save()
+
     template_parameters = {
-        "order": order,
-        "":
-        "payment_id": payment_id
+        "payment": new_payment
     }
     return render_to_response('payment/sps/%s.html' % status,
                               RequestContext(request, template_parameters))
+
+
+
+
+@login_required
+@prevent_all_caching
+def show_single_order_GET(request, order_id):
+    """ Shows the user information related to a single order. """
+    assert request.method == "GET"
+
+    try:
+        order_id = int(order_id)
+    except:
+        return resource_not_found_message(request, "order")
+
+    order = Order.by_id(order_id)
+    if not order:
+        return resource_not_found_message(request, "order")
+
+    if not order.is_made_by(request.user):
+        return access_denied_message(request, "order")
+
+    payment = SPSPayment.of_order(order)
+
+    template_parameters = {
+        "order": order,
+        "payment": payment
+    }
+    return render_to_response_as_public('order/show-single.html', RequestContext(request, template_parameters))
+
+@login_required
+@prevent_all_caching
+def show_single_order_POST(request, order_id):
+    """  """
+    assert request.method == "POST"
+    return HttpResponseBadRequest()
 
 
 

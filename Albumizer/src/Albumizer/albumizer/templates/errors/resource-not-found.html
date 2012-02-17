@@ -1,0 +1,22 @@
+{% extends "base-template.html" %}
+{% load albumizer_common %}
+
+
+
+{% block page_title %}The requested {{ resource }} cannot be found{% endblock %}
+
+
+
+{% block page_content %}
+  
+  <h1>The requested {{ resource }} cannot be found</h1>
+  {% show_messages %}
+
+  <p>
+    Oops! We are afraid, that the requested {{ resource }} does not exist on our servers.
+    If it has existed once, it has been deleted since.
+  </p>
+  
+  <p>We are sorry for any inconvenience this may have caused to you.</p>
+
+{% endblock %}

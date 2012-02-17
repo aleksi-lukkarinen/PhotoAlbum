@@ -1,4 +1,4 @@
-{% extends "simple-success-message-template.html" %}
+{% extends "simple-message-template.html" %}
 {% load albumizer_common %}
 
 
@@ -14,27 +14,31 @@
 {% block message_page_content %}
 
   <div class="paymentInfo">
-	  Your payment via Simple Payments service has been received with following information:
+	  Your payment via Simple Payments service has been arrived.
+	  You should receive an email confirmation in a few minutes.
+
+    <div class="orderInfo">
+      Your order is now being processed, and you will receive an email confirmation
+      when it is sent from our warehouse.<br />
+      You can check the status of your order <a href="{{ payment.order.get_absolute_url }}">here</a>.
+      Should you have any inquiries about your order, please kindly contact our customer service.
+    </div>
+
+    <div class="paymentDetailsProlog">
+      Information about your payment:
+    </div>    
 	  <table class="paymentDetails">
 	    <tbody>
-	      <tr><th>Payer:</th><td>{{ order.orderer.first_name }} {{ order.orderer.last_name }}</td></tr>
+	      <tr><th>Payer:</th><td>{{ payment.order.orderer.first_name }} {{ payment.order.orderer.last_name }}</td></tr>
 	      <tr><th>Payee:</th><td>Albumizer Plc.</td></tr>
-	      <tr><th>Amount:</th><td></td></tr>
-	      <tr><th>Transaction Date:</th><td></td></tr>
-	      <tr><th>Reference #:</th><td>{{ payment_id }}</td></tr>
-	      <tr><th>Order Date:</th><td>{{ order.purchaseDate }}</td></tr>
-	      <tr><th colspan="2">Content of Order:</th></tr>
-	      <tr><td colspan="2"></td></tr>
+	      <tr><th>Amount:</th><td>{{ payment.amount|floatformat:"2" }} &euro;</td></tr>
+        <tr><th>Via:</th><td>Simple Payments</td></tr>
+	      <tr><th>Transaction Date:</th><td title="{{ payment.transactionDate|date:"c" }}">{{ payment.transactionDate|date:"j.n.Y \a\t G.i" }}</td></tr>
+	      <tr><th>Reference #:</th><td>{{ payment.referenceCode }}</td></tr>
+	      <tr><th>Order Date:</th><td title="{{ payment.order.purchaseDate|date:"c" }}">{{ payment.order.purchaseDate|date:"j.n.Y \a\t G.i" }}</td></tr>
 	    </tbody>
 	  </table>
-    You should receive shortly an email containing this same information.
   
-	  <div class="orderInfo">
-	    Your order is now being processed, and you will receive an email confirmation when it is sent from
-	    our warehouse.<br />
-	    Should you have any inquiries about your order, please contact us immediately.
-	  </div>
-	  
 	  <div class="closing">
 	    Thank you for ordering our products! We hope to see you here producing and discovering great new albums!
 	  </div>    
