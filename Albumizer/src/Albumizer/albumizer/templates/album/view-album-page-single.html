@@ -17,6 +17,9 @@
                     });                
             });
         });
+        $(function() {
+            $(".actionButtonContainer input").button();
+        });
       {% endblock %}
 {% block header_definitions_before %}
 	<style type="text/css">
@@ -25,6 +28,30 @@
 {% endblock %}
 
 {% block page_content %}
+
+  <article class="albumBrowser hlisting">
+    {% show_messages %}
+
+    <div>
+		<h1 class="fn">{{ albumTitle }}</h1>
+
+	    {% if request.user.is_authenticated %}
+	    <div class="actionButtonContainer">
+	      <form name="frmAlbumAction" method="post" action="{% url "show_single_album" album_id %}">
+	        {% csrf_token %}
+            {% if current_user_can_edit %}
+            <input type="submit" name="addPage" name="id_cmdAddPage" value="Add Page">
+            {# <input type="submit" name="editPage" name="id_cmdEditPage" value="Edit Page"> #}
+            {% endif %}
+	        {% if current_user_can_delete %}
+	        {# <input type="submit" name="deletePage" name="id_cmdDeletePage" value="Delete Page"> #}
+	        {% endif %}
+	      </form>
+	    </div>
+	    {% endif %}
+    </div>
+    
+    <div class="clear"></div>
 
 	<div id="ajaxContainer">
 		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
@@ -50,4 +77,5 @@
 		</div>
 	<div>
 
+  </article>
 {% endblock %}

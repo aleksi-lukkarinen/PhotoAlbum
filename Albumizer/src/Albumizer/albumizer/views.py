@@ -146,7 +146,7 @@ def welcome_page(request):
 
 
 
-
+@prevent_all_caching
 def list_all_visible_albums(request):
     """ Lists all albums visible to the current user (logged in or not). """
     albums = Album.objects.filter(isPublic = True).order_by('title')
@@ -186,7 +186,11 @@ def show_single_page(request, album_id, page_number):
     pageNumberInt = int(page_number)
     context = {"pageNumber":mypage.pageNumber,
           "albumTitle":myalbum.title,
-          "layoutCssClass":mypage.layout.cssClass}
+          "layoutCssClass":mypage.layout.cssClass,
+          "current_user_can_edit": myalbum.is_editable_to_user(request.user),
+          "current_user_can_delete": myalbum.is_editable_to_user(request.user),
+          "album_id": album_id
+          }
     images = []
     texts = []
 
@@ -319,48 +323,8 @@ def show_single_album_POST(request, album_id):
     if request.POST.get("editAlbum"):
         return HttpResponseRedirect(reverse("edit_album", args = [album_id]))
 
-
     if request.POST.get("addPage"):
-        album_resultset = Album.objects.filter(id__exact = album_id)
-        if not album_resultset:
-            return render_to_response('album/album-not-found.html', RequestContext(request))
-
-        album = album_resultset[0]
-        if not album.is_editable_to_user(request.user):
-            return render_to_response('album/edit-access-denied.html', RequestContext(request))
-
-        form = AddPageForm()
-
-        return render_to_response('album/add-page.html', RequestContext(request, {'album': album, 'form': form}))
-
-    if request.POST.get("cmdAdd"):
-        form = AddPageForm(request.POST)
-        if not form.is_valid():
-            return render_to_response("album/add-page.html", RequestContext(request, {"form": form}))
-
-        album_resultset = Album.objects.filter(id__exact = album_id)
-        if not album_resultset:
-            return render_to_response('album/album-not-found.html', RequestContext(request))
-
-        album = album_resultset[0]
-        if not album.is_editable_to_user(request.user):
-            return render_to_response('album/edit-access-denied.html', RequestContext(request))
-
-        page_album = album
-        page_pageNumber = album.page_set.count()
-        page_layout = form.cleaned_data.get("chcPageLayout")
-
-        new_page = Page(
-            album = page_album,
-            pageNumber = page_pageNumber,
-            layout = page_layout
-        )
-        new_page.save()
-
-        userActionLogger.info("User %s created a new page in album \"%s\"." % (request.user.username, album.title))
-
-        return HttpResponseRedirect(album.get_absolute_url())
-
+        return HttpResponseRedirect(reverse("add_page", args = [album_id]))
 
     if request.POST.get("addToShoppingCart"):
         try:
@@ -496,6 +460,45 @@ def create_album_POST(request):
     return HttpResponseRedirect(new_album.get_absolute_url())
 
 
+@login_required
+@prevent_all_caching
+def add_page_GET(request, album_id):
+    """ """
+    form = AddPageForm()
+    return render_to_response('album/add-page.html', RequestContext(request, {'album': album_id, 'form': form}))
+
+
+@login_required
+@prevent_all_caching
+def add_page_POST(request, album_id):
+    """  """
+    form = AddPageForm(request.POST)
+    if not form.is_valid():
+        return render_to_response("album/add-page.html", RequestContext(request, {"form": form}))
+
+    album_resultset = Album.objects.filter(id__exact = album_id)
+    if not album_resultset:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    album = album_resultset[0]
+    if not album.is_editable_to_user(request.user):
+        return render_to_response('album/edit-access-denied.html', RequestContext(request))
+
+    page_album = album
+    page_pageNumber = album.page_set.count()
+    page_layout = form.cleaned_data.get("chcPageLayout")
+
+    new_page = Page(
+        album = page_album,
+        pageNumber = page_pageNumber,
+        layout = page_layout
+    )
+    new_page.save()
+
+    userActionLogger.info("User %s created a new page in album \"%s\"." % (request.user.username, album.title))
+
+    return HttpResponseRedirect(album.get_absolute_url())
+
 
 
 @login_required
@@ -509,8 +512,13 @@ def edit_album_GET(request, album_id):
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
-
-    return render_to_response('album/edit.html', RequestContext(request, {'album': album}))
+    
+    data = {'txtAlbumTitle' : album.title, 
+            'txtAlbumDescription' : album.description, 
+            'chkPublicAlbum' : album.isPublic
+            }
+    form = AlbumCreationForm(request, initial=data)
+    return render_to_response("album/edit.html",RequestContext(request, {'album': album_id,"form": form}))
 
 
 
@@ -519,7 +527,31 @@ def edit_album_GET(request, album_id):
 @prevent_all_caching
 def edit_album_POST(request, album_id):
     """  """
-    return render_to_response('album/edit.html', RequestContext(request, {'album': album_id}))
+    form = AlbumCreationForm(request, request.POST)
+    if not form.is_valid():
+        return render_to_response("album/edit.html", RequestContext(request, {'album': album_id,"form": form}))
+        
+    album_title = form.cleaned_data.get("txtAlbumTitle")
+    album_description = form.cleaned_data.get("txtAlbumDescription") or ""
+    album_publicity = form.cleaned_data.get("chkPublicAlbum")
+    
+    album_resultset = Album.objects.filter(id__exact = album_id)
+    if not album_resultset:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    album = album_resultset[0]
+    if not album.is_editable_to_user(request.user):
+        return render_to_response('album/edit-access-denied.html', RequestContext(request))
+        
+    album.title = album_title
+    album.description = album_description
+    album.isPublic = album_publicity
+    
+    album.save()
+
+    userActionLogger.info("User %s edited an album called \"%s\"." % (request.user.username, album.title))
+        
+    return HttpResponseRedirect(album.get_absolute_url())
 
 
 
