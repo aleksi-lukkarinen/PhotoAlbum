@@ -1,0 +1,76 @@
+{% extends "base-template.html" %}
+{% load albumizer_common %}
+{% load url from future %}
+
+{% block page_title %}Edit a page{% endblock %}
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#id_cmdEditPage").css({
+      "margin-left": "11.8em",
+      "margin-top": "2em"
+    });
+    $("#id_cmdEditPage").button();
+  });
+  $(window).load(function() {
+    $("#frmCreateAlbum").submit(function() {
+      $("#id_cmdEditPage").button("option", "disabled", true);
+      return true;  
+    })
+  });
+
+{% endblock %}
+
+{% block page_content %}
+  <h1>Edit page</h1>
+
+  {% show_messages %}
+
+  {% if form.field_errors or form.non_field_errors %}
+    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+      {% if form.field_errors %}
+        <tr>
+          <td><span class="ui-icon ui-icon-info"></span></td>
+          <td>
+            <span class="errorMessage">
+            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
+            <ul>
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+            </span>
+          </td>
+        </tr> 
+      {% endif %}
+          
+      {% for error in form.non_field_errors %}
+        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+  <form id="frmCreateAlbum" class="commonForm" enctype="multipart/form-data" method="post" action="{% url "edit_page" album_id page_number %}">
+    {% csrf_token %}
+    
+    <div class="formSectionTitle ui-widget-header">Page Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+      {% for field in form %}
+      <div class="fieldRow"><label for="id_{{ field.name }}">{{ field.label }}</label><div>{{ field }}</div></div>
+      <div class="helpRow">{{ field.help_text }}</div>
+      {% if field.errors %}
+        <div class="errorRow"> 
+          {% for error in field.errors %}
+            <div class="errorMessage">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% endfor %}
+      <input type="submit" name="cmdEditPage" id="id_cmdEditPage" value="Edit Page" />
+    </fieldset>
+  </form>
+
+{% endblock %}
