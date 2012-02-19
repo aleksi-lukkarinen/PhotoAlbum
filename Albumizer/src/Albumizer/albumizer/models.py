@@ -441,7 +441,7 @@ class Page(models.Model):
             "album_id": self.album.id,
             "page_number": self.pageNumber
         }
-        return ("albumizer.views.show_single_page", (), view_parameters)
+        return ("show_single_page", (), view_parameters)
 
     @models.permalink
     def get_secret_url(self):
