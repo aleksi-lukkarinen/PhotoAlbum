@@ -426,6 +426,12 @@ def show_single_album_POST(request, album_id):
             return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
 
         album_title = album.title
+        
+        images = PageContent.objects.filter(page__album = album, placeHolderID__contains = '_image_')
+     
+        for image in images:
+            if image.image:
+                image.image.delete()
 
         album.delete()
 
@@ -527,7 +533,7 @@ def add_page_POST(request, album_id):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
 
     page_album = album
-    page_pageNumber = album.page_set.count()
+    page_pageNumber = album.page_set.count()+1
     page_layout = form.cleaned_data.get("chcPageLayout")
 
     new_page = Page(
@@ -630,6 +636,9 @@ def edit_page_POST(request, album_id, page_number):
             image.image.delete()
             
         if img:
+            filename = img.name.split('.')
+            filename[0] = '%s_%s_%s_%s' % (album.owner.id, album_id, page_number, image.placeHolderID[-1])
+            img.name = '.'.join(filename)
             image.image = img
             image.save()
 
