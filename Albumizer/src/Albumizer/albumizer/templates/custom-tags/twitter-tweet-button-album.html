@@ -23,7 +23,11 @@
   <script type="text/javascript">
     //<![CDATA[
       $(window).load(function() {
-        $("div#twitter-tweet-button-album-container-{{ id }}").css("display", "block");
+    	  $("div#twitter-tweet-button-album-container-{{ id }}").css({
+    		  "display": "none",
+    		  "visibility": "visible"    		      		  
+    	  });
+    	  $("div#twitter-tweet-button-album-container-{{ id }}").show("fade", {}, 2000);
       });
     //]]>
   </script>

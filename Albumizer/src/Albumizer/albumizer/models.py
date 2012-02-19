@@ -621,6 +621,11 @@ class Address(models.Model):
 
         return output
 
+    @staticmethod
+    def addresses_of_user(user):
+        """ Return a queryset of all addresses of given user. """
+        return Address.objects.filter(owner__exact = user)
+
     class Meta():
         ordering = ["owner", "postAddressLine1"]
         verbose_name = u"address"
@@ -638,6 +643,11 @@ class ShoppingCartItem(models.Model):
         auto_now_add = True,
         verbose_name = u"addition date",
         help_text = u"time when the item was added into shopping cart"
+    )
+    deliveryAddress = models.ForeignKey(
+        Address,
+        null = True,
+        verbose_name = u"delivery address"
     )
 
     @staticmethod

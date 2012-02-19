@@ -16,7 +16,7 @@ import views
 urlpatterns = patterns('albumizer.views',
     (r'^$', 'welcome_page'),
 
-    (r'^album/$', 'list_all_visible_albums'),
+    (r'^album/$', 'list_all_public_albums'),
     (r'^album/(?P<album_id>\d+)/s/(?P<secret_hash>[a-z0-9]{64})/$', 'show_single_album_with_hash'),
     (r'^album/(?P<album_id>\d+)/(?P<page_number>\d+)/s/(?P<secret_hash>[a-z0-9]{64})/$', 'show_single_page_with_hash'),
 
@@ -27,9 +27,6 @@ urlpatterns = patterns('albumizer.views',
     (r'^accounts/facebooklogin$', 'facebook_login'),
 
     (r'^order/$', redirect_to, {'url': '/order/information/'}),
-    (r'^order/information/$', 'get_ordering_information'),
-    (r'^order/summary/$', 'show_order_summary'),
-    (r'^order/successful/$', 'report_order_as_successful'),
 
     (r'^api/json/album/latest/$', redirect_to, {'url': '/api/json/album/latest/20/'}),
     (r'^api/json/album/latest/(?P<how_many>\d{1,2})/$', 'api_json_get_latest_albums'),
@@ -56,16 +53,28 @@ urlpatterns += patterns('',
         {"GET": views.edit_page_GET, "POST": views.edit_page_POST}, 'edit_page'),
     (r'^album/(?P<album_id>\d+)/edit/$', views.dispatch_by_method,
         {"GET": views.edit_album_GET, "POST": views.edit_album_POST}, 'edit_album'),
+
     (r'^accounts/login/$', views.dispatch_by_method, {"GET": views.log_in_GET, "POST": views.log_in_POST}, "log_in"),
     (r'^accounts/register/$', views.dispatch_by_method, {
         "GET": views.get_registration_information_GET, "POST": views.get_registration_information_POST},
         "get_registration_information"),
+
     (r'^cart/$', views.dispatch_by_method, {
         "GET": views.edit_shopping_cart_GET, "POST": views.edit_shopping_cart_POST},
         "edit_shopping_cart"),
+
     (r'^order/(?P<order_id>\d+)/$', views.dispatch_by_method, {
         "GET": views.show_single_order_GET, "POST": views.show_single_order_POST},
         'show_single_order'),
+    (r'^order/addresses/$', views.dispatch_by_method, {
+        "GET": views.get_delivery_addresses_GET, "POST": views.get_delivery_addresses_POST},
+        'get_delivery_addresses'),
+    (r'^order/summary/$', views.dispatch_by_method, {
+        "GET": views.show_order_summary_GET, "POST": views.show_order_summary_POST},
+        'show_order_summary'),
+    (r'^order/successful/$', views.dispatch_by_method, {
+        "GET": views.report_order_as_successful_GET}, 'report_order_as_successful'),
+
     (r'^payment/sps/(?P<status>\w+)/$', views.dispatch_by_method, {
         "GET": views.report_sps_payment_status_GET}, 'report_sps_payment_status')
 )

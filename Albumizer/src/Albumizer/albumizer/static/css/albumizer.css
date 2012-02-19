@@ -142,6 +142,12 @@ img {
 	border:                    0em;
 }
 
+.prompt {
+  font-size:                 110%;
+  color:                     #dd9900;
+  font-weight:               bold;
+}
+
 .simpleMessagePageContent {
 	margin-bottom:             7em;
 }
@@ -434,7 +440,8 @@ clear:both;
 }
 
 .twitter-tweet-button-album-container {
-  margin-top:                1em;
+  visibility:                hidden;
+	margin-top:                1em;
 }
 
 .twitter-tweet-button-album-container a {
@@ -821,6 +828,16 @@ clear:both;
 
 
 
+#id_frmShoppingCart .shoppingCartProlog {
+  margin-bottom:             1em;
+}
+
+#id_frmShoppingCart .shoppingCartProlog .prompt {
+  margin:                    0em;
+  float:                     left;
+  width:                     40em;
+}
+
 #id_frmShoppingCart .commonActions {
 	width:                     100%;
 	text-align:                right;
@@ -850,39 +867,39 @@ clear:both;
   color:                     #555555;
 }
 
-.shoppingCart table {
+#id_frmShoppingCart .shoppingCart table {
   width:                     100%;
 }
 
-.shoppingCart .headerRowTable {
+#id_frmShoppingCart .shoppingCart .headerRowTable {
 	font-size:                 90%;
 	background:                #ffffff;
 	color:                     #444444;
 }
 
-.shoppingCart .itemRowTable,
-.shoppingCart .subtotalRowTable {
+#id_frmShoppingCart .shoppingCart .itemRowTable,
+#id_frmShoppingCart .shoppingCart .subtotalRowTable {
   border-top:                1px solid #888888; 
 }
 
-.shoppingCart tr {
+#id_frmShoppingCart .shoppingCart tr {
 	vertical-align:            top;
 }
 
-.shoppingCart th {
+#id_frmShoppingCart .shoppingCart th {
 	padding:                   0.2em 0.4em 0.2em 0em;
 }
 
-.shoppingCart td {
+#id_frmShoppingCart .shoppingCart td {
 	padding:                   0.5em 0.4em 2em 0em;
 }
 
-.shoppingCart .itemColumn {
+#id_frmShoppingCart .shoppingCart .itemColumn {
   width:                     70%;                                
 	text-align:                left;
 }
 
-.shoppingCart .itemColumn img {
+#id_frmShoppingCart .shoppingCart .itemColumn img {
   display:                   block;
   float:                     left;
   width:                     8em;
@@ -898,15 +915,15 @@ clear:both;
   -o-text-overflow:          ellipsis;
 }
 
-.shoppingCart .itemColumn img:hover {
+#id_frmShoppingCart .shoppingCart .itemColumn img:hover {
 	border:                    1px solid #aa0000;
 }
 
-.shoppingCart .itemColumn .item1stRow {
+#id_frmShoppingCart .shoppingCart .itemColumn .item1stRow {
   margin:                    0em 0em 1em 10.4em;
 }
 
-.shoppingCart .itemColumn .item1stRow a {
+#id_frmShoppingCart .shoppingCart .itemColumn .item1stRow a {
   font-size:                 120%;
   font-weight:               bold;
   text-decoration:           none;
@@ -914,28 +931,28 @@ clear:both;
   color:                     #336699;
 }
 
-.shoppingCart .itemColumn .item1stRow a:hover {
+#id_frmShoppingCart .shoppingCart .itemColumn .item1stRow a:hover {
   text-decoration:           underline;
   background:                #ffffff;
   color:                     #aa0000;
 }
 
-.shoppingCart .itemColumn .item1stRow .creator {
+#id_frmShoppingCart .shoppingCart .itemColumn .item1stRow .creator {
   background:                #ffffff;
   color:                     #444444;
 }
 
-.shoppingCart .itemColumn .item2ndRow {
+#id_frmShoppingCart .shoppingCart .itemColumn .item2ndRow {
   margin:                    0em 0em 0em 10.5em;
 	background:                #ffffff;
   color:                     #444444;
 }
 
-.shoppingCart .itemColumn .item3rdRow {
+#id_frmShoppingCart .shoppingCart .itemColumn .item3rdRow {
 	margin:                    1em 0em 0em 10em;
 }
 
-.shoppingCart .itemColumn .item3rdRow input {
+#id_frmShoppingCart .shoppingCart .itemColumn .item3rdRow input {
 	display:                   inline-block;
 	background:                #ffffff;
   color:                     #336699;
@@ -946,55 +963,146 @@ clear:both;
   padding:                   0em;
 }
 
-.shoppingCart .quantityColumn {
+#id_frmShoppingCart .shoppingCart .quantityColumn {
   width:                     10%;                                
 	text-align:                center;
 }
 
-.shoppingCart .quantityColumn input {
+#id_frmShoppingCart .shoppingCart .quantityColumn input {
   text-align:                center;
 }
 
-.shoppingCart .itemRowTable .quantityColumn,
-.shoppingCart .itemRowTable .unitPriceColumn,
-.shoppingCart .itemRowTable .rowTotalColumn {
+#id_frmShoppingCart .shoppingCart .itemRowTable .quantityColumn,
+#id_frmShoppingCart .shoppingCart .itemRowTable .unitPriceColumn,
+#id_frmShoppingCart .shoppingCart .itemRowTable .rowTotalColumn {
   font-size:                 110%;
 }
 
-.shoppingCart .itemRowTable .rowTotalColumn {
+#id_frmShoppingCart .shoppingCart .itemRowTable .rowTotalColumn {
   background:                #ffffff;
   color:                     #aa0000;
   font-weight:               bold;
 }
 
-.shoppingCart .unitPriceColumn {
+#id_frmShoppingCart .shoppingCart .unitPriceColumn {
   width:                     10%;
 	text-align:                right;       
 }
 
-.shoppingCart .rowTotalColumn {
+#id_frmShoppingCart .shoppingCart .rowTotalColumn {
   width:                     10%;                                
 	text-align:                right;           
 }
 
-.shoppingCart .subTotalRow {
+#id_frmShoppingCart .shoppingCart .subTotalRow {
   text-align:                right;
 }
 
-.shoppingCart .subtotalRowTable td {
+#id_frmShoppingCart .shoppingCart .subtotalRowTable td {
   padding-bottom:            0em;           
 }
 
-.shoppingCart .subtotalRowTable {
+#id_frmShoppingCart .shoppingCart .subtotalRowTable {
 	text-align:                right;
 	font-size:                 130%;
 	font-weight:               bold;
 }
 
-.shoppingCart .subtotalRowTable .subTotal {
+#id_frmShoppingCart .shoppingCart .subtotalRowTable .subTotal {
   background:                #ffffff;
   color:                     #880000;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#id_frmDeliveryAddresses .addressListProlog {
+  margin-bottom:             2em;
+}
+
+#id_frmDeliveryAddresses .addressListProlog .prompt {
+	margin:                    0em;
+	float:                     left;
+  width:                     50em;
+}
+
+#id_frmDeliveryAddresses .commonActions {
+
+  text-align:                right;
+}
+
+#id_frmDeliveryAddresses .commonActions input {
+  margin:                    0em 0em 0em 1em;
+}
+
+#id_frmDeliveryAddresses .commonActions .commonActionLinkButton {
+  display:                   inline-block;
+  border:                    none;
+  background:                #ffffff;
+  color:                     #336699;
+  text-decoration:           underline;
+  cursor:                    pointer;
+  margin:                    0em;
+  padding:                   0em;
+}
+
+#id_frmDeliveryAddresses .deliveryAddresses {
+  clear:                     both;
+  width:                     100%;
+}
+
+#id_frmDeliveryAddresses .deliveryAddresses .deliveryAddress {
+  border-top:                1px solid #888888; 
+	padding:                   1em 0em 2em 0em;
+}
+
+#id_frmDeliveryAddresses .deliveryAddresses .deliveryAddress .item label {
+  width:                     100%;
+	font-size:                 120%;
+  font-weight:               bold;
+  background:                #ffffff;
+  color:                     #336699;
+}
+
+#id_frmDeliveryAddresses .deliveryAddresses .deliveryAddress .address select {
+  width:                     50em;
+  margin-top:                1em;
+  padding:                   0.2em;  
+}
+
+#id_frmDeliveryAddresses .disclaimer {
+  border-top:                1px solid #888888; 
+  padding-top:               1em;
+  margin-bottom:             7em;
+  text-align:                right;
+  background:                #ffffff;
+  color:                     #555555;
+}
+
+
+
+
+
+
+
+
+
 
 
 

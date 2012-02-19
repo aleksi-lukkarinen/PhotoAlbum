@@ -12,7 +12,7 @@
   <h1>Order Summary</h1>
   {% show_messages %}
 
-  <form name="frmOrderSummary" method="post" action="{% url "albumizer.views.show_order_summary" %}">
+  <form name="frmOrderSummary" method="post" action="{% url "show_order_summary" %}">
     {% csrf_token %}
     
     <input type="submit" value="Place Order">  

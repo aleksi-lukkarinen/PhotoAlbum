@@ -2,23 +2,26 @@
 
 import hashlib, logging
 from datetime import datetime
+from random import Random
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
+        HttpResponseForbidden, HttpResponseNotFound, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson as json
-from django.views.decorators.cache import cache_control
-from Albumizer.albumizer import facebook_api
+import facebook_api
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
-from forms import AlbumCreationForm, LoginForm, RegistrationForm, AddPageForm, EditPageForm
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
-        HttpResponseForbidden, HttpResponseNotFound, HttpResponse
+from forms import AlbumCreationForm, LoginForm, RegistrationForm, AddPageForm, \
+        EditPageForm, build_delivery_address_form
+from utils import computeValidationHashForShoppingCart, validationHashForShoppingCartIsValid
 
 
 
@@ -29,6 +32,14 @@ SPS_STATUS_UNSUCCESSFUL = "unsuccessful"
 VALID_SPS_PAYMENT_STATUSES = [SPS_STATUS_SUCCESSFUL, SPS_STATUS_CANCELED, SPS_STATUS_UNSUCCESSFUL]
 
 
+CHECKOUT_ERR_MSG_INVALID_HASH = \
+    "User and/or content of the shopping cart have changed since the beginning of the checkout process, " + \
+    "or phases of the checkout process have been tried to perform in wrong order. Please start again " + \
+    "from the Shopping Cart."
+CHECKOUT_ERR_MSG_SHOPPING_CART_IS_EMPTY = \
+    "Your shopping cart is empty. Please add something before trying to make an order."
+CHECKOUT_ERR_MSG_MISSING_ADDRESSES = \
+    "You don't have any addresses to deliver to. Please add at least one address."
 
 
 commonLogger = logging.getLogger("albumizer")
@@ -139,16 +150,31 @@ def access_denied_message(request, resource_name):
 
 
 
+@prevent_all_caching
 def welcome_page(request):
-    """ The first view of this application. """
+    """
+        The first view of this application.
+    
+        **Context**
+    
+        ``RequestContext``
+    
+        ``latest_albums``
+            An queryset from :model:`albumizer.Album` containing the latest public albums.
+    
+        **Template:**
+    
+        :template:`albumizer/templates/welcome.html`
+    """
     template_parameters = {'latest_albums': Album.latest_public_ones()}
     return render_to_response_as_public("welcome.html", RequestContext(request, template_parameters))
 
 
 
+
 @prevent_all_caching
-def list_all_visible_albums(request):
-    """ Lists all albums visible to the current user (logged in or not). """
+def list_all_public_albums(request):
+    """ Lists all public albums. """
     albums = Album.objects.filter(isPublic = True).order_by('title')
 
     paginator = Paginator(albums, 20) # Show 20 albums per page
@@ -215,18 +241,20 @@ def show_single_page_GET(request, album_id, page_number):
 
 def show_single_page_POST(request, album_id, page_number):
     assert request.method == "POST"
-    
+
     if request.POST.get("addPage"):
         return HttpResponseRedirect(reverse("add_page", args = [album_id]))
-    
+
     if request.POST.get("editPage"):
         return HttpResponseRedirect(reverse("edit_page", args = [album_id, page_number]))
-    
+
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
     commonLogger.warning("User %s tried to perform an action to page %s in album %s without specifying which one." % \
                          (request.user.username, page_number, album_id))
 
     return HttpResponseRedirect(reverse("show_single_page", args = [album_id, page_number]))
+
+
 
 
 @prevent_all_caching
@@ -473,13 +501,14 @@ def create_album_POST(request):
     return HttpResponseRedirect(new_album.get_absolute_url())
 
 
+
+
 @login_required
 @prevent_all_caching
 def add_page_GET(request, album_id):
     """ """
     form = AddPageForm()
     return render_to_response('album/add-page.html', RequestContext(request, {'album': album_id, 'form': form}))
-
 
 @login_required
 @prevent_all_caching
@@ -507,10 +536,10 @@ def add_page_POST(request, album_id):
         layout = page_layout
     )
     new_page.save()
-    
+
     page_page = Page.by_album_id_and_page_number(album_id, page_pageNumber)
-    
-    for i in range(1,page_layout.textFieldCount+1):
+
+    for i in range(1, page_layout.textFieldCount + 1):
         pageContent = PageContent(
             page = page_page,
             placeHolderID = page_layout.name + '_caption_%s' % i,
@@ -542,13 +571,13 @@ def edit_page_GET(request, album_id, page_number):
     page_album = album_resultset[0]
     if not page_album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
-    
+
     page_resultset = Page.objects.filter(album = page_album, pageNumber__exact = page_number)
     page = page_resultset[0]
     
     data = {}
     page_captions = PageContent.objects.filter(page = page, placeHolderID__contains = page.layout.name + '_caption_')
-    
+
     for caption in page_captions:
         data["txtCaption_%s" % caption.placeHolderID[-1]] = caption.content
         
@@ -559,6 +588,7 @@ def edit_page_GET(request, album_id, page_number):
         file_data["imgUpload_%s" % caption.placeHolderID[-1]] = image.image
         
     form = EditPageForm(page, data, file_data)
+    
     return render_to_response('album/edit-page.html', RequestContext(request, {'album_id': album_id, 'page_number': page_number, 'form': form}))
 
 
@@ -567,7 +597,9 @@ def edit_page_GET(request, album_id, page_number):
 def edit_page_POST(request, album_id, page_number):
     """  """
     page_page = Page.by_album_id_and_page_number(album_id, page_number)
+    
     form = EditPageForm(page_page,request.POST,request.FILES)
+    
     if not form.is_valid():
         return render_to_response("album/edit-page.html", RequestContext(request, {'album_id': album_id, 'page_number': page_number, "form": form}))
 
@@ -578,7 +610,7 @@ def edit_page_POST(request, album_id, page_number):
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
-    
+        
     page_layout = page_page.layout
     page_captions = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_layout.name + '_caption_')
 
@@ -608,6 +640,7 @@ def edit_page_POST(request, album_id, page_number):
 
 
 
+
 @login_required
 @prevent_all_caching
 def edit_album_GET(request, album_id):
@@ -619,13 +652,13 @@ def edit_album_GET(request, album_id):
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
-    
-    data = {'txtAlbumTitle' : album.title, 
-            'txtAlbumDescription' : album.description, 
+
+    data = {'txtAlbumTitle' : album.title,
+            'txtAlbumDescription' : album.description,
             'chkPublicAlbum' : album.isPublic
             }
-    form = AlbumCreationForm(request, initial=data)
-    return render_to_response("album/edit.html",RequestContext(request, {'album_id': album_id,"form": form}))
+    form = AlbumCreationForm(request, initial = data)
+    return render_to_response("album/edit.html", RequestContext(request, {'album_id': album_id, "form": form}))
 
 
 
@@ -634,14 +667,14 @@ def edit_album_GET(request, album_id):
 @prevent_all_caching
 def edit_album_POST(request, album_id):
     """  """
-    form = AlbumCreationForm(request,request.POST)
+    form = AlbumCreationForm(request, request.POST)
     if not form.is_valid():
-        return render_to_response("album/edit.html", RequestContext(request, {'album_id': album_id,"form": form}))
-        
+        return render_to_response("album/edit.html", RequestContext(request, {'album_id': album_id, "form": form}))
+
     album_title = form.cleaned_data.get("txtAlbumTitle")
     album_description = form.cleaned_data.get("txtAlbumDescription") or ""
     album_publicity = form.cleaned_data.get("chkPublicAlbum")
-    
+
     album_resultset = Album.objects.filter(id__exact = album_id)
     if not album_resultset:
         return render_to_response('album/album-not-found.html', RequestContext(request))
@@ -649,15 +682,15 @@ def edit_album_POST(request, album_id):
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
-        
+
     album.title = album_title
     album.description = album_description
     album.isPublic = album_publicity
-    
+
     album.save()
 
     userActionLogger.info("User %s edited an album called \"%s\"." % (request.user.username, album.title))
-        
+
     return HttpResponseRedirect(album.get_absolute_url())
 
 
@@ -738,7 +771,6 @@ def log_in_GET(request):
     next_url = request.GET.get("next")
     template_parameters = {"is_login_page": True, "nextURL": next_url, "form": form}
     return render_to_response('accounts/login.html', RequestContext(request, template_parameters))
-
 
 @prevent_all_caching
 def log_in_POST(request):
@@ -916,7 +948,7 @@ def show_profile(request):
 @login_required
 @prevent_all_caching
 def edit_account_information(request):
-    """ Allows user to edit his/her personal information managed by the application """
+    """ Allows user to edit his/her personal information managed by the application. """
     return render_to_response('accounts/edit-information.html', RequestContext(request))
 
 
@@ -941,7 +973,7 @@ SHOPPING_CART_ERR_MSG_INVALID_QUANTITY_UI = \
 @login_required
 @prevent_all_caching
 def edit_shopping_cart_GET(request):
-    """ Allows user to edit the content of his/her shopping cart """
+    """ Allows user to edit the content of his/her shopping cart. """
     assert request.method == "GET"
     items = ShoppingCartItem.items_of_user(request.user)
 
@@ -1061,7 +1093,8 @@ def edit_shopping_cart_POST(request):
 
 
     if proceed_to_checkout and not has_errors:
-        return HttpResponseRedirect(reverse("albumizer.views.get_ordering_information"))
+        validation_part = "?v=%s" % computeValidationHashForShoppingCart(request)
+        return HttpResponseRedirect(reverse("get_delivery_addresses") + validation_part)
 
     return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
@@ -1094,33 +1127,97 @@ def shopping_cart_report_missing_cart_item(item_id, user, error_already_given):
 
 @login_required
 @prevent_all_caching
-def get_ordering_information(request):
-    """ Lets user to enter non-product-related information required for making an order. """
-    template_parameters = {}
-    return render_to_response('order/information.html', RequestContext(request, template_parameters))
+def get_delivery_addresses_GET(request):
+    """ Allows user to edit destination addresses for content of his/her shopping cart. """
+    assert request.method == "GET"
+
+    if not validationHashForShoppingCartIsValid(request):
+        request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+    DeliveryAddressForm = build_delivery_address_form(request)
+    form = DeliveryAddressForm()
+
+    if not form.has_items():
+        request.user.message_set.create(message = CHECKOUT_ERR_MSG_SHOPPING_CART_IS_EMPTY)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+    if not form.has_addresses():
+        request.user.message_set.create(message = CHECKOUT_ERR_MSG_MISSING_ADDRESSES)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+    template_parameters = {"form": form}
+    return render_to_response('order/addresses.html', RequestContext(request, template_parameters))
+
+@login_required
+@prevent_all_caching
+def get_delivery_addresses_POST(request):
+    """  """
+    assert request.method == "POST"
+
+    DeliveryAddressForm = build_delivery_address_form(request)
+    form = DeliveryAddressForm(request.POST)
+
+    if not form.has_items():
+        request.user.message_set.create(message = CHECKOUT_ERR_MSG_SHOPPING_CART_IS_EMPTY)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+    if not form.has_addresses():
+        request.user.message_set.create(message = CHECKOUT_ERR_MSG_MISSING_ADDRESSES)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+    if not form.is_valid():
+        template_parameters = {"form": form}
+        return render_to_response('order/addresses.html', RequestContext(request, template_parameters))
+
+    for (item, address) in form.item_address_pairs():
+        item.deliveryAddress = address
+        item.save()
+        #print "%s (%s), %s (%s)" % (unicode(item), unicode(type(item)), unicode(address), unicode(type(address)))
+
+    if request.POST.get("cmdSummary"):
+        return HttpResponseRedirect(reverse("show_order_summary"))
+
+    request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
+    commonLogger.warning("User %s tried to perform an action in delivery address view without specifying which one." % \
+                         request.user.username)
+
+    template_parameters = {"form": form}
+    return render_to_response('order/addresses.html', RequestContext(request, template_parameters))
 
 
 
 
 @login_required
 @prevent_all_caching
-def show_order_summary(request):
+def show_order_summary_GET(request):
     """ Shows user a summary about his/her order and lets him/her to finally place the order. """
+    assert request.method == "GET"
     template_parameters = {}
     return render_to_response('order/summary.html', RequestContext(request, template_parameters))
 
+@login_required
+@prevent_all_caching
+def show_order_summary_POST(request):
+    """  """
+    assert request.method == "POST"
+
+    return HttpResponseRedirect(reverse("report_order_as_successful"))
+
 
 
 
 @login_required
 @prevent_all_caching
-def report_order_as_successful(request):
+def report_order_as_successful_GET(request):
     """
         Actually creates an order based on the content of user's shopping cart and
         acknowledges user about the fact. After this, the shopping cart will be empty.
         User will be asked to pay the order via the Simple Payments service by clicking
         a link leading to the service.
     """
+    assert request.method == "GET"
+
     sps_address = settings.SIMPLE_PAYMENT_SERVICE_URL
     sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
     sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
@@ -1128,8 +1225,8 @@ def report_order_as_successful(request):
     our_protocol = "http"
     our_domain = Site.objects.get_current().domain
 
-    our_url_start = "%s://%s/" % (our_protocol, our_domain)
-    report_view_name = "albumizer.views.report_sps_payment_status"
+    our_url_start = "%s://%s" % (our_protocol, our_domain)
+    report_view_name = "report_sps_payment_status"
     sps_success_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_SUCCESSFUL])
     sps_cancel_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_CANCELED])
     sps_error_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_UNSUCCESSFUL])
@@ -1183,8 +1280,10 @@ def report_sps_payment_status_GET(request, status):
         return HttpResponseServerError()
     order = order_qs[0]
 
+    template_parameters = {}
+
     if status == SPS_STATUS_SUCCESSFUL:
-        if SPSPayment.exists_for_order(order):
+        if order.is_paid():
             return HttpResponseRedirect(order.get_absolute_url())
 
         new_payment = SPSPayment(
@@ -1195,9 +1294,11 @@ def report_sps_payment_status_GET(request, status):
         )
         new_payment.save()
 
-    template_parameters = {
-        "payment": new_payment
-    }
+        template_parameters = {"payment": new_payment}
+        return render_to_response('payment/sps/%s.html' % status,
+                                  RequestContext(request, template_parameters))
+
+    template_parameters = {"order": order}
     return render_to_response('payment/sps/%s.html' % status,
                               RequestContext(request, template_parameters))
 
@@ -1256,24 +1357,32 @@ def api_json_get_random_albums(request, how_many):
 
 
 
+CACHE_KEY_API_JSON_GET_ALBUM_COUNT = "api_json_album_count"
+
 @return_as_json
 def api_json_get_album_count(request):
     """ Returns the number of albums currently registered. """
-    return Album.objects.count()
+    count = cache.get(CACHE_KEY_API_JSON_GET_ALBUM_COUNT)
+    if not count:
+        count = Album.objects.count()
+        cache.set(CACHE_KEY_API_JSON_GET_ALBUM_COUNT, count, 50)
+
+    return count
 
 
 
+
+CACHE_KEY_API_JSON_GET_USER_COUNT = "api_json_user_count"
 
 @return_as_json
 def api_json_get_user_count(request):
     """ Returns the number of users currently registered. """
-    return User.objects.count()
+    count = cache.get(CACHE_KEY_API_JSON_GET_USER_COUNT)
+    if not count:
+        count = User.objects.count()
+        cache.set(CACHE_KEY_API_JSON_GET_USER_COUNT, count, 50)
 
-
-
-
-
-
+    return count
 
 
 

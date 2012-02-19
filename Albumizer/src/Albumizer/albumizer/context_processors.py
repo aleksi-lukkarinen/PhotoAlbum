@@ -13,7 +13,8 @@ def common_variables(request):
         "site_domain": current_site.domain,
         "site_name": current_site.name,
         "twitter_hashtag": settings.TWITTER_HASHTAG,
-        "twitter_account": settings.TWITTER_ACCOUNT
+        "twitter_account": settings.TWITTER_ACCOUNT,
+        "template_cache_timeout": 5 * 60
     }
 
 

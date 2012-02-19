@@ -1,6 +1,7 @@
 {% extends "base-template.html" %}
-{% load static %}
 {% load albumizer_common %}
+{% load cache %}
+{% load static %}
 {% load url from future %}
 
 
@@ -12,7 +13,7 @@
 
   $(function() {
     $("#welcomePageIntroductionTabs").tabs();
-    $("#welcomePageIntroductionTabs").css("display", "block");
+    $("#welcomePageIntroductionTabs").show("slide", {}, 1000);
   });
 
 {% endblock %}
@@ -27,29 +28,31 @@
   
     {% show_messages %}
     
-		<div id="welcomePageIntroductionTabs">
-		  <ul>
-		    <li><a href="#welcomePageIntroductionTabs-1">Create</a></li>
-		    <li><a href="#welcomePageIntroductionTabs-2">Share</a></li>
-		    <li><a href="#welcomePageIntroductionTabs-3">Order</a></li>
-		  </ul>
-		  <div id="welcomePageIntroductionTabs-1">
-		    <div class="welcomePageIntroductionTabHeading">Let Your Imagination Flow!</div>
-		    With Albumizer, creation of outstanding photo albums is a breeze: Just layout your photos and texts with
-		    ready-made page templates, and you have a masterpiece in your hands!
-		  </div>
-      <div id="welcomePageIntroductionTabs-2">
-        <div class="welcomePageIntroductionTabHeading">Share Your Experiences And Passions With Your Friends!</div>
-        Making photo albums for yourself is nice, but the real fun comes from sharing them with your friends
-        and loved ones. Albumizer makes it easy to publish photo albums for the whole world to see, and for more
-        private content, you can give specific friends a special access link for browsing your album.
-      </div>
-      <div id="welcomePageIntroductionTabs-3">
-        <div class="welcomePageIntroductionTabHeading">Order Your Albums As Printed Copies!</div>
-        All albums created with Albumizer can be ordered as printed copies for a very competitive price. Let your
-        memories become amazing and unforgettable presents and store your albums for future generations! 
-      </div>
-		</div>
+    {% cache template_cache_timeout welcome_html_tabs debug %}  
+			<div id="welcomePageIntroductionTabs">
+			  <ul>
+			    <li><a href="#welcomePageIntroductionTabs-1">Create</a></li>
+			    <li><a href="#welcomePageIntroductionTabs-2">Share</a></li>
+			    <li><a href="#welcomePageIntroductionTabs-3">Order</a></li>
+			  </ul>
+			  <div id="welcomePageIntroductionTabs-1">
+			    <div class="welcomePageIntroductionTabHeading">Let Your Imagination Flow!</div>
+			    With Albumizer, creation of outstanding photo albums is a breeze: Just layout your photos and texts with
+			    ready-made page templates, and you have a masterpiece in your hands!
+			  </div>
+	      <div id="welcomePageIntroductionTabs-2">
+	        <div class="welcomePageIntroductionTabHeading">Share Your Experiences And Passions With Your Friends!</div>
+	        Making photo albums for yourself is nice, but the real fun comes from sharing them with your friends
+	        and loved ones. Albumizer makes it easy to publish photo albums for the whole world to see, and for more
+	        private content, you can give specific friends a special access link for browsing your album.
+	      </div>
+	      <div id="welcomePageIntroductionTabs-3">
+	        <div class="welcomePageIntroductionTabHeading">Order Your Albums As Printed Copies!</div>
+	        All albums created with Albumizer can be ordered as printed copies for a very competitive price. Let your
+	        memories become amazing and unforgettable presents and store your albums for future generations! 
+	      </div>
+			</div>
+    {% endcache %}
 
     {% twitter_follow_button %}
 
