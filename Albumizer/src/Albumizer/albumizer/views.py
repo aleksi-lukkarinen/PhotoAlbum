@@ -517,6 +517,13 @@ def add_page_POST(request, album_id):
             content = 'Caption %s' % i
         )
         pageContent.save()
+        
+    for i in range(1,page_layout.imageFieldCount+1):
+        pageContent = PageContent(
+            page = page_page,
+            placeHolderID = page_layout.name + '_image_%s' % i
+        )
+        pageContent.save()
 
     userActionLogger.info("User %s created a new page in album \"%s\"." % (request.user.username, album.title))
 
@@ -538,13 +545,20 @@ def edit_page_GET(request, album_id, page_number):
     
     page_resultset = Page.objects.filter(album = page_album, pageNumber__exact = page_number)
     page = page_resultset[0]
+    
     data = {}
     page_captions = PageContent.objects.filter(page = page, placeHolderID__contains = page.layout.name + '_caption_')
     
     for caption in page_captions:
         data["txtCaption_%s" % caption.placeHolderID[-1]] = caption.content
         
-    form = EditPageForm(page,initial = data)
+    file_data = {}
+    page_images = PageContent.objects.filter(page = page, placeHolderID__contains = page.layout.name + '_image_')
+    
+    for image in page_images:
+        file_data["imgUpload_%s" % caption.placeHolderID[-1]] = image.image
+        
+    form = EditPageForm(page, data, file_data)
     return render_to_response('album/edit-page.html', RequestContext(request, {'album_id': album_id, 'page_number': page_number, 'form': form}))
 
 
@@ -553,7 +567,7 @@ def edit_page_GET(request, album_id, page_number):
 def edit_page_POST(request, album_id, page_number):
     """  """
     page_page = Page.by_album_id_and_page_number(album_id, page_number)
-    form = EditPageForm(page_page,request.POST)
+    form = EditPageForm(page_page,request.POST,request.FILES)
     if not form.is_valid():
         return render_to_response("album/edit-page.html", RequestContext(request, {'album_id': album_id, 'page_number': page_number, "form": form}))
 
@@ -565,13 +579,27 @@ def edit_page_POST(request, album_id, page_number):
     if not album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
     
-
     page_layout = page_page.layout
     page_captions = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_layout.name + '_caption_')
 
     for content in page_captions:
         content.content = form.cleaned_data.get("txtCaption_%s" % content.placeHolderID[-1])
         content.save()
+        
+    page_images = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_page.layout.name + '_image_')
+    
+    for image in page_images:
+        clear =  request.POST.get("imgUpload_%s-clear" % image.placeHolderID[-1])
+        img = form.cleaned_data.get("imgUpload_%s" % image.placeHolderID[-1])
+            
+        if image.image and clear:
+            image.image.delete()
+        elif image.image and img:
+            image.image.delete()
+            
+        if img:
+            image.image = img
+            image.save()
 
     userActionLogger.info("User %s created a new page in album \"%s\"." % (request.user.username, album.title))
 

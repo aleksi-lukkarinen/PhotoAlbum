@@ -571,6 +571,14 @@ clear:both;
   padding-top:               0.2em;
 }
 
+.commonForm .fieldRow div label {
+  float:                     none;
+}
+
+.commonForm .fieldRow div {
+  margin-left:               13em;
+}
+
 .commonForm .fieldRow ul {
   display:                   inline;  
 }
