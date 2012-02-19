@@ -1,4 +1,5 @@
-﻿{% load static %}
+﻿{% load cache %}
+{% load static %}
 {% load url from future %}
 
 <!DOCTYPE html>
@@ -10,17 +11,19 @@
 
     <title>{% block page_title %}Untitled{% endblock %} - Albumizer - Unleash Your Imagination</title>
     
-    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-    
-    <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
-    {% if debug %}
-      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
-      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.js"></script>
-    {% else %}
-      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.min.js"></script>
-      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.min.js"></script>
-    {% endif %}
+    {% cache template_cache_timeout base_html_mls debug %}  
+	    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+	    
+	    <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+	    <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
+	    {% if debug %}
+	      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
+	      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.js"></script>
+	    {% else %}
+	      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.min.js"></script>
+	      <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.min.js"></script>
+	    {% endif %}
+    {% endcache %}
   
     <script type="text/javascript" src="{% get_static_prefix %}scripts/utils.js"></script>
     <script type="text/javascript">
@@ -58,112 +61,118 @@
 
   <body>
 
-    <div id="fb-root"></div>
-    <script type="text/javascript">
-      //<![CDATA[
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '{{ FACEBOOK_APP_ID }}',
-          status     : true, 
-          cookie     : true,
-          xfbml      : true,
-          oauth      : true,
-        });
-        var tokenhandler=function(response) {
-        	if(response.status=='connected' && response.authResponse) {
-        		var dialog=$("<div title='Facebook login'>Checking authentication token..</div>")
-        			.dialog({ 
-        				modal:true,
-        				resizable:false
-        		});
-        		$.post('{% url "albumizer.views.facebook_login" %}',
-        			response.authResponse)
-        		.success(function(data, textStatus, jqXHR) {
-        				if(data.success) {
-        					//alert("great success, refrehing page");
-        					window.location.href=window.location.href;
-        				} else
-        					alert("Login failed: "+data.reason);
-        			})
-        		.error(function() {
-        			alert("Internal error while validating authentication token.");
-        		})
-        		.complete(function() {
-        				dialog.dialog("close");
-        				dialog.remove();          			
-        		});
-        	}
-        };
-        {% if not user.is_authenticated %}
-        //user is not authenticated, check if the user is logged to facebook
-        //TODO: if the user logs out, this will log her on again
-        FB.getLoginStatus(tokenhandler);
-        {% endif %}
-        FB.Event.subscribe('auth.login', tokenhandler);
-        
-      };
-      (function(d){
-         var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
-         js = d.createElement('script'); js.id = id; js.async = true;
-         js.src = "//connect.facebook.net/en_US/all.js";
-         d.getElementsByTagName('head')[0].appendChild(js);
-      }(document));
-      //]]>
-    </script>
+    {% cache template_cache_timeout base_fb_login %}  
+	    <div id="fb-root"></div>
+	    <script type="text/javascript">
+	      //<![CDATA[
+	      window.fbAsyncInit = function() {
+	        FB.init({
+	          appId      : '{{ FACEBOOK_APP_ID }}',
+	          status     : true, 
+	          cookie     : true,
+	          xfbml      : true,
+	          oauth      : true,
+	        });
+	        var tokenhandler=function(response) {
+	        	if(response.status=='connected' && response.authResponse) {
+	        		var dialog=$("<div title='Facebook login'>Checking authentication token..</div>")
+	        			.dialog({ 
+	        				modal:true,
+	        				resizable:false
+	        		});
+	        		$.post('{% url "albumizer.views.facebook_login" %}',
+	        			response.authResponse)
+	        		.success(function(data, textStatus, jqXHR) {
+	        				if(data.success) {
+	        					//alert("great success, refrehing page");
+	        					window.location.href=window.location.href;
+	        				} else
+	        					alert("Login failed: "+data.reason);
+	        			})
+	        		.error(function() {
+	        			alert("Internal error while validating authentication token.");
+	        		})
+	        		.complete(function() {
+	        				dialog.dialog("close");
+	        				dialog.remove();          			
+	        		});
+	        	}
+	        };
+	        {% if not user.is_authenticated %}
+	        //user is not authenticated, check if the user is logged to facebook
+	        //TODO: if the user logs out, this will log her on again
+	        FB.getLoginStatus(tokenhandler);
+	        {% endif %}
+	        FB.Event.subscribe('auth.login', tokenhandler);
+	        
+	      };
+	      (function(d){
+	         var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+	         js = d.createElement('script'); js.id = id; js.async = true;
+	         js.src = "//connect.facebook.net/en_US/all.js";
+	         d.getElementsByTagName('head')[0].appendChild(js);
+	      }(document));
+	      //]]>
+	    </script>
+    {% endcache %}
 
     <div id="pageContainer">
-	    <header id="pageHeader">
-	      <div id="pageHeaderLeftPart">
-	        <a href="/" rel="home"><figure><img src="{% get_static_prefix %}images/albumizer-title.png"
-	             alt="Albumizer Logo" /></figure></a><span id="pageHeaderSlogan">Unleash Your Imagination!</span>
-	      </div>
-	      <div id="pageHeaderRightPart">
-	        <nav>
-		        {% if user.is_authenticated %}
-	            <a href="{% url "albumizer.views.log_out" %}" id="headerLinkLogOut" class="header-link">Log Out</a>
-		          <a href="{% url "albumizer.views.show_profile" %}" id="headerLinkProfile" class="header-link">
-		          {% if user.first_name %}
-		            {{ user.first_name }}
-		            {% if user.last_name %}
-		              {{ user.last_name }}
+      {% cache template_cache_timeout base_header request.user %}  
+		    <header id="pageHeader">
+		      <div id="pageHeaderLeftPart">
+		        <a href="/" rel="home"><figure><img src="{% get_static_prefix %}images/albumizer-title.png"
+		             alt="Albumizer Logo" /></figure></a><span id="pageHeaderSlogan">Unleash Your Imagination!</span>
+		      </div>
+		      <div id="pageHeaderRightPart">
+		        <nav>
+			        {% if user.is_authenticated %}
+		            <a href="{% url "albumizer.views.log_out" %}" id="headerLinkLogOut" class="header-link">Log Out</a>
+			          <a href="{% url "albumizer.views.show_profile" %}" id="headerLinkProfile" class="header-link">
+			          {% if user.first_name %}
+			            {{ user.first_name }}
+			            {% if user.last_name %}
+			              {{ user.last_name }}
+			            {% endif %}
+			          {% else %}
+		              {{ user.username }}
 		            {% endif %}
-		          {% else %}
-	              {{ user.username }}
-	            {% endif %}
-	            </a>
-	            <a href="{% url "edit_shopping_cart" %}" id="headerLinkShoppingCart" class="header-link">Shopping Cart</a>
-	            <a href="{% url "create_album" %}" id="headerLinkAddAlbum" class="header-link">Create Album</a>
-		        {% else %}
-		          {% if not is_registration_page %}
-	              <a href="{% url "get_registration_information" %}" id="headerLinkRegister" class="header-link">Register</a>
-	            {% endif %}
-	            {% if not is_login_page %}
-	              <a href="{% url "log_in" %}" onclick="$('#login-dialog').dialog('open'); return false;" id="headerLinkLogIn" class="header-link">Log In</a>
-	            {% endif %}
-		        {% endif %}
-	          {% if not is_album_list_page %}
-	            <a href="{% url "albumizer.views.list_all_visible_albums" %}" id="headerLinkBrowse" class="header-link">Public Albums</a>
-	          {% endif %}
-	        </nav>
-	      </div>
-	      <div class="clear-floats"></div>
-	    </header>
+		            </a>
+		            <a href="{% url "edit_shopping_cart" %}" id="headerLinkShoppingCart" class="header-link">Shopping Cart</a>
+		            <a href="{% url "create_album" %}" id="headerLinkAddAlbum" class="header-link">Create Album</a>
+			        {% else %}
+			          {% if not is_registration_page %}
+		              <a href="{% url "get_registration_information" %}" id="headerLinkRegister" class="header-link">Register</a>
+		            {% endif %}
+		            {% if not is_login_page %}
+		              <a href="{% url "log_in" %}" onclick="$('#login-dialog').dialog('open'); return false;" id="headerLinkLogIn" class="header-link">Log In</a>
+		            {% endif %}
+			        {% endif %}
+		          {% if not is_album_list_page %}
+		            <a href="{% url "albumizer.views.list_all_public_albums" %}" id="headerLinkBrowse" class="header-link">Public Albums</a>
+		          {% endif %}
+		        </nav>
+		      </div>
+		      <div class="clear-floats"></div>
+		    </header>
+      {% endcache %}
 	
 	    <div id="pageContent">
 	      {% block page_content %}{% endblock %}
 	    </div>
-	
-	    <footer id="pageFooter">
-	      <div id="pageFooterLeftPart" class="vcard">
-	        This web service is an exercise for the
-	        <address>
-	          <span class="organization-unit">T-106.4300 Web Software Development</span> course at 
-	          <a href="http://www.aalto.fi/" title="http://www.aalto.fi/" class="url fn org">Aalto University</a></address>.
-	      </div>
-        <div id="pageFooterRightPart">
-          Copyright &copy; 2012 Tomas, Lauri &amp; Aleksi. All Rights Reserved.
-        </div>
-	    </footer>
+
+      {% cache template_cache_timeout base_footer %}	
+		    <footer id="pageFooter">
+		      <div id="pageFooterLeftPart" class="vcard">
+		        This web service is an exercise for the
+		        <address>
+		          <span class="organization-unit">T-106.4300 Web Software Development</span> course at 
+		          <a href="http://www.aalto.fi/" title="http://www.aalto.fi/" class="url fn org">Aalto University</a></address>.
+		      </div>
+	        <div id="pageFooterRightPart">
+	          Copyright &copy; 2012 Tomas, Lauri &amp; Aleksi. All Rights Reserved.
+	        </div>
+		    </footer>
+	    {% endcache %}
 	  </div>
 	  
 	  {% if not is_login_page %}

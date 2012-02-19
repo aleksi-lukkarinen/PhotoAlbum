@@ -1,4 +1,4 @@
-{% extends "base-template.html" %}
+{% extends "simple-message-template.html" %}
 {% load albumizer_common %}
 
 
@@ -7,9 +7,22 @@
 
 
 
-{% block page_content %}
+{% block message_page_heading %}Payment Canceled{% endblock %}
 
-  <h1>Payment Canceled</h1>
-  {% show_messages %}
+
+
+{% block message_page_content %}
+
+  <div class="paymentInfo">
+    Your payment via Simple Payments service was cancelled by you.
+
+    <div class="orderInfo">
+      Unfortunately, we cannot process your order yet, because it is still unpaid.
+      Please make the payment soon, so that we can start to process your order.  
+    </div>
+    
+    You can check the status of your order <a href="{{ order.get_absolute_url }}">here</a>.
+    Should you have any inquiries about your order, please kindly contact our customer service.
+  </div>
 
 {% endblock %}

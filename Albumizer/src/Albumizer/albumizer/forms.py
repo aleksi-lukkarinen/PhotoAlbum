@@ -1,15 +1,17 @@
 # This Python file uses the following encoding: utf-8
 
-import copy
-import re
+import copy, re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms.forms import NON_FIELD_ERRORS
+from django.forms.forms import BoundField, NON_FIELD_ERRORS
 from django.forms.util import ErrorList, ErrorDict
 from django.forms.widgets import Input
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
+from utils import computeValidationHashForShoppingCart, validationHashForShoppingCartIsValid
+import views
+
 
 
 
@@ -41,8 +43,8 @@ class AlbumizerSearchCriteriaInput(Input):
 
 
 
-class CommonAlbumizerForm(forms.Form):
-    """ Superclass for all Albumizer forms for implementing common features. """
+class CommonAlbumizerBaseForm(forms.BaseForm):
+    """  """
     def add_common_error(self, error_string):
         """ Adds an error message, which is not related to any particular field. """
         if not error_string:
@@ -64,15 +66,22 @@ class CommonAlbumizerForm(forms.Form):
 
 
 
-REGISTRATION_FORM_ERR_USERNAME_MISSING = u'Please enter a username you would like to use.'
-REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING = u'Please enter a password you would like to use.'
-REGISTRATION_FORM_ERR_SECOND_PASSWORD_MISSING = u'Please re-enter the password you would like to use.'
-ERR_FIRST_NAME_MISSING = u'Please enter your first name.'
-ERR_LAST_NAME_MISSING = u'Please enter your last name.'
-ERR_GENDER_MISSING = u'Please enter your gender.'
-ERR_FIRST_EMAIL_MISSING = u'Please enter a real email address you are using.'
-ERR_SECOND_EMAIL_MISSING = u'Please re-enter the email address you are using.'
-ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED = u'This service cannot be used without accepting the Terms and Conditions.'
+class CommonAlbumizerForm(CommonAlbumizerBaseForm, forms.Form):
+    """ Superclass for all standard Albumizer forms for implementing common features. """
+
+
+
+
+REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING = u'Please enter a username you would like to use.'
+REGISTRATION_FORM_ERR_MSG_FIRST_PASSWORD_MISSING = u'Please enter a password you would like to use.'
+REGISTRATION_FORM_ERR_MSG_SECOND_PASSWORD_MISSING = u'Please re-enter the password you would like to use.'
+REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING = u'Please enter your first name.'
+REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING = u'Please enter your last name.'
+REGISTRATION_FORM_ERR_MSG_GENDER_MISSING = u'Please enter your gender.'
+REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING = u'Please enter a real email address you are using.'
+REGISTRATION_FORM_ERR_MSG_SECOND_EMAIL_MISSING = u'Please re-enter the email address you are using.'
+REGISTRATION_FORM_ERR_MSG_TERMS_AND_CONDITIONS_NOT_ACCEPTED = \
+    u'This service cannot be used without accepting the Terms and Conditions.'
 
 RE_VALID_USER_ID = "^[A-Za-z0-9_]*[A-Za-z0-9][A-Za-z0-9_]*$"
 COMPILED_RE_VALID_USER_ID = re.compile(RE_VALID_USER_ID)
@@ -91,10 +100,10 @@ class RegistrationForm(CommonAlbumizerForm):
             'pattern': RE_VALID_USER_ID,
             'required': 'true',
             'autofocus': 'true',
-            'title': REGISTRATION_FORM_ERR_USERNAME_MISSING,
-            'x-moz-errormessage': REGISTRATION_FORM_ERR_USERNAME_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING
         }),
-        error_messages = {'required': (REGISTRATION_FORM_ERR_USERNAME_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING)},
         help_text = u"e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
     )
     txtPassword = forms.CharField(
@@ -104,10 +113,10 @@ class RegistrationForm(CommonAlbumizerForm):
         widget = forms.PasswordInput(attrs = {
             'size':'50',
             'required': 'true',
-            'title': REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING,
-            'x-moz-errormessage': REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_FIRST_PASSWORD_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_FIRST_PASSWORD_MISSING
         }),
-        error_messages = {'required': (REGISTRATION_FORM_ERR_FIRST_PASSWORD_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_FIRST_PASSWORD_MISSING)},
         help_text = u"8 - 50 characters"
     )
     txtPasswordAgain = forms.CharField(
@@ -116,8 +125,8 @@ class RegistrationForm(CommonAlbumizerForm):
         widget = forms.PasswordInput(attrs = {
             'size':'50',
             'required': 'true',
-            'title': REGISTRATION_FORM_ERR_SECOND_PASSWORD_MISSING,
-            'x-moz-errormessage': REGISTRATION_FORM_ERR_SECOND_PASSWORD_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_SECOND_PASSWORD_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_SECOND_PASSWORD_MISSING
         })
     )
 
@@ -127,10 +136,10 @@ class RegistrationForm(CommonAlbumizerForm):
         widget = forms.TextInput(attrs = {
             'size':'30',
             'required': 'true',
-            'title': ERR_FIRST_NAME_MISSING,
-            'x-moz-errormessage': ERR_FIRST_NAME_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING
         }),
-        error_messages = {'required': (ERR_FIRST_NAME_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING)},
         help_text = u"e.g. \"Terhi-Anneli\" or \"Derek\" (max. 30 characters)"
     )
     txtLastName = forms.CharField(
@@ -139,20 +148,20 @@ class RegistrationForm(CommonAlbumizerForm):
         widget = forms.TextInput(attrs = {
             'size':'30',
             'required': 'true',
-            'title': ERR_LAST_NAME_MISSING,
-            'x-moz-errormessage': ERR_LAST_NAME_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING
         }),
-        error_messages = {'required': (ERR_LAST_NAME_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING)},
         help_text = u"e.g. \"Virtanen-Kulmala\" or \"Smith\" (max. 30 characters)"
     )
     radGender = forms.ChoiceField(
         label = u"Gender",
         choices = UserProfile.GENDER_CHOICES,
-        error_messages = {'required': (ERR_GENDER_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_GENDER_MISSING)},
         widget = forms.RadioSelect(attrs = {
             'required': 'true',
-            'title': ERR_GENDER_MISSING,
-            'x-moz-errormessage': ERR_GENDER_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_GENDER_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_GENDER_MISSING
         })
     )
     txtEmail = forms.EmailField(
@@ -162,10 +171,10 @@ class RegistrationForm(CommonAlbumizerForm):
             'size':'50',
             'required': 'true',
             'placeholder': 'firstname.lastname@domain',
-            'title': ERR_FIRST_EMAIL_MISSING,
-            'x-moz-errormessage': ERR_FIRST_EMAIL_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING
         }),
-        error_messages = {'required': (ERR_FIRST_EMAIL_MISSING)},
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING)},
         help_text = u"real address like \"matti.virtanen@company.com\" (max. 100 characters)"
     )
     txtEmailAgain = forms.CharField(
@@ -175,8 +184,8 @@ class RegistrationForm(CommonAlbumizerForm):
             'size':'50',
             'required': 'true',
             'placeholder': 'firstname.lastname@domain',
-            'title': ERR_SECOND_EMAIL_MISSING,
-            'x-moz-errormessage': ERR_SECOND_EMAIL_MISSING
+            'title': REGISTRATION_FORM_ERR_MSG_SECOND_EMAIL_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_SECOND_EMAIL_MISSING
         })
     )
     txtHomePhone = forms.CharField(
@@ -234,11 +243,11 @@ class RegistrationForm(CommonAlbumizerForm):
     chkServiceConditionsAccepted = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {
             'required': 'true',
-            'title': ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED,
-            'x-moz-errormessage': ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED
+            'title': REGISTRATION_FORM_ERR_MSG_TERMS_AND_CONDITIONS_NOT_ACCEPTED,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_TERMS_AND_CONDITIONS_NOT_ACCEPTED
         }),
         label = u"I Hereby Accept the Terms and Conditions and the Privacy Policy of the Albumizer Service",
-        error_messages = {'required': (ERR_TERMS_AND_CONDITIONS_NOT_ACCEPTED)}
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_TERMS_AND_CONDITIONS_NOT_ACCEPTED)}
     )
 
 
@@ -246,7 +255,7 @@ class RegistrationForm(CommonAlbumizerForm):
         """ Ensure that given userid is valid and that no user with that userid does already exist """
         userid = self.cleaned_data.get("txtUserName")
         if not userid:
-            raise ValidationError(REGISTRATION_FORM_ERR_USERNAME_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING)
 
         userid = userid.strip()
         if not re.match(COMPILED_RE_VALID_USER_ID, userid):
@@ -262,11 +271,11 @@ class RegistrationForm(CommonAlbumizerForm):
         """ Trim the first name. """
         firstname = self.cleaned_data.get("txtFirstName")
         if not firstname:
-            raise ValidationError(ERR_FIRST_NAME_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING)
 
         firstname = firstname.strip()
         if not firstname:
-            raise ValidationError(ERR_FIRST_NAME_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING)
 
         return firstname
 
@@ -275,11 +284,11 @@ class RegistrationForm(CommonAlbumizerForm):
         """ Trim the last name. """
         lastname = self.cleaned_data.get("txtLastName")
         if not lastname:
-            raise ValidationError(ERR_LAST_NAME_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING)
 
         lastname = lastname.strip()
         if not lastname:
-            raise ValidationError(ERR_LAST_NAME_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING)
 
         return lastname
 
@@ -287,7 +296,7 @@ class RegistrationForm(CommonAlbumizerForm):
     def clean_radGender(self):
         gender = self.cleaned_data.get("radGender")
         if not gender:
-            raise ValidationError(ERR_GENDER_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_GENDER_MISSING)
 
         if not gender in ('M', 'F'):
             raise ValidationError(u"Unknown value as a gender.")
@@ -299,11 +308,11 @@ class RegistrationForm(CommonAlbumizerForm):
         """ Trim the first email address. """
         email = self.cleaned_data.get("txtEmail")
         if not email:
-            raise ValidationError(ERR_FIRST_EMAIL_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING)
 
         email = email.strip()
         if not email:
-            raise ValidationError(ERR_FIRST_EMAIL_MISSING)
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING)
 
         return email
 
@@ -372,7 +381,7 @@ class RegistrationForm(CommonAlbumizerForm):
 
 
 
-ERR_ALBUM_TITLE_MISSING = u'Please enter a title for the new album.'
+ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING = u'Please enter a title for the new album.'
 
 class AlbumCreationForm(CommonAlbumizerForm):
     """ Form class representing album creation form used to add new albums to database. """
@@ -384,10 +393,10 @@ class AlbumCreationForm(CommonAlbumizerForm):
             'size':'50',
             'required': 'true',
             'autofocus': 'true',
-            'title': ERR_ALBUM_TITLE_MISSING,
-            'x-moz-errormessage': ERR_ALBUM_TITLE_MISSING
+            'title': ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING,
+            'x-moz-errormessage': ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING
         }),
-        error_messages = {'required': ERR_ALBUM_TITLE_MISSING},
+        error_messages = {'required': ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING},
         help_text = u"e.g. \"Holiday Memories\" or \"Dad's Birthday\" (5-255 characters)"
     )
     txtAlbumDescription = forms.CharField(
@@ -415,11 +424,11 @@ class AlbumCreationForm(CommonAlbumizerForm):
         """
         album_title = self.cleaned_data.get("txtAlbumTitle")
         if not album_title:
-            raise ValidationError(ERR_ALBUM_TITLE_MISSING)
+            raise ValidationError(ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING)
 
         album_title = album_title.strip()
         if not album_title:
-            raise ValidationError(ERR_ALBUM_TITLE_MISSING)
+            raise ValidationError(ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING)
 
         current_user = self.request.user
         if not self.request.POST.get("cmdEdit"):
@@ -490,19 +499,142 @@ class LoginForm(CommonAlbumizerForm):
 
 
 
-
-
-
 class AddPageForm(CommonAlbumizerForm):
-	chcPageLayout = forms.ModelChoiceField(
-        queryset='',
-        empty_label=None,
-        label= u'Layout',
-        help_text= u'Select layout for page'
+    chcPageLayout = forms.ModelChoiceField(
+        queryset = '',
+        empty_label = None,
+        label = u'Layout',
+        help_text = u'Select layout for page'
     )
 
-	def __init__(self, *args, **kwargs):
-		super(AddPageForm, self).__init__(*args, **kwargs)
-		layouts = Layout.objects.all()
-		self.fields['chcPageLayout'].queryset = layouts
-		
+    def __init__(self, *args, **kwargs):
+        super(AddPageForm, self).__init__(*args, **kwargs)
+        layouts = Layout.objects.all()
+        self.fields['chcPageLayout'].queryset = layouts
+
+
+
+
+class DeliveryAddressChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        label = u"%s %s" % (obj.owner.first_name, obj.owner.last_name)
+
+        if obj.postAddressLine1:
+            label += u", %s" % obj.postAddressLine1
+
+        if obj.postAddressLine2:
+            label += u", %s" % obj.postAddressLine2
+
+        if obj.zipCode:
+            label += u", %s" % obj.zipCode
+
+        if obj.city:
+            label += u", %s" % obj.city
+
+        if obj.state:
+            label += u", %s" % unicode(obj.state)
+
+        if obj.country:
+            label += u", %s" % unicode(obj.country)
+
+        return label
+
+
+
+
+def build_delivery_address_form(request):
+    """ Builds a form class representing form asking for delivery addresses for items of an order. """
+
+    def init(self, *args, **kwargs):
+        kwargs["initial"] = self.__initial
+        super(self.__class__, self).__init__(*args, **kwargs)
+
+    def has_items(self):
+        """ Returns True if there are items which to choose addresses for. """
+        return self.__items.exists()
+
+    def has_addresses(self):
+        """ Returns True if there are addresses which to choose from. """
+        return self.__addresses.exists()
+
+    def get_address_fields(self):
+        """ Iterates through all address field_dict in form. """
+        for name in self.__address_fields:
+            yield BoundField(self, self.__address_fields[name], name)
+
+    def get_item_address_pairs(self):
+        """ Iterates through all (order items / address) pairs displayed on the form. """
+        for field_name in self.__address_fields:
+            yield (self.__items.get(id__exact = field_name.split("_")[1]),
+                   self.cleaned_data.get(field_name))
+
+    def clean_hdnValidationHash(self):
+        """ Ensures that the validation hash gotten from sent form is correct. """
+        given_hash = self.cleaned_data.get("hdnValidationHash")
+        our_hash = computeValidationHashForShoppingCart(request)
+        if not given_hash == our_hash:
+            self.add_common_error(views.CHECKOUT_ERR_MSG_INVALID_HASH)
+
+    items = ShoppingCartItem.items_of_user(request.user)
+    addresses = Address.addresses_of_user(request.user)
+    validation_hash = computeValidationHashForShoppingCart(request)
+
+    field_dict = {}
+    address_field_dict = {}
+    initial_value_dict = {}
+
+    field_dict["hdnValidationHash"] = forms.CharField(
+        widget = forms.HiddenInput()
+    )
+    initial_value_dict["hdnValidationHash"] = validation_hash
+
+    for item in items:
+        field_name = u"cmbAddress_" + unicode(item.id)
+
+        new_field = DeliveryAddressChoiceField(
+            queryset = addresses,
+            empty_label = None,
+            label = item.album.title
+        )
+        field_dict[field_name] = new_field
+        address_field_dict[field_name] = new_field
+
+        if item.deliveryAddress:
+            initial_value_dict[field_name] = item.deliveryAddress
+
+    members = {
+        "__request": request,
+        "__items": items,
+        "__addresses": addresses,
+        "__validation_hash": validation_hash,
+        "base_fields": field_dict,
+        "__address_fields": address_field_dict,
+        "__initial": initial_value_dict,
+        "has_items": has_items,
+        "has_addresses": has_addresses,
+        "address_fields": get_address_fields,
+        "item_address_pairs": get_item_address_pairs,
+        "clean_hdnValidationHash": clean_hdnValidationHash,
+        "__init__": init
+    }
+
+    return type("DeliveryAddressForm", (CommonAlbumizerBaseForm,), members)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,89 @@
+{% extends "base-template.html" %}
+{% load albumizer_common %}
+{% load url from future %}
+
+
+
+{% block page_title %}Delivery Addresses{% endblock %}
+
+
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#id_frmDeliveryAddresses .commonActions .proceedButton").button();
+  });
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+  <form name="frmDeliveryAddresses" id="id_frmDeliveryAddresses" class="commonForm"
+            method="post" action="{% url "get_delivery_addresses" %}">
+    {% csrf_token %}
+    {% for field in form.hidden_fields %}
+      {{ field }}
+    {% endfor %}
+
+	  <h1>Delivery Addresses</h1>
+	  {% show_messages %}
+	
+	  {% if form.field_errors or form.non_field_errors %}
+	    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+	      {% if form.field_errors %}
+	        <tr>
+	          <td><span class="ui-icon ui-icon-info"></span></td>
+	          <td>
+	            <span class="errorMessage">
+	            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
+	            <ul>
+	              {% for field in form %}
+	                {% for error in field.errors %}
+	                  <li>{{ error }}</li>
+	                {% endfor %}
+	              {% endfor %}
+	            </ul>
+	            </span>
+	          </td>
+	        </tr> 
+	      {% endif %}
+	          
+	      {% for error in form.non_field_errors %}
+	        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+	      {% endfor %}
+	    </table>
+	  {% endif %}
+
+	  <div class="addressListProlog">
+		  <div class="prompt">
+		    For each product, please select the address, where the product is to be delivered to.
+		    Afterwards, please click the Show Order Summary button.
+		  </div> 
+	
+	    <div class="commonActions">
+	        <input type="submit" class="proceedButton" name="cmdSummary" value="Show Order Summary" 
+	                          title="Accept the current selections for delivery addresses and show order summary" />
+	    </div>
+	    <div style="clear: both;"></div>
+    </div>
+        
+    <div class="deliveryAddresses">
+      {% for field in form.address_fields %}
+	      <div class="deliveryAddress">
+	        <div class="item">{{ field.label_tag }}</div>
+	        <div class="address">{{ field }}</div>
+	      </div>
+      {% endfor %}
+    </div>
+    <div class="disclaimer">
+      Please double-check for errors, because incorrectly entered addresses may cause your order to be delayed.<br />
+      The addresses can be managed via your profile page.
+    </div>
+  </form>
+
+
+  {% random_picks_album_list 8 %}
+
+{% endblock %}
