@@ -345,6 +345,36 @@ class Command(BaseCommand):
                     elif verbosity == 1:
                         self.stdout.write(u"p ")
 
+
+                    number_of_captions = layout.textFieldCount
+                    if number_of_captions > 0:
+                        for content_number in range(1, number_of_captions + 1):
+                            if self._albumRandomizer.randrange(0, 100) < 50:
+                                text = self.generate_title()
+                            else:
+                                text = self.generate_description()
+
+                            text = text[:255]
+
+                            new_content = PageContent(
+                                page = new_page,
+                                placeHolderID = "%s_caption_%s" % (layout.name, content_number),
+                                content = text
+                            )
+                            new_content.save()
+
+                            if verbosity >= 2:
+                                text = new_content.content
+                                if len(text) > 30:
+                                    text = text[:30] + u"..."
+                                message = u"                  (%s) %s, %s\n" % \
+                                    (unicode(content_number).rjust(3, "0"), new_content.placeHolderID, text)
+                                self.stdout.write(message.encode("ascii", "backslashreplace"))
+                            elif verbosity == 1:
+                                self.stdout.write(u"n ")
+
+                            del new_content
+
                     del new_page
 
                 if verbosity >= 2:
@@ -629,8 +659,8 @@ class Command(BaseCommand):
 
 
 
-    def generate_album_title(self):
-        """ Generates a title for a single photo album """
+    def generate_title_proposal(self):
+        """ Generates a proposal for a title. """
         album_type_factor = self._albumRandomizer.randrange(0, 99)
 
         title = u""
@@ -818,18 +848,24 @@ class Command(BaseCommand):
 
 
 
-    def generate_album_data(self, user):
-        """ Generates information related to a single photo album """
-        title = self.generate_album_title().strip()
+    def generate_title(self):
+        """ Generates a title. """
+        title = self.generate_title_proposal().strip()
         title_generation_tries = 1
         while len(title) < 5 and title_generation_tries < 5:
             title_generation_tries += 1
-            title = self.generate_album_title().strip()
+            title = self.generate_title_proposal().strip()
         if len(title) < 5:
             title = "<Title generation failed>"
         if len(title) > 255:
             title = title[0:255]
+        return title
 
+
+
+
+    def generate_description(self):
+        """ Generates a description like lorem ipsum. """
         description = u""
         for i in range(0, self._albumRandomizer.randrange(1, 4)):
             description_words = self._paragraphs[self._albumRandomizer.randrange(0, len(self._paragraphs))].split()
@@ -846,6 +882,15 @@ class Command(BaseCommand):
         if self._albumRandomizer.randrange(0, 99) < 30:
             description = self.decorate_with_html(description)
 
+        return description
+
+
+
+
+    def generate_album_data(self, user):
+        """ Generates information related to a single photo album """
+        title = self.generate_title()
+        description = self.generate_description()
 
         is_public = True
         if self._albumRandomizer.randrange(0, 100) > 70:
