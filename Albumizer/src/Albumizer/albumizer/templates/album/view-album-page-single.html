@@ -37,11 +37,11 @@
 
 	    {% if request.user.is_authenticated %}
 	    <div class="actionButtonContainer">
-	      <form name="frmAlbumAction" method="post" action="{% url "show_single_album" album_id %}">
+	      <form name="frmAlbumAction" method="post" action="{% url "show_single_page" album_id pageNumber %}">
 	        {% csrf_token %}
             {% if current_user_can_edit %}
             <input type="submit" name="addPage" name="id_cmdAddPage" value="Add Page">
-            {# <input type="submit" name="editPage" name="id_cmdEditPage" value="Edit Page"> #}
+            <input type="submit" name="editPage" name="id_cmdEditPage" value="Edit Page">
             {% endif %}
 	        {% if current_user_can_delete %}
 	        {# <input type="submit" name="deletePage" name="id_cmdDeletePage" value="Delete Page"> #}

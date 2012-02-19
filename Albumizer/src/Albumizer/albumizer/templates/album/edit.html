@@ -5,6 +5,29 @@
 
 {% block page_title %}Edit Album{% endblock %}
 
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#lblPublicAlbum").css({
+      "position": "relative",
+      "margin-left": "11.8em",
+      "margin-bottom": "0.5em",
+      "width": "10em"
+    });
+    $("#id_cmdEditAlbum").css({
+      "margin-left": "11.8em",
+      "margin-top": "2em"
+    });
+    $("#id_chkPublicAlbum").button();
+    $("#id_cmdEditAlbum").button({
+      icons: {
+        primary: 'ui-icon-check'
+      }
+    });
+  });
+
+{% endblock %}
+
 
 
 {% block page_content %}
@@ -38,7 +61,7 @@
     </table>
   {% endif %}
 
-  <form id="frmCreateAlbum" class="commonForm" method="post" action="{% url edit_album album %}">
+  <form id="frmCreateAlbum" class="commonForm" method="post" action="{% url edit_album album_id %}">
     {% csrf_token %}
     
     <div class="formSectionTitle ui-widget-header">Album Information</div>
@@ -63,7 +86,7 @@
         </div>
       {% endif %}
 
-      <div class="fieldRow">{{ form.chkPublicAlbum }}<label id="lblPublicAlbum" for="id_{{ form.chkPublicAlbum.name }}">{{ form.chkPublicAlbum.label }}</label></div>
+      <div class="fieldRow clear">{{ form.chkPublicAlbum }}<label id="lblPublicAlbum" for="id_{{ form.chkPublicAlbum.name }}">{{ form.chkPublicAlbum.label }}</label></div>
       <div class="helpRow">{{ form.chkPublicAlbum.help_text }}</div>
       {% if form.chkPublicAlbum.errors %}
         <div class="errorRow"> 
@@ -73,7 +96,7 @@
         </div>
       {% endif %}
 
-      <input type="submit" name="cmdEdit" id="id_cmdEditAlbum" value="Edit Album" />
+      <input type="submit" name="cmdEditAlbum" id="id_cmdEditAlbum" value="Edit Album" />
     </fieldset>
   </form>
 

@@ -404,7 +404,7 @@ class AlbumCreationForm(CommonAlbumizerForm):
         max_length = 255,
         label = u"Description",
         widget = forms.Textarea(attrs = {'cols':'80', 'rows': '4'}),
-        help_text = u"Please descripbe the content of your new album (max. 255 characters)"
+        help_text = u"Please describe the content of your new album (max. 255 characters)"
     )
     chkPublicAlbum = forms.BooleanField(
         required = False,
@@ -431,7 +431,7 @@ class AlbumCreationForm(CommonAlbumizerForm):
             raise ValidationError(ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING)
 
         current_user = self.request.user
-        if not self.request.POST.get("cmdEdit"):
+        if not self.request.POST.get("cmdEditAlbum"):
             if Album.objects.filter(owner = current_user, title = album_title):
                 raise ValidationError(u"You cannot have two albums with the same name. " +
                                       u"Please change the name to something different.")
@@ -500,6 +500,7 @@ class LoginForm(CommonAlbumizerForm):
 
 
 class AddPageForm(CommonAlbumizerForm):
+    """  """
     chcPageLayout = forms.ModelChoiceField(
         queryset = '',
         empty_label = None,
@@ -511,6 +512,19 @@ class AddPageForm(CommonAlbumizerForm):
         super(AddPageForm, self).__init__(*args, **kwargs)
         layouts = Layout.objects.all()
         self.fields['chcPageLayout'].queryset = layouts
+
+
+
+
+class EditPageForm(CommonAlbumizerForm):
+    """  """
+    def __init__(self, page, *args, **kwargs):
+        """ This makes it possible to pass the page object to this object as a constructor parameter. """
+        captions = page.layout.textFieldCount
+        super(EditPageForm, self).__init__(*args, **kwargs)
+
+        for i in range(1, captions + 1):
+            self.fields['txtCaption_%s' % i] = forms.CharField(label = u'%s. Caption' % i, required = False)
 
 
 
@@ -619,18 +633,6 @@ def build_delivery_address_form(request):
     }
 
     return type("DeliveryAddressForm", (CommonAlbumizerBaseForm,), members)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
