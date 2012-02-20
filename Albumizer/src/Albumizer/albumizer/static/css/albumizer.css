@@ -1188,7 +1188,7 @@ clear:both;
   display:                   inline-block;
   width:                     7em;
   text-align:                right;
-  color:                     #aa0000;
+  color:                     #008800;
 }
 
 #id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems {
@@ -1198,7 +1198,7 @@ clear:both;
 
 #id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem {
   clear:                     both;
-  margin-bottom:             1em;
+  margin-bottom:             2em;
 }
 
 #id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem.last {
@@ -1241,7 +1241,7 @@ clear:both;
 	position:                  absolute;
 	left:                      30em;
 	width:                     20em;
-  color:                     #aa0000;
+
 }
 
 #id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .image img {
