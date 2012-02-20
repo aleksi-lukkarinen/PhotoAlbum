@@ -514,17 +514,20 @@ class AddPageForm(CommonAlbumizerForm):
         self.fields['chcPageLayout'].queryset = layouts
 
 
-
-
 class EditPageForm(CommonAlbumizerForm):
     """  """
+
     def __init__(self, page, *args, **kwargs):
         """ This makes it possible to pass the page object to this object as a constructor parameter. """
         captions = page.layout.textFieldCount
+        images = page.layout.imageFieldCount
         super(EditPageForm, self).__init__(*args, **kwargs)
 
-        for i in range(1, captions + 1):
-            self.fields['txtCaption_%s' % i] = forms.CharField(label = u'%s. Caption' % i, required = False)
+        for i in range(1,captions+1):
+            self.fields['txtCaption_%s' % i] = forms.CharField(label= u'%s. Caption' % i, required = False)
+            
+        for i in range(1,images+1):
+            self.fields['imgUpload_%s' % i] = forms.ImageField(label= u'%s. Image' % i, required = False)
 
 
 
@@ -633,10 +636,5 @@ def build_delivery_address_form(request):
     }
 
     return type("DeliveryAddressForm", (CommonAlbumizerBaseForm,), members)
-
-
-
-
-
 
 

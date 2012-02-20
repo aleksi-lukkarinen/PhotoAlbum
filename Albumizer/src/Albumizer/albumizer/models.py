@@ -497,6 +497,7 @@ class PageContent(models.Model):
     content = models.CharField(
         max_length = 255
     )
+    image = models.ImageField(upload_to = 'images/', blank=True)
 
     def __unicode__(self):
         return u"%s, %s, %s" % (self.page, self.placeHolderID, self.content)
