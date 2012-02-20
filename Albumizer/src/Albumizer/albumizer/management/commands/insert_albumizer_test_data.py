@@ -348,6 +348,9 @@ class Command(BaseCommand):
 
                     number_of_captions = layout.textFieldCount
                     if number_of_captions > 0:
+                        if verbosity >= 2:
+                            message = u"                  + captions:\n"
+                            self.stdout.write(message.encode("ascii", "backslashreplace"))
                         for content_number in range(1, number_of_captions + 1):
                             if self._albumRandomizer.randrange(0, 100) < 50:
                                 text = self.generate_title()
@@ -367,13 +370,36 @@ class Command(BaseCommand):
                                 text = new_content.content
                                 if len(text) > 30:
                                     text = text[:30] + u"..."
-                                message = u"                  (%s) %s, %s\n" % \
+                                message = u"                      (%s) %s, %s\n" % \
                                     (unicode(content_number).rjust(3, "0"), new_content.placeHolderID, text)
                                 self.stdout.write(message.encode("ascii", "backslashreplace"))
                             elif verbosity == 1:
                                 self.stdout.write(u"n ")
 
                             del new_content
+
+
+                    number_of_images = layout.imageFieldCount
+                    if number_of_images > 0:
+                        if verbosity >= 2:
+                            message = u"                  + images:\n"
+                            self.stdout.write(message.encode("ascii", "backslashreplace"))
+                        for content_number in range(1, number_of_images + 1):
+                            new_content = PageContent(
+                                page = new_page,
+                                placeHolderID = "%s_image_%s" % (layout.name, content_number)
+                            )
+                            new_content.save()
+
+                            if verbosity >= 2:
+                                message = u"                      (%s) %s\n" % \
+                                    (unicode(content_number).rjust(3, "0"), new_content.placeHolderID)
+                                self.stdout.write(message.encode("ascii", "backslashreplace"))
+                            elif verbosity == 1:
+                                self.stdout.write(u"n ")
+
+                            del new_content
+
 
                     del new_page
 
