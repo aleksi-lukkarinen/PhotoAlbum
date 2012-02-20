@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 import hashlib, logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import Random
 from django.conf import settings
 from django.contrib import auth
@@ -1145,7 +1145,8 @@ def get_delivery_addresses_POST(request):
         #print "%s (%s), %s (%s)" % (unicode(item), unicode(type(item)), unicode(address), unicode(type(address)))
 
     if request.POST.get("cmdSummary"):
-        return HttpResponseRedirect(reverse("show_order_summary"))
+        validation_part = "?v=%s" % computeValidationHashForShoppingCart(request, exclude_addresses = False)
+        return HttpResponseRedirect(reverse("show_order_summary") + validation_part)
 
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
     commonLogger.warning("User %s tried to perform an action in delivery address view without specifying which one." % \
@@ -1162,7 +1163,81 @@ def get_delivery_addresses_POST(request):
 def show_order_summary_GET(request):
     """ Shows user a summary about his/her order and lets him/her to finally place the order. """
     assert request.method == "GET"
-    template_parameters = {}
+
+    if not validationHashForShoppingCartIsValid(request, exclude_addresses = False):
+        request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+    validation_hash = computeValidationHashForShoppingCart(request,
+                        exclude_addresses = False, extra_key = "show_order_summary_GET")
+
+    items = ShoppingCartItem.items_of_user(request.user)
+    items_by_address = {}
+
+    order_total_price = 0.00
+
+    for item in items:
+        item_price = item.album.price()
+        single_item_subtotal = item.count * item_price
+        order_total_price += single_item_subtotal
+
+        if not item.deliveryAddress in items_by_address.keys():
+            items_by_address[item.deliveryAddress] = {"items": []}
+
+        items_by_address[item.deliveryAddress]["items"].append({
+            "title": item.album.title,
+            "description": item.album.description,
+            "creator": item.album.owner,
+            "coverUrl": "",
+            "number_of_units": item.count,
+            "unit_price": item_price,
+            "single_item_subtotal": single_item_subtotal
+        })
+
+    price_of_items = order_total_price
+
+
+    current_date = datetime.now()
+    dispatch_timedelta = timedelta(days = 3)
+    delivery_timedelta = timedelta(days = 14)
+
+    single_shipping_expense = settings.SHIPPING_EXPENSES
+    total_shipping_expenses = 0.00
+    for address, items in items_by_address.items():
+        items_by_address[address]["estimated_dispatch_date"] = current_date + dispatch_timedelta
+        items_by_address[address]["estimated_delivery_date"] = current_date + delivery_timedelta
+
+        item_group_subtotal_before_shipping = 0.00
+        for item_info in items["items"]:
+            item_group_subtotal_before_shipping += item_info["single_item_subtotal"]
+
+        items_by_address[address]["item_group_subtotal_before_shipping"] = item_group_subtotal_before_shipping
+
+        items_by_address[address]["shipping_expenses"] = single_shipping_expense
+
+        item_group_subtotal_with_shipping = item_group_subtotal_before_shipping + single_shipping_expense
+        items_by_address[address]["item_group_subtotal_with_shipping"] = item_group_subtotal_with_shipping
+
+        total_shipping_expenses += single_shipping_expense
+
+    order_total_price += total_shipping_expenses
+
+    order_total_price_before_vat = order_total_price
+    vat_percentage = settings.VAT_PERCENTAGE
+    vat_amount = vat_percentage / 100.0 * order_total_price
+    order_total_price += vat_amount
+
+
+    template_parameters = {
+        "validation_hash": validation_hash,
+        "items_by_address": items_by_address,
+        "price_of_items": price_of_items,
+        "total_shipping_expenses": total_shipping_expenses,
+        "order_total_price_before_vat": order_total_price_before_vat,
+        "vat_percentage": vat_percentage,
+        "vat_amount": vat_amount,
+        "order_total_price": order_total_price
+    }
     return render_to_response('order/summary.html', RequestContext(request, template_parameters))
 
 @login_required

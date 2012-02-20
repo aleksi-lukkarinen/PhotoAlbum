@@ -3,19 +3,171 @@
 {% load url from future %}
 
 
+
 {% block page_title %}Order Summary{% endblock %}
+
+
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#id_frmOrderSummary .generalInfo .proceedButton").button();
+  });
+
+{% endblock %}
 
 
 
 {% block page_content %}
 
-  <h1>Order Summary</h1>
-  {% show_messages %}
-
-  <form name="frmOrderSummary" method="post" action="{% url "show_order_summary" %}">
+  <form name="frmOrderSummary" id="id_frmOrderSummary" class="commonForm"
+            method="post" action="{% url "show_order_summary" %}">
     {% csrf_token %}
+    <input type="hidden" name="v" value="{{ validation_hash }}" />
     
-    <input type="submit" value="Place Order">  
+    <h1>Review Your Order</h1>
+    {% show_messages %}
+
+    <div class="orderSummaryProlog">
+      <div class="prompt">
+        Please review your order below. Should you want to change anything, please go back to make
+        the changes you wish to have.<br />
+        When you are ready to order, please click the Place Your Order button.
+      </div> 
+    </div>
+    <div class="generalInfoBackground ui-corner-all">
+	    <div class="orderSummary">
+	      <div class="generalInfo">
+	        <div class="placeOrderButton ui-corner-all">
+						<input type="submit" class="proceedButton" name="cmdPlaceOrder" value="Place Your Order" 
+						                 title="Place your order after accepting its content, terms, conditions and policies" />
+					</div>
+					<div class="keyFigures ui-corner-all">
+					  <div class="title">Order Summary</div>
+					  <div class="line items">
+	            <span class="heading">Items:</span>
+	            <span class="value">{{ price_of_items|floatformat:"2" }} &euro;</span>
+					  </div>
+	          <div class="line shipping">
+	            <span class="heading">Shipping:</span>
+	            <span class="value">{{ total_shipping_expenses|floatformat:"2" }} &euro;</span>
+	          </div>
+	          <hr class="subSeparator" />
+	          <div class="line totalBeforeVAT">
+	            <span class="heading">Total before VAT:</span>
+	            <span class="value">{{ order_total_price_before_vat|floatformat:"2" }} &euro;</span>
+	          </div>
+	          <div class="line vat">
+	            <span class="heading">VAT ({{ vat_percentage|floatformat:"1" }} %):</span>
+	            <span class="value">{{ vat_amount|floatformat:"2" }} &euro;</span>
+	          </div>
+	          <hr class="separator" />
+	          <div class="line orderTotal">
+	            <span class="heading">Order Total:</span>
+	            <span class="value"><nobr>{{ order_total_price|floatformat:"2" }} &euro;</nobr></span>
+	          </div>
+	          <div style="clear: both;"></div>
+					</div>
+					<div style="clear: both;"></div>
+	      </div>
+	      {% for address, item_group in items_by_address.items %}
+	        <div class="itemsOfSingleAddress ui-corner-all">
+	          <div class="addressGroupHeader ui-corner-all">
+		          <div class="address">
+		            <div class="addressTitle">Delivery Address:</div>
+		            <div class="addressLine">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+		            {% if address.postAddressLine1 %}
+		              <div class="addressLine">{{ address.postAddressLine1 }}</div>
+		            {% endif %}
+		            {% if address.postAddressLine2 %}
+		              <div class="addressLine">{{ address.postAddressLine2 }}</div>
+		            {% endif %}
+		            {% if address.zipCode or address.city %}
+		              <div class="addressLine">{{ address.zipCode }} {{ address.city }}</div>
+		            {% endif %}
+		            {% if address.state %}
+		              <div class="addressLine">{{ address.state }}</div>
+		            {% endif %}
+		            {% if address.country %}
+		              <div class="addressLine">{{ address.country }}</div>
+		            {% endif %}
+		          </div>
+		          <div class="price">
+	              <div class="priceTitle">Expenses:</div>
+		            <div class="priceRow subtotaBeforeShipping">
+		              <span class="heading">Items:</span>
+		              <span class="value">{{ item_group.item_group_subtotal_before_shipping|floatformat:"2" }} &euro;</span>
+		            </div>
+	              <div class="priceRow ShippingExpenses">
+	                <div class="bottomBorder">
+		                <span class="heading">Shipping:</span>
+		                <span class="value">{{ item_group.shipping_expenses|floatformat:"2" }} &euro;</span>
+		              </div>
+	              </div>
+	              <div class="priceRow subtotaWithShipping">
+	                <span class="heading">Subtotal:</span>
+	                <span class="value">{{ item_group.item_group_subtotal_with_shipping|floatformat:"2" }} &euro;</span>
+	              </div>
+		          </div>
+	            <div class="keyDates">
+	              <div class="title">Key Dates:</div>
+	              <div class="line dispatch">
+	                <span class="heading">Estimated Dispatch:</span>
+	                <span class="value">{{ item_group.estimated_dispatch_date|date:"j.n.Y" }}</span>
+	              </div>
+	              <div class="line delivery">
+	                <span class="heading">Estimated Delivery:</span>
+	                <span class="value">{{ item_group.estimated_delivery_date|date:"j.n.Y" }}</span>
+	              </div>
+	            </div>
+	            <div style="clear: both;"></div>
+		        </div>
+	          <div class="allItems ui-corner-all">
+		          {% for item_info in item_group.items %}
+		            <div class="singleItem ui-corner-all {% if forloop.last %}last{% endif %}">
+		              <div class="image">
+		                <img src="{{ item_info.coverUrl }}" alt="Cover of {{ item_info.title }}" 
+		                               title="Cover of {{ item_info.title }}" />
+		              </div>
+		              <div class="titleRow">
+		                <span class="title">{{ item_info.title }}</span> &mdash; 
+		                <span class="creator">{{ item_info.creator }}</span>
+		              </div>
+		              <div class="description">{{ item_info.description }}</div>
+	                <div class="priceAndQuantity">
+	                  <span class="content">
+		                  {{ item_info.number_of_units }} piece{{ item_info.number_of_units|pluralize }},
+		                  {{ item_info.unit_price|floatformat:"2" }} &euro;/piece
+		                  <span class="subtotal">Subtotal: {{ item_info.single_item_subtotal|floatformat:"2" }} &euro;</span>
+		                </span>
+	                </div>
+	                <div style="clear: both;"></div>
+		            </div>
+		          {% endfor %}
+	          </div>
+	        </div>
+	      {% endfor %}
+	    </div>
+    </div>
+    <div class="disclaimer">
+      Should you have any inquiries about your order or the Albumizer service, please don't hesitate to contact
+      our customer support.
+    </div>
+    <div class="disclaimer">
+      By ordering from Albumizer, you accept the Terms and Conditions and
+      the Privacy Policy of the Albumizer service.
+    </div>
+    <div class="disclaimer">
+      After you click the "Place Your Order" button, your order will be registered. However, it won't be processed
+      until we receive your payment. The payment options are located on the order's status page, and are presented
+      to you after you place your order. If we do not receive your payment during 7 days from placement of your
+      order, the order will be automatically removed.
+    </div>
+    <div class="disclaimer">
+      After the date of delivery, you will have 14 days to return the product to have full refund. If returned, the
+      product must be unopened and in the condition you received it. 
+    </div>
+ 
   </form>
   
 

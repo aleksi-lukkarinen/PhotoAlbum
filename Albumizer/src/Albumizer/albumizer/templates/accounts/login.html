@@ -27,40 +27,40 @@
 
 {% block page_content %}
 
-  <h1>Log In</h1>
-  {% show_messages %}
-
-  <p>Please enter your credentials to the fields below.</p>
-
-  {% if form.field_errors or form.non_field_errors %}
-    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
-      {% if form.field_errors %}
-        <tr>
-          <td><span class="ui-icon ui-icon-info"></span></td>
-          <td>
-            <span class="errorMessage">
-            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
-            <ul>
-              {% for field in form %}
-                {% for error in field.errors %}
-                  <li>{{ error }}</li>
-                {% endfor %}
-              {% endfor %}
-            </ul>
-            </span>
-          </td>
-        </tr> 
-      {% endif %}
-
-      {% for error in form.non_field_errors %}
-        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
-      {% endfor %}
-    </table>
-  {% endif %}
-
   <form id="frmLogin" class="commonForm" method="post" action="{% url "log_in" %}">
     {% csrf_token %}
     {% if nextURL %}<input type="hidden" name="nextURL" value="{{ nextURL }}" />{% endif %}
+
+	  <h1>Log In</h1>
+	  {% show_messages %}
+	
+	  <p class="prompt">Please enter your credentials to the fields below.</p>
+	
+	  {% if form.field_errors or form.non_field_errors %}
+	    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+	      {% if form.field_errors %}
+	        <tr>
+	          <td><span class="ui-icon ui-icon-info"></span></td>
+	          <td>
+	            <span class="errorMessage">
+	            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
+	            <ul>
+	              {% for field in form %}
+	                {% for error in field.errors %}
+	                  <li>{{ error }}</li>
+	                {% endfor %}
+	              {% endfor %}
+	            </ul>
+	            </span>
+	          </td>
+	        </tr> 
+	      {% endif %}
+	
+	      {% for error in form.non_field_errors %}
+	        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+	      {% endfor %}
+	    </table>
+	  {% endif %}
 
     <div class="formSectionTitle ui-widget-header">Login Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">

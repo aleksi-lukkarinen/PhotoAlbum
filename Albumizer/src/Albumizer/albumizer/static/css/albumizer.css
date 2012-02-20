@@ -15,7 +15,7 @@ body {
 
 #pageContainer {
   margin:                    0em auto;
-  width:                     902px;
+  width:                     85em;
   background:                #ffffff;
   color:                     #000000;
 }
@@ -37,7 +37,7 @@ body {
 #pageHeaderSlogan {
 	margin-left:               0.4em;
   background:                #ffffff;
-  color:                     #88dd00;
+  color:                     #66cc00;
 	font-size:                 200%;
 	font-style:                italic;
 }
@@ -51,9 +51,9 @@ body {
   margin-top:                2em;
   margin-bottom:             2em;
   padding-top:               0.2em;
-  border-top:                1px solid #eeeeee;
+  border-top:                1px solid #dddddd;
   background:                #ffffff;
-  color:                     #cccccc;
+  color:                     #bbbbbb;
 }
 
 #pageFooter a {
@@ -144,7 +144,7 @@ img {
 
 .prompt {
   font-size:                 110%;
-  color:                     #dd9900;
+  color:                     #bb7700;
   font-weight:               bold;
 }
 
@@ -501,123 +501,9 @@ clear:both;
 
 
 
-.commonFormErrorList {
-	padding:                   0.5em 1em;
+#frmRegister .prompt {
 	margin-bottom:             2em;
 }
-
-.commonFormErrorList td {
-	vertical-align:            top;
-}
-
-.commonFormErrorList td li {
-  margin-left:               2em;
-}
-
-.commonFormErrorList .ui-icon {
-  margin-right:              0.5em;
-}
-
-.commonFormErrorList .errorMessage {
-  display:                   inline-block;
-  margin-top:                0.1em;
-}
-
-.commonForm fieldset {
-  margin-bottom:             2em;
-  padding:                   0em 1em 1em 1em;
-}
-
-.commonForm .formSectionTitle {
-  padding:                   0.5em;
-  background-color:          #777777;
-  font-size:                 120%;
-  font-weight:               bold;
-  color:                     #efefef;
-}
-
-.commonForm fieldset {
-  border:                    none;
-}
-
-.commonForm label {
-  display:                   inline-block;
-  width:                     13em;
-}
-
-.commonForm textarea {
-  width:                     50em;
-  min-width:                 10em;
-  max-width:                 60em;
-  min-height:                3em;
-} 
-
-.commonForm .requiredLabel {
-  font-weight:               bold;
-}
-
-.commonForm .requiredLabel .ui-icon {
-  display:                   inline-block;
-  position:                  absolute;
-  margin:                    -0.2em 0em 0em 0.4em;
-}
-
-.commonForm .infoRow {
-  margin-top:                1em;
-  font-size:                 110%;
-  line-height:               1.5em;
-}
-
-.commonForm .fieldRow {
-	margin-top:                1em;
-  vertical-align:            top;
-}
-
-.commonForm .fieldRow label {
-  float:                     left;
-  padding-top:               0.2em;
-}
-
-.commonForm .fieldRow ul {
-  display:                   inline;  
-}
-
-.commonForm .fieldRow li {
-  display:                   inline-block;
-  width:                     5em;
-}
-
-.commonForm .helpRow {
-  margin-top:                0.2em;
-  padding-left:              13em;
-  color:                     #888888;
-}
-
-.commonForm .errorRow {
-  margin:                    0.5em 0em 2em 13em;
-}
-
-.commonForm .errorMessage {
-  color:                     #dd0000;
-  font-weight:               bold;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #frmRegister #errorRowHomePhone {
@@ -663,7 +549,9 @@ clear:both;
   width:                     12em;
 }
 
-
+#frmCreateAlbum .prompt {
+	margin-bottom:             2em;
+}
 
 
 
@@ -684,6 +572,10 @@ clear:both;
 
 #frmLogin {
 	width:                     45em;
+}
+
+#frmLogin .prompt {
+  margin-bottom:             2em;
 }
 
 #frmLogin #id_txtLoginUserName,
@@ -1035,7 +927,6 @@ clear:both;
 }
 
 #id_frmDeliveryAddresses .commonActions {
-
   text-align:                right;
 }
 
@@ -1092,6 +983,425 @@ clear:both;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+#id_frmOrderSummary .orderSummaryProlog {
+  margin-bottom:             2em;
+}
+
+#id_frmOrderSummary .commonActions input {
+  margin:                    0em 0em 0em 1em;
+}
+
+#id_frmOrderSummary .generalInfoBackground {
+	margin-left:               67em;
+  width:                     18em;
+  min-height:                22.5em;
+  background:                #eebb77;
+}
+
+#id_frmOrderSummary .orderSummary {
+	overflow:                  visible;
+  position:                  relative;
+  right:                     67em;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo {
+	float:                     right;
+	position:                  absolute;
+	top:                       0.1em;
+	left:                      67em;
+	width:                     17em;
+  padding:                   0.3em 0.5em;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .placeOrderButton {
+	height:                    4em;
+	padding:                   1em 0.3em 0em 0.3em;
+	background:                #ffffee;
+	text-align:                center;
+	margin-bottom:             0.5em;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures {
+  height:                    15em;
+	padding:                   0.5em 0.5em;
+  background:                #ffffff;
+  text-align:                center;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures hr {
+  clear:                     all;
+	color:                     #888888;
+  border:                    none;
+  border-top:                1px solid #aaaaaa;
+  height:                    1px;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .subSeparator {
+	width:                     6em;
+	margin:                    0.5em 0.5em 0.5em 10em;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .separator {
+  width:                     15em;
+  margin:                    2em 0.5em;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .title {
+  font-size:                 110%;
+  font-weight:               bold;
+  margin-bottom:             1em;
+  width:                     16em;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .line {
+	clear:                     both;
+	width:                     16em;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .heading {
+  float:                     left;
+	display:                   inline-block;
+  width:                     9em;
+  text-align:                left;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .value {
+  display:                   inline-block;
+  width:                     7em;
+  text-align:                right;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .line.orderTotal {
+	text-align:                center;
+}
+
+#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .orderTotal span {
+	float:                     none;
+  width:                     auto;
+  white-space:               nowrap;
+  font-size:                 130%;
+	font-weight:               bold;
+  background:                #ffffff;
+  color:                     #aa0000;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress {
+	background:                #88cc55;
+	padding:                   0.3em 0.5em;
+  width:                     65em;
+  margin-bottom:             1em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader {
+  background:                #f6fff6;
+  padding:                   0.8em;
+  margin-bottom:             0.3em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .address {
+	float:                     left;
+	width:                     20em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .address .addressTitle {
+	font-size:                 110%;
+	font-weight:               bold;
+	margin-bottom:             0.5em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .address .addressLine {
+  width:                     17em;
+	font-size:                 110%;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .price {
+  float:                     left;
+  width:                     18em;
+  font-size:                 110%;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .priceTitle {
+  font-weight:               bold;
+  margin-bottom:             0.5em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .priceRow {
+  margin-bottom:             0.2em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .ShippingExpenses {
+  margin-bottom:             0.5em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .bottomBorder {
+	width:                     14em;
+  border-bottom:             1px solid #999999;
+  padding-bottom:            0.1em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .price .heading {
+	float:                     left;
+	display:                   inline-block;
+	width:                     5em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .price .value {
+  display:                   inline-block;
+  width:                     9em;
+  text-align:                right;
+  color:                     #aa0000;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates {
+  float:                     left;
+	width:                     18em;
+  font-size:                 110%;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .title {
+  font-weight:               bold;
+  margin-bottom:             0.5em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .line {
+  margin-bottom:             0.2em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .heading {
+  float:                     left;
+  display:                   inline-block;
+  width:                     11em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .value {
+  display:                   inline-block;
+  width:                     7em;
+  text-align:                right;
+  color:                     #aa0000;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems {
+  background:                #ffffff;
+  padding:                   0.8em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem {
+  clear:                     both;
+  margin-bottom:             1em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem.last {
+  clear:                     both;
+  margin-bottom:             0em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .titleRow {
+  width:                     50em;
+  margin-bottom:             0.4em;
+  margin-left:               10em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .titleRow .title {
+  font-weight:               bold;
+  background:                #ffffff;
+  color:                     #336699;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .description {
+  width:                     50em;
+	margin-left:               10em;
+  margin-bottom:             1em;
+  background:                #ffffff;
+  color:                     #888888;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity {
+  width:                     50em;
+  margin-bottom:             0.4em;
+  margin-left:               10em;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content {
+  font-size:                 110%;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content .subtotal {
+	display:                   inline-block;
+	position:                  absolute;
+	left:                      30em;
+	width:                     20em;
+  color:                     #aa0000;
+}
+
+#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .image img {
+  display:                   block;
+  float:                     left;
+  width:                     8em;
+  height:                    8em;
+  margin-right:              1em;
+  border:                    1px solid #aaaaaa;
+  background:                #dddddd;
+  color:                     #888888;
+  padding-top:               0.3em;
+  text-align:                center;
+  overflow:                  hidden;
+  text-overflow:             ellipsis;
+  -o-text-overflow:          ellipsis;
+}
+
+
+
+
+
+
+
+#id_frmOrderSummary .disclaimer {
+  padding-top:               1em;
+  text-align:                right;
+  background:                #ffffff;
+  color:                     #777777;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.commonForm .formSectionTitle {
+  padding:                   0.5em;
+  background-color:          #777777;
+  font-size:                 120%;
+  font-weight:               bold;
+  color:                     #efefef;
+}
+
+.commonForm fieldset {
+  border:                    none;
+}
+
+.commonForm label {
+  display:                   inline-block;
+  width:                     13em;
+}
+
+.commonForm textarea {
+  width:                     50em;
+  min-width:                 10em;
+  max-width:                 60em;
+  min-height:                3em;
+} 
+
+.commonForm .requiredLabel {
+  font-weight:               bold;
+}
+
+.commonForm .requiredLabel .ui-icon {
+  display:                   inline-block;
+  position:                  absolute;
+  margin:                    -0.2em 0em 0em 0.4em;
+}
+
+.commonForm .infoRow {
+  margin-top:                1em;
+  font-size:                 110%;
+  line-height:               1.5em;
+}
+
+.commonForm .fieldRow {
+  margin-top:                1em;
+  vertical-align:            top;
+}
+
+.commonForm .fieldRow label {
+  float:                     left;
+  padding-top:               0.2em;
+}
+
+.commonForm .fieldRow ul {
+  display:                   inline;  
+}
+
+.commonForm .fieldRow li {
+  display:                   inline-block;
+  width:                     5em;
+}
+
+.commonForm .helpRow {
+  margin-top:                0.2em;
+  padding-left:              13em;
+  color:                     #888888;
+}
+
+.commonForm .errorRow {
+  margin:                    0.5em 0em 2em 13em;
+}
+
+.commonForm .errorMessage {
+  color:                     #dd0000;
+  font-weight:               bold;
+}
+
+.commonFormErrorList {
+  padding:                   0.5em 1em;
+  margin-bottom:             2em;
+}
+
+.commonFormErrorList td {
+  vertical-align:            top;
+}
+
+.commonFormErrorList td li {
+  margin-left:               2em;
+}
+
+.commonFormErrorList .ui-icon {
+  margin-right:              0.5em;
+}
+
+.commonFormErrorList .errorMessage {
+  display:                   inline-block;
+  margin-top:                0.1em;
+  color:                     black;
+  font-weight:               normal;
+}
+
+.commonForm fieldset {
+  margin-bottom:             2em;
+  padding:                   0em 1em 1em 1em;
+}
 
 
 

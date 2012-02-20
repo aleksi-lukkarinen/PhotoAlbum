@@ -26,40 +26,43 @@
 
 {% block page_content %}
 
-  <h1>Register</h1>
-  {% show_messages %}
-
-  <p>If you want to register into the service, please enter the necessary information below. The fields with a star next to their label are required.</p>
-
-  {% if form.field_errors or form.non_field_errors %}
-    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
-      {% if form.field_errors %}
-        <tr>
-          <td><span class="ui-icon ui-icon-info"></span></td>
-          <td>
-            <span class="errorMessage">
-            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
-            <ul>
-				      {% for field in form %}
-				        {% for error in field.errors %}
-				          <li>{{ error }}</li>
-				        {% endfor %}
-				      {% endfor %}
-			      </ul>
-			      </span>
-	        </td>
-	      </tr> 
-      {% endif %}
-          
-      {% for error in form.non_field_errors %}
-        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
-      {% endfor %}
-    </table>
-  {% endif %}
-
   <form id="frmRegister" class="commonForm" method="post" action="{% url "get_registration_information" %}">
     {% csrf_token %}
-    
+
+	  <h1>Register</h1>
+	  {% show_messages %}
+	
+	  <p class="prompt">
+	    If you want to register into the service, please enter the necessary information below.
+	    The fields with a star next to their label are required.
+	  </p>
+	
+	  {% if form.field_errors or form.non_field_errors %}
+	    <table class="commonFormErrorList ui-state-highlight ui-corner-all">
+	      {% if form.field_errors %}
+	        <tr>
+	          <td><span class="ui-icon ui-icon-info"></span></td>
+	          <td>
+	            <span class="errorMessage">
+	            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
+	            <ul>
+					      {% for field in form %}
+					        {% for error in field.errors %}
+					          <li>{{ error }}</li>
+					        {% endfor %}
+					      {% endfor %}
+				      </ul>
+				      </span>
+		        </td>
+		      </tr> 
+	      {% endif %}
+	          
+	      {% for error in form.non_field_errors %}
+	        <tr><td><span class="ui-icon ui-icon-info"></span></td><td><span class="errorMessage">{{ error }}</span></td></tr>
+	      {% endfor %}
+	    </table>
+	  {% endif %}
+
     <div class="formSectionTitle ui-widget-header">Account Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
 		  <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtUserName.name }}">{{ form.txtUserName.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtUserName }}</div>
