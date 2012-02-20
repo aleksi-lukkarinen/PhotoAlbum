@@ -70,12 +70,16 @@
 			            </div>
 			            <div class="item2ndRow">{{ item.description }}</div>
                   <div class="item3rdRow">
-                    <input type="submit" name="submit.remove.{{ item.id }}" 
+                    <input type="submit" name="submit.remove.{{ item.id }}"
                            value="Remove" title="Remove '{{ item.title }}' from your shopping cart" />
                   </div>
 			          </td>
 			          <td class="quantityColumn">
-			            <input type="text" name="itemcount.{{ item.id }}" value="{{ item.number_of_units }}" size="2" />
+			            <input type="text" name="itemcount.{{ item.id }}" 
+			                   pattern="^[0-9]{1,2}$"
+			                   title="Quantities must be integers between 0 and 99."
+			                   x-moz-errormessage="Quantities must be integers between 0 and 99."
+			                   value="{{ item.number_of_units }}" size="2" />
 			          </td>
 			          <td class="unitPriceColumn">{{ item.unit_price|floatformat:"2" }} &euro;</td>
 			          <td class="rowTotalColumn">{{ item.row_total|floatformat:"2" }} &euro;</td>

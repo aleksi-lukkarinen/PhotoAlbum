@@ -66,14 +66,15 @@ urlpatterns += patterns('',
     (r'^order/(?P<order_id>\d+)/$', views.dispatch_by_method, {
         "GET": views.show_single_order_GET, "POST": views.show_single_order_POST},
         'show_single_order'),
+    (r'^order/(?P<order_id>\d+)/successful/$', views.dispatch_by_method, {
+        "GET": views.report_order_as_successful_GET}, 'report_order_as_successful'),
+
     (r'^order/addresses/$', views.dispatch_by_method, {
         "GET": views.get_delivery_addresses_GET, "POST": views.get_delivery_addresses_POST},
         'get_delivery_addresses'),
     (r'^order/summary/$', views.dispatch_by_method, {
         "GET": views.show_order_summary_GET, "POST": views.show_order_summary_POST},
         'show_order_summary'),
-    (r'^order/successful/$', views.dispatch_by_method, {
-        "GET": views.report_order_as_successful_GET}, 'report_order_as_successful'),
 
     (r'^payment/sps/(?P<status>\w+)/$', views.dispatch_by_method, {
         "GET": views.report_sps_payment_status_GET}, 'report_sps_payment_status')

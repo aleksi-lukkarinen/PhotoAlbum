@@ -426,9 +426,9 @@ def show_single_album_POST(request, album_id):
             return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
 
         album_title = album.title
-        
+
         images = PageContent.objects.filter(page__album = album, placeHolderID__contains = '_image_')
-     
+
         for image in images:
             if image.image:
                 image.image.delete()
@@ -533,7 +533,7 @@ def add_page_POST(request, album_id):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
 
     page_album = album
-    page_pageNumber = album.page_set.count()+1
+    page_pageNumber = album.page_set.count() + 1
     page_layout = form.cleaned_data.get("chcPageLayout")
 
     new_page = Page(
@@ -552,8 +552,8 @@ def add_page_POST(request, album_id):
             content = 'Caption %s' % i
         )
         pageContent.save()
-        
-    for i in range(1,page_layout.imageFieldCount+1):
+
+    for i in range(1, page_layout.imageFieldCount + 1):
         pageContent = PageContent(
             page = page_page,
             placeHolderID = page_layout.name + '_image_%s' % i
@@ -580,21 +580,21 @@ def edit_page_GET(request, album_id, page_number):
 
     page_resultset = Page.objects.filter(album = page_album, pageNumber__exact = page_number)
     page = page_resultset[0]
-    
+
     data = {}
     page_captions = PageContent.objects.filter(page = page, placeHolderID__contains = page.layout.name + '_caption_')
 
     for caption in page_captions:
         data["txtCaption_%s" % caption.placeHolderID[-1]] = caption.content
-        
+
     file_data = {}
     page_images = PageContent.objects.filter(page = page, placeHolderID__contains = page.layout.name + '_image_')
-    
+
     for image in page_images:
         file_data["imgUpload_%s" % caption.placeHolderID[-1]] = image.image
-        
+
     form = EditPageForm(page, data, file_data)
-    
+
     return render_to_response('album/edit-page.html', RequestContext(request, {'album_id': album_id, 'page_number': page_number, 'form': form}))
 
 
@@ -603,9 +603,9 @@ def edit_page_GET(request, album_id, page_number):
 def edit_page_POST(request, album_id, page_number):
     """  """
     page_page = Page.by_album_id_and_page_number(album_id, page_number)
-    
-    form = EditPageForm(page_page,request.POST,request.FILES)
-    
+
+    form = EditPageForm(page_page, request.POST, request.FILES)
+
     if not form.is_valid():
         return render_to_response("album/edit-page.html", RequestContext(request, {'album_id': album_id, 'page_number': page_number, "form": form}))
 
@@ -616,25 +616,25 @@ def edit_page_POST(request, album_id, page_number):
     album = album_resultset[0]
     if not album.is_editable_to_user(request.user):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
-        
+
     page_layout = page_page.layout
     page_captions = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_layout.name + '_caption_')
 
     for content in page_captions:
         content.content = form.cleaned_data.get("txtCaption_%s" % content.placeHolderID[-1])
         content.save()
-        
+
     page_images = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_page.layout.name + '_image_')
-    
+
     for image in page_images:
-        clear =  request.POST.get("imgUpload_%s-clear" % image.placeHolderID[-1])
+        clear = request.POST.get("imgUpload_%s-clear" % image.placeHolderID[-1])
         img = form.cleaned_data.get("imgUpload_%s" % image.placeHolderID[-1])
-            
+
         if image.image and clear:
             image.image.delete()
         elif image.image and img:
             image.image.delete()
-            
+
         if img:
             filename = img.name.split('.')
             filename[0] = '%s_%s_%s_%s' % (album.owner.id, album_id, page_number, image.placeHolderID[-1])
@@ -1198,6 +1198,8 @@ def get_delivery_addresses_POST(request):
 
 
 
+ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY = "show_order_summary_GET"
+
 @login_required
 @prevent_all_caching
 def show_order_summary_GET(request):
@@ -1209,7 +1211,7 @@ def show_order_summary_GET(request):
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
     validation_hash = computeValidationHashForShoppingCart(request,
-                        exclude_addresses = False, extra_key = "show_order_summary_GET")
+                        exclude_addresses = False, extra_key = ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY)
 
     items = ShoppingCartItem.items_of_user(request.user)
     items_by_address = {}
@@ -1283,17 +1285,42 @@ def show_order_summary_GET(request):
 @login_required
 @prevent_all_caching
 def show_order_summary_POST(request):
-    """  """
+    """ Creates an order based on the content of user's shopping cart. """
     assert request.method == "POST"
 
-    return HttpResponseRedirect(reverse("report_order_as_successful"))
+    if not validationHashForShoppingCartIsValid(request,
+                    exclude_addresses = False, extra_key = ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY):
+        request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
+        return HttpResponseRedirect(reverse("edit_shopping_cart"))
+
+    cart_items = ShoppingCartItem.items_of_user(request.user)
+
+
+    new_order = Order(
+        orderer = request.user,
+        status = OrderStatus.ordered()
+    )
+    new_order.save()
+
+    for cart_item in cart_items:
+        new_order_item = OrderItem(
+            order = new_order,
+            album = cart_item.album,
+            count = cart_item.count,
+            deliveryAddress = cart_item.deliveryAddress
+        )
+        new_order_item.save()
+
+    cart_items.delete()
+
+    return HttpResponseRedirect(reverse("report_order_as_successful", args = [new_order.id]))
 
 
 
 
 @login_required
 @prevent_all_caching
-def report_order_as_successful_GET(request):
+def report_order_as_successful_GET(request, order_id):
     """
         Actually creates an order based on the content of user's shopping cart and
         acknowledges user about the fact. After this, the shopping cart will be empty.
@@ -1301,6 +1328,15 @@ def report_order_as_successful_GET(request):
         a link leading to the service.
     """
     assert request.method == "GET"
+
+    try:
+        order_id = int(order_id)
+    except:
+        return resource_not_found_message(request, "order")
+
+    order = Order.by_id(order_id)
+    if not order:
+        return resource_not_found_message(request, "order")
 
     sps_address = settings.SIMPLE_PAYMENT_SERVICE_URL
     sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
@@ -1315,8 +1351,8 @@ def report_order_as_successful_GET(request):
     sps_cancel_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_CANCELED])
     sps_error_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_UNSUCCESSFUL])
 
-    sps_payment_id = 3
-    amount = 4
+    sps_payment_id = unicode(order_id)
+    amount = order.total_price_as_2dstr()
 
     checksum_source = "pid=%s&sid=%s&amount=%s&token=%s" % (sps_payment_id, sps_seller_id, amount, sps_secret)
     checksum = hashlib.md5(checksum_source).hexdigest()
