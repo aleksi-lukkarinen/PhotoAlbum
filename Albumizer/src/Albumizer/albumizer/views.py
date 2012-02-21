@@ -642,7 +642,6 @@ def edit_page_POST(request, album_id, page_number):
     page_images = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_page.layout.name + '_image_')
 
     for image in page_images:
-        print image
         clear = request.POST.get("imgUpload_%s-clear" % image.placeHolderID[-1])
         img = form.cleaned_data.get("imgUpload_%s" % image.placeHolderID[-1])
 
@@ -652,8 +651,14 @@ def edit_page_POST(request, album_id, page_number):
             image.image.delete()
 
         if img:
+            security_hash_base = unicode(album.owner.id) + unicode(album_id) + unicode(page_number) + \
+                            unicode(image.placeHolderID[-1]) + unicode(datetime.now()) + \
+                            unicode(settings.SECRET_KEY) + unicode(request.META.get("REMOTE_ADDR")) + \
+                            unicode(request.META.get("REMOTE_HOST")) + unicode(request.META.get("HTTP_USER_AGENT"))
+            security_hash = hashlib.md5(security_hash_base).hexdigest()
             filename = img.name.split('.')
-            filename[0] = '%s_%s_%s_%s' % (album.owner.id, album_id, page_number, image.placeHolderID[-1])
+            filename[0] = '%s_%s_%s_%s_%s' % \
+                (album.owner.id, album_id, page_number, image.placeHolderID[-1], security_hash)
             img.name = '.'.join(filename)
             image.image = img
             image.save()
