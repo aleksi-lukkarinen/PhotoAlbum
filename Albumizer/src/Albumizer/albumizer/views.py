@@ -221,9 +221,9 @@ def show_single_page_GET(request, album_id, page_number):
     texts = []
 
     for pagecontent in mypage.pagecontents.all():
-        if pagecontent.placeHolderID.startswith("image"):
-            images.append(pagecontent.content)
-        elif pagecontent.placeHolderID.startswith("text"):
+        if pagecontent.image:
+            images.append(pagecontent.image)
+        elif pagecontent.content:
             texts.append(pagecontent.content)
     context["texts"] = texts
     context["images"] = images
@@ -413,6 +413,7 @@ def show_single_album_POST(request, album_id):
         except:
             request.user.message_set.create(message = DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_UI)
             commonLogger.warning(DELETE_ALBUM_ERR_MSG_MISSING_ALBUM_LOG % (request.user.username, album_id))
+            return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
 
         album = Album.by_id(album_id)
         if not album:
@@ -442,6 +443,11 @@ def show_single_album_POST(request, album_id):
     if request.POST.get("deletePage"):
         pageNumber=request.POST.get("pageNumber")
         myAlbum=get_object_or_404(Album, pk=album_id)
+        
+        if not myAlbum.is_owned_by(request.user):
+            request.user.message_set.create(message = u"You are not the owner of this album")
+            commonLogger.warning(u"User %s attempted to remove a page from album %s, but is not the owner of the album" % (request.user.username, album_id))
+            return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
         myAlbum.deletePage(pageNumber)
         request.user.message_set.create(message = "Page %s deleted" % pageNumber)
         return HttpResponseRedirect(reverse("show_single_album", args = [album_id]))
