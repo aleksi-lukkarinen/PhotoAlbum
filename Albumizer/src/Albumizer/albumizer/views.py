@@ -443,7 +443,7 @@ def show_single_album_POST(request, album_id):
         pageNumber=request.POST.get("pageNumber")
         myAlbum=get_object_or_404(Album, pk=album_id)
         myAlbum.deletePage(pageNumber)
-        request.user.message_set.create(message = "Page %s deleted".format(pageNumber))
+        request.user.message_set.create(message = "Page %s deleted" % pageNumber)
         return HttpResponseRedirect(reverse("show_single_album", args = [album_id]))
     
 

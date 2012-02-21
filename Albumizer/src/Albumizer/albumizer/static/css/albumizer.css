@@ -1310,6 +1310,7 @@ clear:both;
 
 #checkoutSuccessful #id_frmSPSPayment .spsContainer .spsLogo {
   color:                     #3a3;
+  font-family:               "Georgia", "Times New Roman", times, serif;
   font-size:                 55px;
   font-weight:               bolder;
   text-shadow:               -1px -1px 1px #FFF, 1px 1px 1px #151;
