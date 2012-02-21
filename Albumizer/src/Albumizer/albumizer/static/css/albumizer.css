@@ -1390,6 +1390,10 @@ clear:both;
   vertical-align:            top;
 }
 
+.commonForm .fieldRow div{
+  margin-left:                13em;
+}
+
 .commonForm .fieldRow label {
   float:                     left;
   padding-top:               0.2em;
