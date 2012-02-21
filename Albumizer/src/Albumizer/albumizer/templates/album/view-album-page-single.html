@@ -62,7 +62,7 @@
 				<span id="text{{ forloop.counter}}">{{ text }}</span>
 				{% endfor %}
 				{% for image in images %}
-				<img id="image{{ forloop.counter}}" src="{{ image }}" />
+				<img id="image{{ forloop.counter}}" src="{{ image.url }}" />
 				{% endfor %}
 			</div>
 			<div>

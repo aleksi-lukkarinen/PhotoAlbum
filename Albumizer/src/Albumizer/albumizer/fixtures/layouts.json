@@ -3,7 +3,7 @@
         "pk": 1,
         "model": "albumizer.layout",
         "fields": {
-            "cssContent": ".singleImage .image1 {\r\n\r\n}",
+            "cssContent": ".singleImage #image1 { \r\n  width: 600px; \r\n  height:350px;\r\n}\r\n.singleImage #text1 {\r\ndisplay: block;\r\nfont-size: x-large;\r\nheight: 40px;\r\ntext-align: center;\r\npadding-top: 10px;\r\n}",
             "cssClass": "singleImage",
             "name": "SingleImage",
             "textFieldCount": 1,

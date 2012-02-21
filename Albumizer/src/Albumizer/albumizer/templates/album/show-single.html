@@ -82,9 +82,8 @@
 	  <div class="albumList"> 
 	  {% if album.pages|length > 0 %}
 	  {% for page in album.pages %}
-	  <div class="albumListItem">
-	    <a href="{% if opened_using_secret_hash %}{{ page.get_secret_url }}{% else %}{{ page.get_absolute_url }}{% endif %}" 
-	           class="{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+	  <div class="albumListItem{% if forloop.counter0|divisibleby:"5" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+	    <a href="{% if opened_using_secret_hash %}{{ page.get_secret_url }}{% else %}{{ page.get_absolute_url }}{% endif %}">
 	      <img src="" alt="" class="albumListItemImage" />
 	      <p class="albumListItemTitle">Page {{ page.pageNumber }}</p>
 	    </a>
@@ -97,10 +96,10 @@
           </form>
         </div>
         {% endif %}
-        </div>
-	    {% if forloop.counter|divisibleby:"5" %}
-	    <div class="clear"></div>
-	    {% endif %}
+      </div>
+	  {% if forloop.counter|divisibleby:"5" %}
+	  <div class="clear"></div>
+	  {% endif %}
 	  {% endfor %}
 	  {% else %}
 	    <div class="noPagesNotice">This album is currently empty.</div>
