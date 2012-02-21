@@ -6,8 +6,8 @@ from random import Random
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Max, Q
-from django.db.models.signals import post_save
+from django.db.models import ImageField, Max, Q
+from django.db.models.signals import post_init, post_save
 from django.utils.html import escape
 
 
@@ -33,6 +33,34 @@ def serialize_into_json(object_to_serialize):
         return json.dumps(object_to_serialize, sort_keys = True, indent = 4, default = json_serialization_handler)
     else:
         return json.dumps(object_to_serialize, default = json_serialization_handler)
+
+
+
+
+class AlbumizerImageField(ImageField):
+    """
+    
+    
+        22.2.2012 Aleksi:
+            The idea for the way to implement dynamic upload path has been gotten from
+            <http://scottbarnham.com/blog/2007/07/31/uploading-images-to-a-dynamic-path-with-django/>.
+    """
+    def contribute_to_class(self, cls, name):
+        """ Registers this field instance for listening post-init signals, so that the upload path can be tweaked. """
+        super(AlbumizerImageField, self).contribute_to_class(cls, name)
+        post_init.connect(self._post_init_handler, cls, dispatch_uid = "AlbumizerImageField.contribute_to_class")
+
+    def _post_init_handler(self, instance = None, **kwargs):
+        """ 
+            Asks the parent model instance the upload path by executing
+            its get_upload_folder() method, if one is found.   
+        """
+        if hasattr(instance, "get_upload_folder"):
+            self.upload_to = instance.get_upload_folder(self.attname)
+
+    def db_type(self):
+        """ Tells Django's object/relational mapper the physical type of this field. """
+        return "varchar(100)"
 
 
 
@@ -535,10 +563,13 @@ class PageContent(models.Model):
     content = models.CharField(
         max_length = 255
     )
-    image = models.ImageField(upload_to = 'images/', blank = True)
+    image = AlbumizerImageField(upload_to = "photos/albums/", blank = True)
 
     def __unicode__(self):
         return u"%s, %s, %s" % (self.page, self.placeHolderID, self.content)
+
+    def get_upload_folder(self, field_name):
+        return "photos/albums/%s/%s/%s" % (self.page.album.owner.username, self.page.album.id, self.page.pageNumber)
 
     class Meta():
         unique_together = ("page", "placeHolderID")

@@ -670,7 +670,6 @@ def edit_page_POST(request, album_id, page_number):
 
 
 
-
 @login_required
 @prevent_all_caching
 def edit_album_GET(request, album_id):
