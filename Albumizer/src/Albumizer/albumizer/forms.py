@@ -523,11 +523,11 @@ class EditPageForm(CommonAlbumizerForm):
         images = page.layout.imageFieldCount
         super(EditPageForm, self).__init__(*args, **kwargs)
 
-        for i in range(1,captions+1):
-            self.fields['txtCaption_%s' % i] = forms.CharField(label= u'%s. Caption' % i, required = False)
-            
-        for i in range(1,images+1):
-            self.fields['imgUpload_%s' % i] = forms.ImageField(label= u'%s. Image' % i, required = False)
+        for i in range(1, captions + 1):
+            self.fields['txtCaption_%s' % i] = forms.CharField(label = u'%s. Caption' % i, required = False)
+
+        for i in range(1, images + 1):
+            self.fields['imgUpload_%s' % i] = forms.ImageField(label = u'%s. Image' % i, required = False)
 
 
 
@@ -592,7 +592,7 @@ def build_delivery_address_form(request):
         if not given_hash == our_hash:
             self.add_common_error(views.CHECKOUT_ERR_MSG_INVALID_HASH)
 
-    items = ShoppingCartItem.items_of_user(request.user)
+    items = ShoppingCartItem.items_of_user_with_albums_and_addresses(request.user)
     addresses = Address.addresses_of_user(request.user)
     validation_hash = computeValidationHashForShoppingCart(request)
 

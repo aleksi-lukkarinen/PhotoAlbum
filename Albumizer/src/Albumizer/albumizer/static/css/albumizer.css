@@ -712,7 +712,9 @@ clear:both;
 
 
 
-
+#id_frmShoppingCart .promptForEmpty {
+	margin-bottom:             7em;
+}
 
 #id_frmShoppingCart .shoppingCartProlog {
   margin-bottom:             1em;
