@@ -1259,12 +1259,6 @@ clear:both;
   -o-text-overflow:          ellipsis;
 }
 
-
-
-
-
-
-
 #id_frmOrderSummary .disclaimer {
   padding-top:               1em;
   text-align:                right;
@@ -1275,6 +1269,55 @@ clear:both;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#checkoutSuccessful .prompt {
+	margin-bottom:             2em;
+}
+
+#checkoutSuccessful .paymentServiceLink {
+  display:                   inline-block;
+  border:                    none;
+  background:                #ffffff;
+  color:                     #336699;
+  text-decoration:           underline;
+  cursor:                    pointer;
+  margin:                    0em;
+  padding:                   0em;
+}
+
+#checkoutSuccessful #id_frmSPSPayment .spsContainer {
+	display:                   inline-block;
+	text-align:                center;
+}
+
+#checkoutSuccessful #id_frmSPSPayment .spsContainer .spsLogo {
+  color:                     #3a3;
+  font-size:                 55px;
+  font-weight:               bolder;
+  text-shadow:               -1px -1px 1px #FFF, 1px 1px 1px #151;
+}
+
+#checkoutSuccessful .disclaimer {
+  padding-top:               1em;
+  text-align:                right;
+  background:                #ffffff;
+  color:                     #777777;
+}
 
 
 
