@@ -9,6 +9,7 @@
 
   $(function() {
     $(".actionButtonContainer input").button();
+    $(".albumListItem :submit").button();
   });
 
 {% endblock %}
@@ -81,11 +82,22 @@
 	  <div class="albumList"> 
 	  {% if album.pages|length > 0 %}
 	  {% for page in album.pages %}
+	  <div class="albumListItem">
 	    <a href="{% if opened_using_secret_hash %}{{ page.get_secret_url }}{% else %}{{ page.get_absolute_url }}{% endif %}" 
-	           class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+	           class="{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
 	      <img src="" alt="" class="albumListItemImage" />
 	      <p class="albumListItemTitle">Page {{ page.pageNumber }}</p>
 	    </a>
+	    {% if current_user_can_delete %}
+        <div class="center">
+          <form name="frmAlbumAction" method="post" action="{% url "show_single_album" album.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="pageNumber" value="{{page.pageNumber}}" />
+              <input type="submit" name="deletePage" value="Delete page" />            
+          </form>
+        </div>
+        {% endif %}
+        </div>
 	    {% if forloop.counter|divisibleby:"5" %}
 	    <div class="clear"></div>
 	    {% endif %}

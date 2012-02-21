@@ -310,6 +310,20 @@ class Album(models.Model):
     def price_as_2dstr(self):
         """ Calculates and returns the price of this album as a string with two decimal places. """
         return convert_money_into_two_decimal_string(self.price())
+    
+    def deletePage(self, page_number):
+        """deletes the given page from this album"""
+        query=self.pages().filter(pageNumber=page_number)[:1]
+        if query:
+            #delete page
+            query[0].delete()
+            #then fix page numbers
+            query=self.pages().order_by("pageNumber")
+            counter=0
+            for page in query.all():
+                counter += 1 
+                page.pageNumber=counter
+                page.save()
 
     def as_api_dict(self):
         """ Returns this album as an dictionary containing values wanted to be exposed in the public api. """
@@ -373,7 +387,7 @@ class Album(models.Model):
     def pseudo_random_public_ones_as_json(cls, how_many = 4):
         """ Returns some pseudo-random publicly visible albums as json. """
         return serialize_into_json(cls.list_as_api_dict(cls.pseudo_random_public_ones(how_many)))
-
+        
     class Meta():
         unique_together = ("owner", "title")
         ordering = ["owner", "title"]
