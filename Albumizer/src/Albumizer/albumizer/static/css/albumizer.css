@@ -389,9 +389,12 @@ img {
 
 
 
+.center {
+    text-align:center;
+}
 
+.albumListItem {
 
-a.albumListItem {
 float:left;
 text-decoration:none;
 margin:10px 4px;

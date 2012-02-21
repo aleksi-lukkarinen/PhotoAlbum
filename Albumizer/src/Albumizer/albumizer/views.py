@@ -229,9 +229,9 @@ def show_single_page_GET(request, album_id, page_number):
     context["images"] = images
     context["cssContent"] = mypage.layout.cssContent
     if myalbum.pages().filter(pageNumber = pageNumberInt + 1).exists():
-        context["nextLink"] = reverse('show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt + 1})
+        context["nextLink"] = reverse('show_single_page', kwargs = {"album_id":album_id, "page_number":pageNumberInt + 1})
     if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
-        context["previousLink"] = reverse('show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt - 1})
+        context["previousLink"] = reverse('show_single_page', kwargs = {"album_id":album_id, "page_number":pageNumberInt - 1})
 
     response = render_to_response_as_public('album/view-album-page-single.html', RequestContext(request, context))
     if not myalbum.isPublic:
@@ -247,10 +247,10 @@ def show_single_page_POST(request, album_id, page_number):
 
     if request.POST.get("editPage"):
         return HttpResponseRedirect(reverse("edit_page", args = [album_id, page_number]))
-
+    
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
     commonLogger.warning("User %s tried to perform an action to page %s in album %s without specifying which one." % \
-                         (request.user.username, page_number, album_id))
+                     (request.user.username, page_number, album_id))
 
     return HttpResponseRedirect(reverse("show_single_page", args = [album_id, page_number]))
 
@@ -438,7 +438,14 @@ def show_single_album_POST(request, album_id):
         request.user.message_set.create(message = u"Album \"%s\" has been deleted." % album_title)
         userActionLogger.info("User %s deleted an album called \"%s\"." % (request.user.username, album_title))
         return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
-
+    
+    if request.POST.get("deletePage"):
+        pageNumber=request.POST.get("pageNumber")
+        myAlbum=get_object_or_404(Album, pk=album_id)
+        myAlbum.deletePage(pageNumber)
+        request.user.message_set.create(message = "Page %s deleted" % pageNumber)
+        return HttpResponseRedirect(reverse("show_single_album", args = [album_id]))
+    
 
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
     commonLogger.warning("User %s tried to perform an action to album %s without specifying which one." % \

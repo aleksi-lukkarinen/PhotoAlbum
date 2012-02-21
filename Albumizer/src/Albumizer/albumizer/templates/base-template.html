@@ -98,11 +98,13 @@
 	        		});
 	        	}
 	        };
+	        {% comment %}
 	        {% if not user.is_authenticated %}
 	        //user is not authenticated, check if the user is logged to facebook
 	        //TODO: if the user logs out, this will log her on again
 	        FB.getLoginStatus(tokenhandler);
 	        {% endif %}
+	        {% endcomment %}
 	        FB.Event.subscribe('auth.login', tokenhandler);
 	        
 	      };
