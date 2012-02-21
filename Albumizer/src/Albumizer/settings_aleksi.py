@@ -3,7 +3,7 @@
 DEBUG = True
 
 
-MEDIA_ROOT = "D:/djangomedia/"
+MEDIA_ROOT = "/d:/djangomedia/"
 
 
 DATABASES = {

@@ -514,6 +514,8 @@ class AddPageForm(CommonAlbumizerForm):
         self.fields['chcPageLayout'].queryset = layouts
 
 
+
+
 class EditPageForm(CommonAlbumizerForm):
     """  """
 

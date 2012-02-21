@@ -288,20 +288,23 @@ class Album(models.Model):
             raise ValueError, "Quantity of an album cannot be negative"
 
         price_of_single_album = 0.00
-        page_count = self.pages().count()
-        if page_count < 1:
-            return price_of_single_album
 
-        price_of_single_album += settings.PRICE_PER_ALBUM
-        price_of_single_album += page_count * settings.PRICE_PER_ALBUM_PAGE
+        page_count = self.pages().count()
+        if page_count > 0:
+            price_of_single_album += settings.PRICE_PER_ALBUM
+            price_of_single_album += page_count * settings.PRICE_PER_ALBUM_PAGE
+
         result_list = [price_of_single_album]
 
         if quantity:
-            price_of_albums = quantity * price_of_single_album
+            price_of_albums = 0.00
+            if page_count > 0:
+                price_of_albums = quantity * price_of_single_album
             result_list.append(price_of_albums)
 
         if cumulative_total != None:
-            cumulative_total += price_of_albums
+            if page_count > 0:
+                cumulative_total += price_of_albums
             result_list.append(cumulative_total)
 
         return result_list
@@ -845,8 +848,8 @@ class Order(models.Model):
         """ Calculates and returns the total price for this order. """
         items = self.items()
         total = 0.0
-        for i in range(items.count()):
-            total += items[i].count * items[i].album.price_excluding_vat_and_shipping()[0]
+        for i in items:
+            total += i.count * i.album.price_excluding_vat_and_shipping()[0]
         total += settings.SHIPPING_EXPENSES
         return total
 

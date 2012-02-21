@@ -2,7 +2,6 @@
 
 import hashlib, logging
 from datetime import datetime, timedelta
-from random import Random
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -12,7 +11,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
-        HttpResponseForbidden, HttpResponseNotFound, HttpResponse
+        HttpResponseNotFound, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson as json
@@ -643,6 +642,7 @@ def edit_page_POST(request, album_id, page_number):
     page_images = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_page.layout.name + '_image_')
 
     for image in page_images:
+        print image
         clear = request.POST.get("imgUpload_%s-clear" % image.placeHolderID[-1])
         img = form.cleaned_data.get("imgUpload_%s" % image.placeHolderID[-1])
 
