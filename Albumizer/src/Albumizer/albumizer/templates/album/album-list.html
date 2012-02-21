@@ -10,10 +10,12 @@
 <div class="albumList">
   {% if albums.object_list %}
   {% for album in albums.object_list %}
-  <a href="{{ album.get_absolute_url }}" class="albumListItem{% if forloop.counter|divisibleby:"6" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
-    <img src="" alt="" class="albumListItemImage" />
-    <p class="albumListItemTitle">{{ album.title }}</p>
-  </a>
+  <div class="albumListItem{% if forloop.counter0|divisibleby:"5" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+	  <a href="{{ album.get_absolute_url }}">
+        <img src="" alt="" class="albumListItemImage" />
+        <p class="albumListItemTitle">{{ album.title }}</p>
+      </a>
+  </div>
   {% if forloop.counter|divisibleby:"5" %}
   <div class="clear"></div>
   {% endif %}
