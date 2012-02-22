@@ -10,6 +10,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Max, Q
 from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, \
         Country, State, Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
+from Albumizer.albumizer.utils import convert_money_into_two_decimal_string
+
 
 
 
@@ -404,7 +406,8 @@ class Command(BaseCommand):
                     del new_page
 
                 if verbosity >= 2:
-                    message = u"\n    * Price: %s euros\n\n" % new_album.price_as_2dstr()
+                    message = u"\n    * Price: %s euros\n\n" % \
+                                convert_money_into_two_decimal_string(new_album.price_excluding_vat_and_shipping()[0])
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
                 del new_album
@@ -517,7 +520,8 @@ class Command(BaseCommand):
                         self.stdout.write(u"i ")
 
                 if verbosity >= 2:
-                    message = u"            Total price: %s euros\n" % new_order.total_price_as_2dstr()
+                    message = u"            Total price: %s euros\n" % \
+                                    convert_money_into_two_decimal_string(new_order.total_price())
                     if order_number < number_of_orders - 1:
                         message += u"\n"
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
@@ -565,7 +569,8 @@ class Command(BaseCommand):
 
                     if verbosity >= 2:
                         message = u"  - SPS payment for order (%s), %s euros, made %s, ref code %s\n" % \
-                                        (order.purchaseDate, new_sps_payment.amount_as_2dstr(),
+                                        (order.purchaseDate,
+                                         convert_money_into_two_decimal_string(new_sps_payment.amount),
                                          new_sps_payment.transactionDate, new_sps_payment.referenceCode)
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     elif verbosity == 1:

@@ -20,15 +20,17 @@
 
 {% block page_content %}
 
-  <h1>Your Shopping Cart</h1>
-
-  {% show_messages %}
-
-  {% if not item_info %}
-    <p>Your shopping cart is empty.</p>
-  {% else %}
-    <form name="frmShoppingCart" id="id_frmShoppingCart"
-          method="post" action="{% url "edit_shopping_cart" %}">
+  <form name="frmShoppingCart" id="id_frmShoppingCart"
+        method="post" action="{% url "edit_shopping_cart" %}">
+	  <h1>Your Shopping Cart</h1>
+	
+	  {% show_messages %}
+	
+	  {% if not cart_info.items %}
+	    <p class="prompt promptForEmpty">
+	      Your shopping cart is empty. Albums can be added into the cart from their own pages.
+	    </p>
+	  {% else %}
       {% csrf_token %}
 	    <div class="shoppingCartProlog">
 	      <div class="prompt">
@@ -57,16 +59,16 @@
 			      </tr>
 			    </tbody>
 		    </table>
-		    {% for item in item_info %}
+		    {% for item, item_info in cart_info.items.items %}
 			    <table class="itemRowTable">
 			      <tbody>
 			        <tr>
 			          <td class="itemColumn">
-			            <a href="{{ item.url }}"><img src="{{ item.coverUrl }}" alt="Cover of {{ item.title }}"
-			                 title="Cover of {{ item.title }}" /></a>
+			            <a href="{{ item.get_absolute_url }}"><img src="{{ item.get_cover_url }}"
+			                 alt="Cover of {{ item.title }}" title="Cover of {{ item.title }}" /></a>
 			            <div class="item1stRow">
 			              <a href="{{ item.url }}">{{ item.title }}</a> &mdash;
-			              <span class="creator">{{ item.creator }}</span>
+			              <span class="creator">{{ item.owner }}</span>
 			            </div>
 			            <div class="item2ndRow">{{ item.description }}</div>
                   <div class="item3rdRow">
@@ -79,10 +81,10 @@
 			                   pattern="^[0-9]{1,2}$"
 			                   title="Quantities must be integers between 0 and 99."
 			                   x-moz-errormessage="Quantities must be integers between 0 and 99."
-			                   value="{{ item.number_of_units }}" size="2" />
+			                   value="{{ item_info.quantity }}" size="2" />
 			          </td>
-			          <td class="unitPriceColumn">{{ item.unit_price|floatformat:"2" }} &euro;</td>
-			          <td class="rowTotalColumn">{{ item.row_total|floatformat:"2" }} &euro;</td>
+			          <td class="unitPriceColumn">{{ item_info.unit_price|floatformat:"2" }} &euro;</td>
+			          <td class="rowTotalColumn">{{ item_info.sub_total|floatformat:"2" }} &euro;</td>
 			        </tr>
 			      </tbody>	      
 			    </table> 
@@ -90,8 +92,8 @@
 		    <table class="subtotalRowTable">
 			    <tr>
 			      <td>
-			        You have {{ item_info|length }} item{{ item_info|length|pluralize }} in the shopping cart. Subtotal:
-			        <span class="subTotal">{{ sub_total_price|floatformat:"2" }} &euro;</span>
+			        You have {{ cart_info.items|length }} item{{ cart_info.items|length|pluralize }} in the shopping cart.
+			        Subtotal: <span class="subTotal">{{ cart_info.sub_total|floatformat:"2" }} &euro;</span>
 			      </td>
 		      </tr>
 		    </table>
@@ -99,8 +101,8 @@
 	    <div class="disclaimer">
 	      The price and availability of albums at {{ site_name }} are subject to change.
 	    </div>
-		</form>
-  {% endif %}
+    {% endif %}
+  </form>
 
 
   {% random_picks_album_list 8 %}

@@ -2,7 +2,6 @@
 
 import hashlib, logging
 from datetime import datetime, timedelta
-from random import Random
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -12,7 +11,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, \
-        HttpResponseForbidden, HttpResponseNotFound, HttpResponse
+        HttpResponseNotFound, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson as json
@@ -21,10 +20,7 @@ from models import UserProfile, FacebookProfile, Album, Layout, Page, PageConten
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 from forms import AlbumCreationForm, LoginForm, RegistrationForm, RegistrationModelForm, AddPageForm, \
         EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm,UserAuthForm
-from utils import computeValidationHashForShoppingCart, validationHashForShoppingCartIsValid
-from Albumizer.albumizer.forms import UserProfileForm, AddressModelForm
-
-
+import utils
 
 
 SPS_STATUS_SUCCESSFUL = "successful"
@@ -32,6 +28,7 @@ SPS_STATUS_CANCELED = "canceled"
 SPS_STATUS_UNSUCCESSFUL = "unsuccessful"
 VALID_SPS_PAYMENT_STATUSES = [SPS_STATUS_SUCCESSFUL, SPS_STATUS_CANCELED, SPS_STATUS_UNSUCCESSFUL]
 
+#this one caused a cyclic import forms->views->forms... fixed by moving this one to forms, so forms won't need to import vies
 from forms import CHECKOUT_ERR_MSG_INVALID_HASH
 #CHECKOUT_ERR_MSG_INVALID_HASH = \
 #    "User and/or content of the shopping cart have changed since the beginning of the checkout process, " + \
@@ -248,7 +245,7 @@ def show_single_page_POST(request, album_id, page_number):
 
     if request.POST.get("editPage"):
         return HttpResponseRedirect(reverse("edit_page", args = [album_id, page_number]))
-    
+
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
     commonLogger.warning("User %s tried to perform an action to page %s in album %s without specifying which one." % \
                      (request.user.username, page_number, album_id))
@@ -440,19 +437,22 @@ def show_single_album_POST(request, album_id):
         request.user.message_set.create(message = u"Album \"%s\" has been deleted." % album_title)
         userActionLogger.info("User %s deleted an album called \"%s\"." % (request.user.username, album_title))
         return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
-    
+
     if request.POST.get("deletePage"):
-        pageNumber=request.POST.get("pageNumber")
-        myAlbum=get_object_or_404(Album, pk=album_id)
-        
+        pageNumber = request.POST.get("pageNumber")
+        myAlbum = get_object_or_404(Album, pk = album_id)
+
         if not myAlbum.is_owned_by(request.user):
             request.user.message_set.create(message = u"You are not the owner of this album")
-            commonLogger.warning(u"User %s attempted to remove a page from album %s, but is not the owner of the album" % (request.user.username, album_id))
+            commonLogger.warning(
+                u"User %s attempted to remove a page from album %s, but is not the owner of the album" %
+                (request.user.username, album_id))
             return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
+
         myAlbum.deletePage(pageNumber)
         request.user.message_set.create(message = "Page %s deleted" % pageNumber)
         return HttpResponseRedirect(reverse("show_single_album", args = [album_id]))
-    
+
 
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
     commonLogger.warning("User %s tried to perform an action to album %s without specifying which one." % \
@@ -650,8 +650,14 @@ def edit_page_POST(request, album_id, page_number):
             image.image.delete()
 
         if img:
+            security_hash_base = unicode(album.owner.id) + unicode(album_id) + unicode(page_number) + \
+                            unicode(image.placeHolderID[-1]) + unicode(datetime.now()) + \
+                            unicode(settings.SECRET_KEY) + unicode(request.META.get("REMOTE_ADDR")) + \
+                            unicode(request.META.get("REMOTE_HOST")) + unicode(request.META.get("HTTP_USER_AGENT"))
+            security_hash = hashlib.md5(security_hash_base).hexdigest()
             filename = img.name.split('.')
-            filename[0] = '%s_%s_%s_%s' % (album.owner.id, album_id, page_number, image.placeHolderID[-1])
+            filename[0] = '%s_%s_%s_%s_%s' % \
+                (album.owner.id, album_id, page_number, image.placeHolderID[-1], security_hash)
             img.name = '.'.join(filename)
             image.image = img
             image.save()
@@ -659,7 +665,6 @@ def edit_page_POST(request, album_id, page_number):
     userActionLogger.info("User %s created a new page in album \"%s\"." % (request.user.username, album.title))
 
     return HttpResponseRedirect(page_page.get_absolute_url())
-
 
 
 
@@ -989,30 +994,9 @@ SHOPPING_CART_ERR_MSG_INVALID_QUANTITY_UI = \
 def edit_shopping_cart_GET(request):
     """ Allows user to edit the content of his/her shopping cart. """
     assert request.method == "GET"
-    items = ShoppingCartItem.items_of_user(request.user)
 
-    item_info = []
-    sub_total_price = 0.00
-    for item in items:
-        item_price = item.album.price()
-        row_total = item.count * item_price
-        sub_total_price += row_total
-        item_info.append({
-            "id": item.album.id,
-            "title": item.album.title,
-            "url": item.album.get_absolute_url(),
-            "description": item.album.description,
-            "creator": item.album.owner,
-            "coverUrl": "",
-            "number_of_units": item.count,
-            "unit_price": item_price,
-            "row_total": row_total
-        })
-
-    template_parameters = {
-        "item_info": item_info,
-        "sub_total_price": sub_total_price
-    }
+    cart_info = ShoppingCartItem.cart_info_for_user(request.user)
+    template_parameters = {"cart_info": cart_info}
     return render_to_response('order/shopping-cart.html', RequestContext(request, template_parameters))
 
 @login_required
@@ -1107,7 +1091,7 @@ def edit_shopping_cart_POST(request):
 
 
     if proceed_to_checkout and not has_errors:
-        validation_part = "?v=%s" % computeValidationHashForShoppingCart(request)
+        validation_part = "?v=%s" % utils.computeValidationHashForShoppingCart(request)
         return HttpResponseRedirect(reverse("get_delivery_addresses") + validation_part)
 
     return HttpResponseRedirect(reverse("edit_shopping_cart"))
@@ -1145,7 +1129,7 @@ def get_delivery_addresses_GET(request):
     """ Allows user to edit destination addresses for content of his/her shopping cart. """
     assert request.method == "GET"
 
-    if not validationHashForShoppingCartIsValid(request):
+    if not utils.validationHashForShoppingCartIsValid(request):
         request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
@@ -1190,7 +1174,7 @@ def get_delivery_addresses_POST(request):
         #print "%s (%s), %s (%s)" % (unicode(item), unicode(type(item)), unicode(address), unicode(type(address)))
 
     if request.POST.get("cmdSummary"):
-        validation_part = "?v=%s" % computeValidationHashForShoppingCart(request, exclude_addresses = False)
+        validation_part = "?v=%s" % utils.computeValidationHashForShoppingCart(request, exclude_addresses = False)
         return HttpResponseRedirect(reverse("show_order_summary") + validation_part)
 
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
@@ -1211,20 +1195,20 @@ def show_order_summary_GET(request):
     """ Shows user a summary about his/her order and lets him/her to finally place the order. """
     assert request.method == "GET"
 
-    if not validationHashForShoppingCartIsValid(request, exclude_addresses = False):
+    if not utils.validationHashForShoppingCartIsValid(request, exclude_addresses = False):
         request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
-    validation_hash = computeValidationHashForShoppingCart(request,
+    validation_hash = utils.computeValidationHashForShoppingCart(request,
                         exclude_addresses = False, extra_key = ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY)
 
-    items = ShoppingCartItem.items_of_user(request.user)
+    items = ShoppingCartItem.items_of_user_with_albums_and_addresses(request.user)
     items_by_address = {}
 
     order_total_price = 0.00
 
     for item in items:
-        item_price = item.album.price()
+        item_price = item.album.price_excluding_vat_and_shipping()[0]
         single_item_subtotal = item.count * item_price
         order_total_price += single_item_subtotal
 
@@ -1293,7 +1277,7 @@ def show_order_summary_POST(request):
     """ Creates an order based on the content of user's shopping cart. """
     assert request.method == "POST"
 
-    if not validationHashForShoppingCartIsValid(request,
+    if not utils.validationHashForShoppingCartIsValid(request,
                     exclude_addresses = False, extra_key = ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY):
         request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
@@ -1357,7 +1341,7 @@ def report_order_as_successful_GET(request, order_id):
     sps_error_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_UNSUCCESSFUL])
 
     sps_payment_id = unicode(order_id)
-    amount = order.total_price_as_2dstr()
+    amount = utils.convert_money_into_two_decimal_string(order.total_price())
 
     checksum_source = "pid=%s&sid=%s&amount=%s&token=%s" % (sps_payment_id, sps_seller_id, amount, sps_secret)
     checksum = hashlib.md5(checksum_source).hexdigest()

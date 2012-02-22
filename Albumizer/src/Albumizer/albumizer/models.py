@@ -6,8 +6,8 @@ from random import Random
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Max, Q
-from django.db.models.signals import post_save
+from django.db.models import ImageField, Max, Q
+from django.db.models.signals import post_init, post_save
 from django.utils.html import escape
 
 
@@ -37,20 +37,30 @@ def serialize_into_json(object_to_serialize):
 
 
 
-def convert_money_into_two_decimal_string(amount):
-    """ Returns the price of this album as a string with two decimal places. """
-    amount_str = unicode(int(amount * 100.0) / 100.0)
-    period_pos = amount_str.find(".")
-    if period_pos == -1:
-        amount_str += ".00"
-    else:
-        numbers_after_period = len(amount_str) - period_pos - 1
-        if numbers_after_period == 1:
-            amount_str += "0"
-        elif numbers_after_period == 0:
-            amount_str += "00"
+class AlbumizerImageField(ImageField):
+    """
+    
+    
+        22.2.2012 Aleksi:
+            The idea for the way to implement dynamic upload path has been gotten from
+            <http://scottbarnham.com/blog/2007/07/31/uploading-images-to-a-dynamic-path-with-django/>.
+    """
+    def contribute_to_class(self, cls, name):
+        """ Registers this field instance for listening post-init signals, so that the upload path can be tweaked. """
+        super(AlbumizerImageField, self).contribute_to_class(cls, name)
+        post_init.connect(self._post_init_handler, cls, dispatch_uid = "AlbumizerImageField.contribute_to_class")
 
-    return amount_str
+    def _post_init_handler(self, instance = None, **kwargs):
+        """ 
+            Asks the parent model instance the upload path by executing
+            its get_upload_folder() method, if one is found.   
+        """
+        if hasattr(instance, "get_upload_folder"):
+            self.upload_to = instance.get_upload_folder(self.attname)
+
+    def db_type(self):
+        """ Tells Django's object/relational mapper the physical type of this field. """
+        return "varchar(100)"
 
 
 
@@ -242,6 +252,9 @@ class Album(models.Model):
         return ("albumizer.views.show_single_album_with_hash", (),
                         {"album_id": self.id, "secret_hash": self.secretHash})
 
+    def get_cover_url(self):
+        return ""
+
     def is_owned_by(self, user):
         """ Checks if this album is owned by a given user. """
         return user == self.owner
@@ -297,32 +310,71 @@ class Album(models.Model):
         """ Return True if this album has at least one page. Otherwise returns False. """
         return Page.objects.filter(album__exact = self).exists()
 
-    def price(self):
-        """ Calculates and returns the price of this album. """
-        total = 0.0
-        page_count = self.pages().count()
-        if page_count < 1:
-            return total
-        total += settings.PRICE_PER_ALBUM
-        total += page_count * settings.PRICE_PER_ALBUM_PAGE
-        return total
+    def price_excluding_vat_and_shipping(self, quantity = None, cumulative_total = None):
+        """ Calculates a price for a number of a single album, excluding VAT and shipping. """
+        if quantity and quantity < 0:
+            raise ValueError, "Quantity of an album cannot be negative"
 
-    def price_as_2dstr(self):
-        """ Calculates and returns the price of this album as a string with two decimal places. """
-        return convert_money_into_two_decimal_string(self.price())
-    
+        price_of_single_album = 0.00
+
+        page_count = self.pages().count()
+        if page_count > 0:
+            price_of_single_album += settings.PRICE_PER_ALBUM
+            price_of_single_album += page_count * settings.PRICE_PER_ALBUM_PAGE
+
+        result_list = [price_of_single_album]
+
+        if quantity:
+            price_of_albums = 0.00
+            if page_count > 0:
+                price_of_albums = quantity * price_of_single_album
+            result_list.append(price_of_albums)
+
+        if cumulative_total != None:
+            if page_count > 0:
+                cumulative_total += price_of_albums
+            result_list.append(cumulative_total)
+
+        return result_list
+
+    @staticmethod
+    def price_for_several_albums_excluding_vat_and_shipping(album_info_list):
+        """ 
+            Calculates a prices for several albums, excluding VAT and shipping.
+            
+            album_info_list is a list of lists containing an Album object and a quantity, like
+            [[album1, 3], [album2, 23], [album3, 1]] .
+            
+            Returns an dictionary of    
+        """
+        item_infos = {}
+        sub_total_price_for_all_albums = 0.00
+        for (album, quantity) in album_info_list:
+            unit_price, sub_total_for_single_album, sub_total_price_for_all_albums = \
+                album.price_excluding_vat_and_shipping(quantity, sub_total_price_for_all_albums)
+            item_infos[album] = {
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "sub_total": sub_total_for_single_album
+            }
+
+        return {
+            "items": item_infos,
+            "sub_total": sub_total_price_for_all_albums
+        }
+
     def deletePage(self, page_number):
         """deletes the given page from this album"""
-        query=self.pages().filter(pageNumber=page_number)[:1]
+        query = self.pages().filter(pageNumber = page_number)[:1]
         if query:
             #delete page
             query[0].delete()
             #then fix page numbers
-            query=self.pages().order_by("pageNumber")
-            counter=0
+            query = self.pages().order_by("pageNumber")
+            counter = 0
             for page in query.all():
-                counter += 1 
-                page.pageNumber=counter
+                counter += 1
+                page.pageNumber = counter
                 page.save()
 
     def as_api_dict(self):
@@ -387,7 +439,7 @@ class Album(models.Model):
     def pseudo_random_public_ones_as_json(cls, how_many = 4):
         """ Returns some pseudo-random publicly visible albums as json. """
         return serialize_into_json(cls.list_as_api_dict(cls.pseudo_random_public_ones(how_many)))
-        
+
     class Meta():
         unique_together = ("owner", "title")
         ordering = ["owner", "title"]
@@ -511,10 +563,13 @@ class PageContent(models.Model):
     content = models.CharField(
         max_length = 255
     )
-    image = models.ImageField(upload_to = 'images/', blank=True)
+    image = AlbumizerImageField(upload_to = "photos/albums/", blank = True)
 
     def __unicode__(self):
         return u"%s, %s, %s" % (self.page, self.placeHolderID, self.content)
+
+    def get_upload_folder(self, field_name):
+        return "photos/albums/%s/%s/%s" % (self.page.album.owner.username, self.page.album.id, self.page.pageNumber)
 
     class Meta():
         unique_together = ("page", "placeHolderID")
@@ -685,6 +740,27 @@ class ShoppingCartItem(models.Model):
         return ShoppingCartItem.objects.filter(user__exact = user)
 
     @staticmethod
+    def items_of_user_with_albums(user):
+        """ Return a queryset of all items in given user's shopping cart preloading albums. """
+        return ShoppingCartItem.objects.select_related('album').filter(user__exact = user)
+
+    @staticmethod
+    def items_of_user_with_albums_and_addresses(user):
+        """ Return a queryset of all items in given user's shopping cart preloading albums and addresses. """
+        return ShoppingCartItem.objects.select_related('album', 'deliveryAddress').filter(user__exact = user)
+
+    @staticmethod
+    def cart_info_for_user(user):
+        """ 
+            Returns information about items in given user's shopping cart.
+            
+            Returns a dictionary, see Album.price_for_several_albums_excluding_vat_and_shipping().
+        """
+        items = ShoppingCartItem.items_of_user_with_albums(user)
+        album_count_list = [(i.album, i.count) for i in items]
+        return Album.price_for_several_albums_excluding_vat_and_shipping(album_count_list)
+
+    @staticmethod
     def does_exist(user, album_id):
         """ Returns True, if given item exist in given user's shopping cart. Otherwise returns False. """
         return ShoppingCartItem.objects.filter(user = user, album = album_id).exists()
@@ -803,14 +879,10 @@ class Order(models.Model):
         """ Calculates and returns the total price for this order. """
         items = self.items()
         total = 0.0
-        for i in range(items.count()):
-            total += items[i].count * items[i].album.price()
+        for i in items:
+            total += i.count * i.album.price_excluding_vat_and_shipping()[0]
         total += settings.SHIPPING_EXPENSES
         return total
-
-    def total_price_as_2dstr(self):
-        """ Calculates and returns the total price for this order as a string with two decimal places. """
-        return convert_money_into_two_decimal_string(self.total_price())
 
     @models.permalink
     def get_absolute_url(self):
@@ -878,10 +950,6 @@ class SPSPayment(models.Model):
     def exists_for_order(order):
         """ Checks if a payment for given order exists. """
         return SPSPayment.objects.filter(order__exact = order).exists()
-
-    def amount_as_2dstr(self):
-        """ Returns the amount of this payment as a string with two decimal places. """
-        return convert_money_into_two_decimal_string(self.amount)
 
     def __unicode__(self):
         return u"%s, %s, %f" % (self.order, self.transactionDate, self.amount)
