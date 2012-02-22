@@ -19,7 +19,7 @@ import facebook_api
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 from forms import AlbumCreationForm, LoginForm, RegistrationForm, RegistrationModelForm, AddPageForm, \
-        EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm,UserAuthForm
+        EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm, UserAuthForm
 import utils
 
 
@@ -645,25 +645,19 @@ def edit_page_POST(request, album_id, page_number):
                                                      placeHolderID__contains = page_page.layout.name + '_image_')
     for content in page_image_contents:
         placeholder_number = unicode(content.placeHolderID.split("_")[-1])
-        is_image_to_be_cleared = request.POST.get("imgUpload_%s-clear" % placeholder_number)
+        image_is_to_be_cleared = request.POST.get("imgUpload_%s-clear" % placeholder_number)
         sent_image = form.cleaned_data.get("imgUpload_%s" % placeholder_number)
 
-        path_of_image_to_delete = None
-        if is_image_to_be_cleared:
+        if image_is_to_be_cleared or sent_image:
             if content.image:
-                path_of_image_to_delete = content.image.path
-                content.image = None
+#                path_of_image_to_delete = content.image.path
+#                content.image = None
+#                content.save()
+#                os.remove(path_of_image_to_delete)
+                content.image.delete(save = True)
+            if sent_image:
+                content.image = sent_image
                 content.save()
-                os.remove(path_of_image_to_delete)
-        elif sent_image:
-            if content.image:
-                path_of_image_to_delete = content.image.path
-                content.image = None
-                content.save()
-                os.remove(path_of_image_to_delete)
-            content.image = sent_image
-            content.save()
-
 
     userActionLogger.info("User %s edited page %s in album \"%s\"." % \
                           (request.user.username, unicode(page_number), album.title))
@@ -691,9 +685,6 @@ def edit_album_GET(request, album_id):
             }
     form = AlbumCreationForm(request, initial = data)
     return render_to_response("album/edit.html", RequestContext(request, {'album_id': album_id, "form": form}))
-
-
-
 
 @login_required
 @prevent_all_caching
@@ -734,10 +725,10 @@ def get_registration_information_GET(request):
     assert request.method == "GET"
     template_parameters = {
         "is_registration_page": True,
-        "userAuthForm":UserAuthForm(prefix="auth"),
-        "registerForm": RegistrationModelForm(prefix="register"),
-        "userProfileForm": UserProfileForm(prefix="userprofile"),
-        "addressForm": AddressModelForm(prefix="address")
+        "userAuthForm":UserAuthForm(prefix = "auth"),
+        "registerForm": RegistrationModelForm(prefix = "register"),
+        "userProfileForm": UserProfileForm(prefix = "userprofile"),
+        "addressForm": AddressModelForm(prefix = "address")
     }
     return render_to_response("accounts/register2.html",
                               RequestContext(request, template_parameters))
@@ -746,12 +737,12 @@ def get_registration_information_GET(request):
 def get_registration_information_POST(request):
     """ Register an user to this service and redirects him/her to his/her profile. """
     assert request.method == "POST"
-    authform= UserAuthForm(request.POST, prefix="auth")
-    profileform= UserProfileForm(request.POST, prefix="userprofile")
-    addressform=AddressModelForm(request.POST, prefix="address")
-    registerform=RegistrationModelForm(request.POST, prefix="register")
-    allforms=(authform,profileform,addressform,registerform)
-    
+    authform = UserAuthForm(request.POST, prefix = "auth")
+    profileform = UserProfileForm(request.POST, prefix = "userprofile")
+    addressform = AddressModelForm(request.POST, prefix = "address")
+    registerform = RegistrationModelForm(request.POST, prefix = "register")
+    allforms = (authform, profileform, addressform, registerform)
+
     if not all([f.is_valid() for f in allforms]):
         template_parameters = {
             "is_registration_page": True,
@@ -763,18 +754,18 @@ def get_registration_information_POST(request):
         return render_to_response("accounts/register2.html",
                                   RequestContext(request, template_parameters))
 
-    new_user=authform.save()
-    
-    profileform= UserProfileForm(request.POST, prefix="userprofile", instance=new_user.get_profile())
+    new_user = authform.save()
+
+    profileform = UserProfileForm(request.POST, prefix = "userprofile", instance = new_user.get_profile())
     profileform.save()
 
     userActionLogger.info("User %s (id %d) was created." % (new_user.username, new_user.id))
 
     if addressform.has_changed():
-        new_address=addressform.save(commit=False)
-        new_address.owner=new_user
+        new_address = addressform.save(commit = False)
+        new_address.owner = new_user
         new_address.save()
-        
+
         userActionLogger.info("For user %s, an address (id %d) was created." % (new_user.username, new_address.id))
 
     #automatically login. note we must use the password provided in authform, because new_user.password is hashed at this point
