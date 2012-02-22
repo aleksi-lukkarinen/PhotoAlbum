@@ -19,9 +19,10 @@ from django.utils import simplejson as json
 import facebook_api
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
-from forms import AlbumCreationForm, LoginForm, RegistrationForm, AddPageForm, \
-        EditPageForm, build_delivery_address_form
+from forms import AlbumCreationForm, LoginForm, RegistrationForm, RegistrationModelForm, AddPageForm, \
+        EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm,UserAuthForm
 from utils import computeValidationHashForShoppingCart, validationHashForShoppingCartIsValid
+from Albumizer.albumizer.forms import UserProfileForm, AddressModelForm
 
 
 
@@ -31,11 +32,11 @@ SPS_STATUS_CANCELED = "canceled"
 SPS_STATUS_UNSUCCESSFUL = "unsuccessful"
 VALID_SPS_PAYMENT_STATUSES = [SPS_STATUS_SUCCESSFUL, SPS_STATUS_CANCELED, SPS_STATUS_UNSUCCESSFUL]
 
-
-CHECKOUT_ERR_MSG_INVALID_HASH = \
-    "User and/or content of the shopping cart have changed since the beginning of the checkout process, " + \
-    "or phases of the checkout process have been tried to perform in wrong order. Please start again " + \
-    "from the Shopping Cart."
+from forms import CHECKOUT_ERR_MSG_INVALID_HASH
+#CHECKOUT_ERR_MSG_INVALID_HASH = \
+#    "User and/or content of the shopping cart have changed since the beginning of the checkout process, " + \
+#    "or phases of the checkout process have been tried to perform in wrong order. Please start again " + \
+#    "from the Shopping Cart."
 CHECKOUT_ERR_MSG_SHOPPING_CART_IS_EMPTY = \
     "Your shopping cart is empty. Please add something before trying to make an order."
 CHECKOUT_ERR_MSG_MISSING_ADDRESSES = \
@@ -724,60 +725,51 @@ def get_registration_information_GET(request):
     assert request.method == "GET"
     template_parameters = {
         "is_registration_page": True,
-        "form": RegistrationForm()
+        "userAuthForm":UserAuthForm(prefix="auth"),
+        "registerForm": RegistrationModelForm(prefix="register"),
+        "userProfileForm": UserProfileForm(prefix="userprofile"),
+        "addressForm": AddressModelForm(prefix="address")
     }
-    return render_to_response("accounts/register.html",
+    return render_to_response("accounts/register2.html",
                               RequestContext(request, template_parameters))
 
 @prevent_all_caching
 def get_registration_information_POST(request):
     """ Register an user to this service and redirects him/her to his/her profile. """
     assert request.method == "POST"
-    form = RegistrationForm(request.POST)
-    if not form.is_valid():
-        return render_to_response("accounts/register.html",
-                                  RequestContext(request, {"is_registration_page": True, "form": form}))
+    authform= UserAuthForm(request.POST, prefix="auth")
+    profileform= UserProfileForm(request.POST, prefix="userprofile")
+    addressform=AddressModelForm(request.POST, prefix="address")
+    registerform=RegistrationModelForm(request.POST, prefix="register")
+    allforms=(authform,profileform,addressform,registerform)
+    
+    if not all([f.is_valid() for f in allforms]):
+        template_parameters = {
+            "is_registration_page": True,
+            "userAuthForm":authform,
+            "registerForm": registerform,
+            "userProfileForm": profileform,
+            "addressForm": addressform
+        }
+        return render_to_response("accounts/register2.html",
+                                  RequestContext(request, template_parameters))
 
-    username = form.cleaned_data.get("txtUserName")
-    password = form.cleaned_data.get("txtPassword")
-    firstname = form.cleaned_data.get("txtFirstName")
-    lastname = form.cleaned_data.get("txtLastName")
-    gender = form.cleaned_data.get("radGender")
-    email = form.cleaned_data.get("txtEmail")
-    homephone = form.cleaned_data.get("txtHomePhone") or ""
-    postaddressline1 = form.cleaned_data.get("txtPostAddress1") or ""
-    postaddressline2 = form.cleaned_data.get("txtPostAddress2") or ""
-    zipcode = form.cleaned_data.get("txtZipCode") or ""
-    city = form.cleaned_data.get("txtCity") or ""
-    state = form.cleaned_data.get("cmbState")
-    country = form.cleaned_data.get("cmbCountry")
+    new_user=authform.save()
+    
+    profileform= UserProfileForm(request.POST, prefix="userprofile", instance=new_user.get_profile())
+    profileform.save()
 
-    new_user = User.objects.create_user(username, email, password)
-    new_user.first_name = firstname
-    new_user.last_name = lastname
-    new_user.save()
+    userActionLogger.info("User %s (id %d) was created." % (new_user.username, new_user.id))
 
-    user_profile = new_user.get_profile()
-    user_profile.gender = gender
-    user_profile.homePhone = homephone
-    user_profile.save()
-
-    userActionLogger.info("User %s (id %d) was created." % (username, new_user.id))
-
-    if postaddressline1 or postaddressline2 or zipcode or city or state or country:
-        new_address = Address(
-            owner = new_user,
-            postAddressLine1 = postaddressline1,
-            postAddressLine2 = postaddressline2,
-            zipCode = zipcode,
-            city = city,
-            state = state,
-            country = country
-        )
+    if addressform.has_changed():
+        new_address=addressform.save(commit=False)
+        new_address.owner=new_user
         new_address.save()
-        userActionLogger.info("For user %s, an address (id %d) was created." % (username, new_address.id))
+        
+        userActionLogger.info("For user %s, an address (id %d) was created." % (new_user.username, new_address.id))
 
-    authenticated_user = auth.authenticate(username = username, password = password)
+    #automatically login. note we must use the password provided in authform, because new_user.password is hashed at this point
+    authenticated_user = auth.authenticate(username = new_user.username, password = authform.cleaned_data["password"])
     auth.login(request, authenticated_user)
 
     return HttpResponseRedirect(reverse("albumizer.views.show_profile"))
