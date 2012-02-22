@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-import hashlib, logging
+import hashlib, logging, os
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib import auth
@@ -245,6 +245,7 @@ def show_single_page_POST(request, album_id, page_number):
         return HttpResponseRedirect(reverse("add_page", args = [album_id]))
 
     if request.POST.get("editPage"):
+        print page_number
         return HttpResponseRedirect(reverse("edit_page", args = [album_id, page_number]))
 
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
@@ -597,21 +598,21 @@ def edit_page_GET(request, album_id, page_number):
     page = page_resultset[0]
 
     data = {}
-    page_captions = PageContent.objects.filter(page = page, placeHolderID__contains = page.layout.name + '_caption_')
-
-    for caption in page_captions:
-        data["txtCaption_%s" % caption.placeHolderID[-1]] = caption.content
+    page_caption_contents = PageContent.objects.filter(page = page,
+                                                       placeHolderID__contains = page.layout.name + '_caption_')
+    for content in page_caption_contents:
+        data["txtCaption_%s" % content.placeHolderID.split("_")[-1]] = content.content
 
     file_data = {}
-    page_images = PageContent.objects.filter(page = page, placeHolderID__contains = page.layout.name + '_image_')
-
-    for image in page_images:
-        file_data["imgUpload_%s" % caption.placeHolderID[-1]] = image.image
+    page_image_contents = PageContent.objects.filter(page = page,
+                                                     placeHolderID__contains = page.layout.name + '_image_')
+    for content in page_image_contents:
+        file_data["imgUpload_%s" % content.placeHolderID.split("_")[-1]] = content.image
 
     form = EditPageForm(page, data, file_data)
 
-    return render_to_response('album/edit-page.html', RequestContext(request, {'album_id': album_id, 'page_number': page_number, 'form': form}))
-
+    return render_to_response('album/edit-page.html', RequestContext(request,
+                                            {'album_id': album_id, 'page_number': page_number, 'form': form}))
 
 @login_required
 @prevent_all_caching
@@ -622,7 +623,8 @@ def edit_page_POST(request, album_id, page_number):
     form = EditPageForm(page_page, request.POST, request.FILES)
 
     if not form.is_valid():
-        return render_to_response("album/edit-page.html", RequestContext(request, {'album_id': album_id, 'page_number': page_number, "form": form}))
+        return render_to_response("album/edit-page.html",
+                        RequestContext(request, {'album_id': album_id, 'page_number': page_number, "form": form}))
 
     album_resultset = Album.objects.filter(id__exact = album_id)
     if not album_resultset:
@@ -633,37 +635,39 @@ def edit_page_POST(request, album_id, page_number):
         return render_to_response('album/edit-access-denied.html', RequestContext(request))
 
     page_layout = page_page.layout
-    page_captions = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_layout.name + '_caption_')
+    page_captions = PageContent.objects.filter(page = page_page,
+                                               placeHolderID__contains = page_layout.name + '_caption_')
 
     for content in page_captions:
-        content.content = form.cleaned_data.get("txtCaption_%s" % content.placeHolderID[-1])
+        content.content = form.cleaned_data.get("txtCaption_%s" % content.placeHolderID.split("_")[-1])
         content.save()
 
-    page_images = PageContent.objects.filter(page = page_page, placeHolderID__contains = page_page.layout.name + '_image_')
+    page_image_contents = PageContent.objects.filter(page = page_page,
+                                                     placeHolderID__contains = page_page.layout.name + '_image_')
+    for content in page_image_contents:
+        placeholder_number = unicode(content.placeHolderID.split("_")[-1])
+        is_image_to_be_cleared = request.POST.get("imgUpload_%s-clear" % placeholder_number)
+        sent_image = form.cleaned_data.get("imgUpload_%s" % placeholder_number)
 
-    for image in page_images:
-        clear = request.POST.get("imgUpload_%s-clear" % image.placeHolderID[-1])
-        img = form.cleaned_data.get("imgUpload_%s" % image.placeHolderID[-1])
+        path_of_image_to_delete = None
+        if is_image_to_be_cleared:
+            if content.image:
+                path_of_image_to_delete = content.image.path
+                content.image = None
+                content.save()
+                os.remove(path_of_image_to_delete)
+        elif sent_image:
+            if content.image:
+                path_of_image_to_delete = content.image.path
+                content.image = None
+                content.save()
+                os.remove(path_of_image_to_delete)
+            content.image = sent_image
+            content.save()
 
-        if image.image and clear:
-            image.image.delete()
-        elif image.image and img:
-            image.image.delete()
 
-        if img:
-            security_hash_base = unicode(album.owner.id) + unicode(album_id) + unicode(page_number) + \
-                            unicode(image.placeHolderID[-1]) + unicode(datetime.now()) + \
-                            unicode(settings.SECRET_KEY) + unicode(request.META.get("REMOTE_ADDR")) + \
-                            unicode(request.META.get("REMOTE_HOST")) + unicode(request.META.get("HTTP_USER_AGENT"))
-            security_hash = hashlib.md5(security_hash_base).hexdigest()
-            filename = img.name.split('.')
-            filename[0] = '%s_%s_%s_%s_%s' % \
-                (album.owner.id, album_id, page_number, image.placeHolderID[-1], security_hash)
-            img.name = '.'.join(filename)
-            image.image = img
-            image.save()
-
-    userActionLogger.info("User %s created a new page in album \"%s\"." % (request.user.username, album.title))
+    userActionLogger.info("User %s edited page %s in album \"%s\"." % \
+                          (request.user.username, unicode(page_number), album.title))
 
     return HttpResponseRedirect(page_page.get_absolute_url())
 

@@ -41,26 +41,7 @@ class AlbumizerImageField(ImageField):
     """
     
     
-        22.2.2012 Aleksi:
-            The idea for the way to implement dynamic upload path has been gotten from
-            <http://scottbarnham.com/blog/2007/07/31/uploading-images-to-a-dynamic-path-with-django/>.
     """
-    def contribute_to_class(self, cls, name):
-        """ Registers this field instance for listening post-init signals, so that the upload path can be tweaked. """
-        super(AlbumizerImageField, self).contribute_to_class(cls, name)
-        post_init.connect(self._post_init_handler, cls, dispatch_uid = "AlbumizerImageField.contribute_to_class")
-
-    def _post_init_handler(self, instance = None, **kwargs):
-        """ 
-            Asks the parent model instance the upload path by executing
-            its get_upload_folder() method, if one is found.   
-        """
-        if hasattr(instance, "get_upload_folder"):
-            self.upload_to = instance.get_upload_folder(self.attname)
-
-    def db_type(self):
-        """ Tells Django's object/relational mapper the physical type of this field. """
-        return "varchar(100)"
 
 
 
@@ -553,6 +534,23 @@ class Page(models.Model):
 
 
 
+def get_album_photo_upload_path(page_content_model_instance, original_filename):
+    username = page_content_model_instance.page.album.owner.username
+    album_id = unicode(page_content_model_instance.page.album.id)
+    page_number = unicode(page_content_model_instance.page.pageNumber)
+    placeholder_number = unicode(page_content_model_instance.placeHolderID.split("_")[-1])
+    file_extension = original_filename.split('.')[-1]
+
+    security_hash_base = username + album_id + page_number + placeholder_number + \
+                            unicode(datetime.now()) + unicode(settings.SECRET_KEY)
+    security_hash = hashlib.md5(security_hash_base).hexdigest()
+
+    filename = "%s-%s-%s-%s-%s" % (username, album_id, page_number, placeholder_number, security_hash)
+    filename = filename[:90]
+    filename += ".%s" % file_extension
+
+    return "photos/albums/%s/%s/%s/%s" % (username, album_id, page_number, filename)
+
 class PageContent(models.Model):
     """ Represents a single piece of content in a placeholder. """
     page = models.ForeignKey(Page, related_name = "pagecontents")
@@ -563,13 +561,13 @@ class PageContent(models.Model):
     content = models.CharField(
         max_length = 255
     )
-    image = AlbumizerImageField(upload_to = "photos/albums/", blank = True)
+    image = models.ImageField(
+        upload_to = get_album_photo_upload_path,
+        blank = True
+    )
 
     def __unicode__(self):
         return u"%s, %s, %s" % (self.page, self.placeHolderID, self.content)
-
-    def get_upload_folder(self, field_name):
-        return "photos/albums/%s/%s/%s" % (self.page.album.owner.username, self.page.album.id, self.page.pageNumber)
 
     class Meta():
         unique_together = ("page", "placeHolderID")
