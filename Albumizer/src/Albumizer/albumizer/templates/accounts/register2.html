@@ -1,0 +1,69 @@
+{% extends "base-template.html" %}
+{% load albumizer_common %}
+{% load url from future %}
+
+
+
+{% block page_title %}Register{% endblock %}
+
+
+
+{% block page_scripts_after %}
+
+  $(function() {
+    $("#id_cmdRegister").button();
+  });
+  $(window).load(function() {
+	  $("#frmRegister").submit(function() {
+	    $("#id_cmdRegister").button("option", "disabled", true);
+	    return true;  
+	  })
+  });
+
+{% endblock %}
+
+
+
+{% block page_content %}
+
+  <form id="frmRegister" class="commonForm" method="post" action="{% url "get_registration_information" %}">
+    {% csrf_token %}
+
+	  <h1>Register</h1>
+	  {% show_messages %}
+	
+	  <p class="prompt">
+	    If you want to register into the service, please enter the necessary information below.
+	    The fields with a star next to their label are required.
+	  </p>
+    <div class="formSectionTitle ui-widget-header">Account Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+	  {{ userAuthForm.as_p }}
+	  </fieldset>
+	  
+    <div class="formSectionTitle ui-widget-header">Personal Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+		{{userProfileForm.as_p }}
+    
+	  </fieldset>
+	
+    <div class="formSectionTitle ui-widget-header">Delivery Address</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+	{{ addressForm.as_p }}
+	
+	  </fieldset>
+    <div class="formSectionTitle ui-widget-header">Confirmation</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+      <div class="infoRow">
+        The Terms and Conditions of Albumizer&reg; Service contain important information about using the Service,
+        including your rights and obligations. Also, the Privacy Policy of Albumizer&reg; Service describes how
+        the information you give to the Service is handled. These documents must be read, fully understood and
+        accepted before using this Service.
+      </div>
+	{{ registerForm.as_p }}
+	</fieldset>
+      
+      <input type="submit" name="cmdRegister" id="id_cmdRegister" value="Register" />
+  </form>
+
+{% endblock %}
