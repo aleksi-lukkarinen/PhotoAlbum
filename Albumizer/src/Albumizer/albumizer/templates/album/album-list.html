@@ -12,7 +12,7 @@
   {% for album in albums.object_list %}
   <div class="albumListItem{% if forloop.counter0|divisibleby:"5" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
 	  <a href="{{ album.get_absolute_url }}">
-        <img src="" alt="" class="albumListItemImage" />
+        <img src="{{ album.get_cover_url }}" alt="" class="albumListItemImage" />
         <p class="albumListItemTitle">{{ album.title }}</p>
       </a>
   </div>

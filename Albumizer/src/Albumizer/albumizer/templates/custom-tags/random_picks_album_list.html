@@ -12,7 +12,7 @@
           <td>
             <div class="randomPickAlbumsListItemContainer hlisting">
               <figure id="randomPickAlbumsListItemWrapper{{ album.id }}_{{ id }}">
-                <a href="{{ album.get_absolute_url }}"><img class="randomPickAlbumsListItemImage photo" src="" alt="Cover of {{ album.title }}" /></a>
+                <a href="{{ album.get_absolute_url }}"><img class="randomPickAlbumsListItemImage photo" src="{{ album.get_cover_url }}" alt="Cover of {{ album.title }}" /></a>
                 <figcaption class="randomPickAlbumsListItemTitle fn"><a href="{{ album.get_absolute_url }}">{{ album.title }}</a></figcaption>
               </figure>
               <div class="offer-sell">available for order</div>
@@ -64,7 +64,7 @@
 				          '<td>' +
 				            '<div class="randomPickAlbumsListItemContainer hlisting">' +
                       '<figure id="randomPickAlbumsListItemWrapper' + this.id + '_{{ id }}" class="randomPickAlbumsListItemWrapperHidden">' +
-			                  '<a href="' + albumUrl + '"><img class="randomPickAlbumsListItemImage photo" src="" alt="Cover of ' + this.title + '" /></a>' +
+			                  '<a href="' + albumUrl + '"><img class="randomPickAlbumsListItemImage photo" src="' + this.coverUrl + '" alt="Cover of ' + this.title + '" /></a>' +
 			                  '<figcaption class="randomPickAlbumsListItemTitle fn"><a href="' + albumUrl + '">' + this.title + '</a></figcaption>' +
                       '</figure>' +
                       '<div class="offer-sell">available for order</div>' +

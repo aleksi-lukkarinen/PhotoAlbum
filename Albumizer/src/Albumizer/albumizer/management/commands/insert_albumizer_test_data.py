@@ -1,11 +1,12 @@
 # This Python file uses the following encoding: utf-8
 
-import codecs, fileinput, gc, os, string, time
+import fileinput, gc, json, os, re, time
 from datetime import datetime, timedelta
 from optparse import make_option
 from random import Random
 from django import db
 from django.contrib.auth.models import User
+from django.core.files.images import ImageFile
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Max, Q
 from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, \
@@ -34,6 +35,23 @@ DATAFILE_FINNISH_REGIONS = DATAFILE_PATH + "finnish-regions.txt"
 DATAFILE_HTML_TAGS = DATAFILE_PATH + "html-tags.txt"
 
 
+IMAGE_FILE_DICT_ROOT_DIR_KEY = "."
+IMAGE_FILE_DICT_IMAGES_KEY = "images"
+IMAGE_FILE_DICT_QUANTITY_KEY = "quantity"
+IMAGE_FILE_DICT_PATH_KEY = "file_name"
+IMAGE_FILE_DICT_CLEAR_NAME = "clear_name"
+IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS = ["jpg", "jpeg", "png"]
+
+
+COMPILED_RE_IMAGE_FILENAME_CLEARING_PATTERNS_RET_GRP1 = [
+    re.compile(r"^[a-f0-9]{10}_[a-f0-9]{10} (.*)$"),
+    re.compile(r"^(.*).jpg_DFree Photos$"),
+    re.compile(r"^(.*).jpg_ Photos$"),
+    re.compile(r"^(.*).jpg_$"),
+    re.compile(r"^(.*)_O$"),
+    re.compile(r"^(.*)_LOC$"),
+    re.compile(r"^\[(.*)\][ \t]*$"),
+]
 
 
 class Command(BaseCommand):
@@ -71,6 +89,17 @@ class Command(BaseCommand):
             dest = "ordersmin",
             default = 0,
             help = "Minimum number of orders to generate per user, 0-100, default 0"),
+        make_option("--no-images",
+            action = "store_true",
+            dest = "no_images",
+            default = False,
+            help = "Indicate that albums are to be created without filling them with images"),
+        make_option("--image-base-path",
+            action = "store",
+            type = "string",
+            dest = "image_base_path",
+            default = None,
+            help = "Full path to folder containing images to be used to fill albums with"),
         )
 
     _men_first_names = []
@@ -117,7 +146,113 @@ class Command(BaseCommand):
 
 
 
+    def _build_image_info(self, filename, full_path):
+        """ Builds a dictionary describing a single image. """
+        clear_name = ".".join(filename.split(".")[0:-1])
+
+        for regexp in COMPILED_RE_IMAGE_FILENAME_CLEARING_PATTERNS_RET_GRP1:
+            match = re.match(regexp, clear_name)
+            if match:
+                clear_name = match.group(1)
+
+        clear_name = clear_name.replace("_", " ")
+        clear_name = " ".join(clear_name.split())
+
+        return {
+            IMAGE_FILE_DICT_PATH_KEY: full_path,
+            IMAGE_FILE_DICT_CLEAR_NAME: clear_name
+        }
+
+
+
+
+    def _retrieve_image_file_data(self, base_path, recursion_depth = 0, verbosity = 1):
+        """
+            Builds a data structure containing files assumed to be images, i.e. their
+            name ends with one of the extensions listed in IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS.
+        """
+        if recursion_depth < 0:
+            raise ValueError, "recursion_depth cannot be negative"
+
+        if recursion_depth == 0:
+            self.stdout.write(u"Retrieving images...\n")
+
+            image_file_data = {
+                IMAGE_FILE_DICT_IMAGES_KEY: {
+                    IMAGE_FILE_DICT_ROOT_DIR_KEY: {
+                        IMAGE_FILE_DICT_IMAGES_KEY: [],
+                        IMAGE_FILE_DICT_QUANTITY_KEY: 0
+                    }
+                },
+                IMAGE_FILE_DICT_QUANTITY_KEY: 0
+            }
+
+            photos_at_root_dir = []
+            total_quantity = 0
+
+            if not os.path.isdir(base_path):
+                return image_file_data
+
+            for node in os.listdir(base_path):
+                full_path = os.path.join(base_path, node)
+
+                if os.path.isfile(full_path):
+                    if node.split(".")[-1] in IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS:
+                        photos_at_root_dir.append(self._build_image_info(node, full_path))
+
+                        if verbosity >= 2:
+                            self.stdout.write(u".")
+
+                elif os.path.isdir(full_path):
+                    images = self._retrieve_image_file_data(full_path, 1, verbosity)
+                    total_quantity += len(images)
+                    image_file_data[IMAGE_FILE_DICT_IMAGES_KEY][node] = {
+                        IMAGE_FILE_DICT_IMAGES_KEY: images,
+                        IMAGE_FILE_DICT_QUANTITY_KEY: len(images)
+                    }
+
+                    if verbosity >= 2:
+                        self.stdout.write(u"\n")
+
+            image_file_data[IMAGE_FILE_DICT_IMAGES_KEY][IMAGE_FILE_DICT_ROOT_DIR_KEY] = {
+                IMAGE_FILE_DICT_IMAGES_KEY: photos_at_root_dir,
+                IMAGE_FILE_DICT_QUANTITY_KEY: len(photos_at_root_dir)
+            }
+            total_quantity += len(photos_at_root_dir)
+
+            image_file_data[IMAGE_FILE_DICT_QUANTITY_KEY] = total_quantity
+            self.stdout.write(u"\n")
+
+        else:
+            image_file_data = []
+
+            for node in os.listdir(base_path):
+                full_path = os.path.join(base_path, node)
+
+                if os.path.isfile(full_path):
+                    if node.split(".")[-1] in IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS:
+                        image_file_data.append(self._build_image_info(node, full_path))
+
+                        if verbosity >= 2:
+                            self.stdout.write(u".")
+
+                elif os.path.isdir(full_path):
+                    image_file_data += self._retrieve_image_file_data(full_path, recursion_depth + 1, verbosity)
+
+                    if verbosity >= 2:
+                        self.stdout.write(u"\n")
+
+        return image_file_data
+
+
+
+
     def handle(self, *args, **options):
+        self.stdout.write(
+                u"\n---------------------------------\n" +
+                u"  Albumizer Test Data Generator\n" +
+                u"---------------------------------\n\n")
+
         """ Populates the Albumizer database with random test data """
         verbosity = int(options.get("verbosity"))
         number_of_users = options.get("users")
@@ -125,9 +260,23 @@ class Command(BaseCommand):
         min_number_of_albums = options.get("albumsmin")
         max_number_of_orders = options.get("ordersmax")
         min_number_of_orders = options.get("ordersmin")
+        no_images_to_albums = options.get("no_images")
+        image_base_path = options.get("image_base_path")
+
+        if not image_base_path and not no_images_to_albums:
+            self.stdout.write(
+                    u"No path to image files given. If you want to create albums without\n" +
+                    u"using images, please use the --no-images switch. Otherwise, please\n" +
+                    u"use the --image-base-path option to give a path to a folder containing\n" +
+                    u"images to be used to fill albums with.\n\n")
+            return
+
+        if not os.path.isdir(image_base_path):
+            self.stdout.write(u"The given base path for images is either invalid or unaccessible.\n")
+            return
 
         if number_of_users < 1:
-            self.stdout.write(u"No users to be created.\n")
+            self.stdout.write(u"No users to be created.\n\n")
             return
 
         if number_of_users > 500000:
@@ -164,21 +313,76 @@ class Command(BaseCommand):
         self.stdout.write(u"Initializing data structures...\n\n");
 
         self._men_first_names = self._read_data_file(DATAFILE_MEN_FIRST_NAMES)
+        if verbosity >= 3:
+            self.stdout.write(u"Mens' first names: " + unicode(len(self._men_first_names)) + u"\n")
+
         self._women_first_names = self._read_data_file(DATAFILE_WOMEN_FIRST_NAMES)
+        if verbosity >= 3:
+            self.stdout.write(u"Womens' first names: " + unicode(len(self._women_first_names)) + u"\n")
+
         self._last_names = self._read_data_file(DATAFILE_LAST_NAMES)
+        if verbosity >= 3:
+            self.stdout.write(u"Last names: " + unicode(len(self._last_names)) + u"\n")
+
         self._street_names = self._read_data_file(DATAFILE_STREET_NAMES)
+        if verbosity >= 3:
+            self.stdout.write(u"Street names: " + unicode(len(self._street_names)) + u"\n")
+
         self._email_domains = self._read_data_file(DATAFILE_EMAIL_DOMAINS)
+        if verbosity >= 3:
+            self.stdout.write(u"Email domains: " + unicode(len(self._email_domains)) + u"\n")
+
         self._tel_area_codes = self._read_data_file(DATAFILE_TEL_AREA_CODES)
+        if verbosity >= 3:
+            self.stdout.write(u"Telephone area codes: " + unicode(len(self._tel_area_codes)) + u"\n")
+
         self._common_adjectives = self._read_data_file(DATAFILE_COMMON_ADJECTIVES)
+        if verbosity >= 3:
+            self.stdout.write(u"Common adjectives: " + unicode(len(self._common_adjectives)) + u"\n")
+
         self._common_nouns = self._read_data_file(DATAFILE_COMMON_NOUNS)
+        if verbosity >= 3:
+            self.stdout.write(u"Common nouns: " + unicode(len(self._common_nouns)) + u"\n")
+
         self._people_nouns = self._read_data_file(DATAFILE_PEOPLE_NOUNS)
+        if verbosity >= 3:
+            self.stdout.write(u"People nouns: " + unicode(len(self._people_nouns)) + u"\n")
+
         self._common_verbs = self._read_data_file(DATAFILE_COMMON_VERBS)
+        if verbosity >= 3:
+            self.stdout.write(u"Common verbs: " + unicode(len(self._common_verbs)) + u"\n")
+
         self._title_phrases = self._read_data_file(DATAFILE_TITLE_PHRASES)
+        if verbosity >= 3:
+            self.stdout.write(u"Title phrases: " + unicode(len(self._title_phrases)) + u"\n")
+
         self._countries = self._read_data_file(DATAFILE_COUNTRIES)
+        if verbosity >= 3:
+            self.stdout.write(u"Countries: " + unicode(len(self._countries)) + u"\n")
+
         self._cities_regions = self._read_data_file(DATAFILE_CITIES_REGIONS)
+        if verbosity >= 3:
+            self.stdout.write(u"Cities and regions: " + unicode(len(self._cities_regions)) + u"\n")
+
         self._paragraphs = self._read_data_file(DATAFILE_PARAGRAPHS)
+        if verbosity >= 3:
+            self.stdout.write(u"Paragraphs: " + unicode(len(self._paragraphs)) + u"\n")
+
         self._finnish_regions = self._read_data_file(DATAFILE_FINNISH_REGIONS)
+        if verbosity >= 3:
+            self.stdout.write(u"Finnish regions: " + unicode(len(self._finnish_regions)) + u"\n")
+
         self._html_tags = self._read_data_file(DATAFILE_HTML_TAGS)
+        if verbosity >= 3:
+            self.stdout.write(u"HTML tags: " + unicode(len(self._html_tags)) + u"\n")
+
+        if verbosity >= 3:
+            self.stdout.write(u"\n")
+
+        image_file_data = self._retrieve_image_file_data(image_base_path, verbosity = verbosity)
+        if verbosity >= 3:
+            self.stdout.write(json.dumps(image_file_data, sort_keys = True, indent = 4) + u"\n")
+
 
         for i in range(1, len(self._trans_tbl_email_username_src)):
             self._trans_tbl_email_username[ord(self._trans_tbl_email_username_src[i])] = \
@@ -386,11 +590,24 @@ class Command(BaseCommand):
                         if verbosity >= 2:
                             message = u"                  + images:\n"
                             self.stdout.write(message.encode("ascii", "backslashreplace"))
+
                         for content_number in range(1, number_of_images + 1):
                             new_content = PageContent(
                                 page = new_page,
                                 placeHolderID = "%s_image_%s" % (layout.name, content_number)
                             )
+
+                            if not no_images_to_albums:
+                                image_collections = image_file_data[IMAGE_FILE_DICT_IMAGES_KEY]
+                                selected_collection = image_collections[
+                                            image_collections.keys()[self._albumRandomizer.randrange(0, len(image_collections.keys()))]]
+                                images_of_collection = selected_collection[IMAGE_FILE_DICT_IMAGES_KEY]
+                                selected_image = images_of_collection[
+                                            self._albumRandomizer.randrange(0, len(images_of_collection))]
+                                image_file = ImageFile(open(selected_image[IMAGE_FILE_DICT_PATH_KEY], "rb"))
+                                new_content.image.save("this-will-be-overridden.jpg", image_file, True)
+                                image_file.close()
+
                             new_content.save()
 
                             if verbosity >= 2:

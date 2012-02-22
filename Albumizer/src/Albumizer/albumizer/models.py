@@ -234,6 +234,12 @@ class Album(models.Model):
                         {"album_id": self.id, "secret_hash": self.secretHash})
 
     def get_cover_url(self):
+        """ Returns url of this album's cover image, if one can be found. Otherwise, returns an empty string. """
+        for page in self.pages():
+            image_content = page.image_content()
+            for content in image_content:
+                if content.image:
+                    return content.image.url
         return ""
 
     def is_owned_by(self, user):
@@ -285,7 +291,7 @@ class Album(models.Model):
 
     def pages(self):
         """ Return a queryset of all pages of this album. """
-        return Page.objects.filter(album__exact = self)
+        return Page.objects.filter(album__exact = self).order_by("pageNumber")
 
     def has_pages(self):
         """ Return True if this album has at least one page. Otherwise returns False. """
@@ -365,7 +371,8 @@ class Album(models.Model):
             "title": escape(self.title),
             "description": escape(self.description),
             "ownerUname": escape(self.owner.username),
-            "creationDate": self.creationDate
+            "creationDate": self.creationDate,
+            "coverUrl": self.get_cover_url()
         }
 
     @staticmethod
@@ -501,6 +508,25 @@ class Page(models.Model):
         }
         return ("albumizer.views.show_single_page_with_hash", (), view_parameters)
 
+    def get_cover_url(self):
+        """ Returns url of this page's cover image, if one can be found. Otherwise, returns an empty string. """
+        for content in self.image_content():
+            if content.image:
+                return content.image.url
+        return ""
+
+    def content(self):
+        """  """
+        return PageContent.objects.filter(page = self).order_by("placeHolderID")
+
+    def image_content(self):
+        """  """
+        return self.content().filter(placeHolderID__contains = "_image_")
+
+    def caption_content(self):
+        """  """
+        return self.content().filter(placeHolderID__contains = "_caption_")
+
     @staticmethod
     def by_album_id_and_page_number(album_id, page_number):
         """ Returns a page of an album by album's id and page number, if one exists. Otherwise returns None. """
@@ -539,17 +565,19 @@ def get_album_photo_upload_path(page_content_model_instance, original_filename):
     album_id = unicode(page_content_model_instance.page.album.id)
     page_number = unicode(page_content_model_instance.page.pageNumber)
     placeholder_number = unicode(page_content_model_instance.placeHolderID.split("_")[-1])
-    file_extension = original_filename.split('.')[-1]
+    extension = original_filename.split('.')[-1]
 
     security_hash_base = username + album_id + page_number + placeholder_number + unicode(settings.SECRET_KEY)
     #security_hash_base += unicode(datetime.now())
     security_hash = hashlib.md5(security_hash_base).hexdigest()
 
-    filename = "%s-%s-%s-%s-%s" % (username, album_id, page_number, placeholder_number, security_hash)
-    filename = filename[:90]
-    filename += ".%s" % file_extension
+    filename = "%s-%s-%s-%s-%s.%s" % (username, album_id, page_number, placeholder_number, security_hash, extension)
+    path = "photos/albums/%s/%s/%s/%s" % (username, album_id, page_number, filename)
 
-    return "photos/albums/%s/%s/%s/%s" % (username, album_id, page_number, filename)
+    if len(path) > 250:
+        path = path.split(".")[0][:245] + ".%s" % extension
+
+    return path
 
 class PageContent(models.Model):
     """ Represents a single piece of content in a placeholder. """
@@ -563,7 +591,8 @@ class PageContent(models.Model):
     )
     image = models.ImageField(
         upload_to = get_album_photo_upload_path,
-        blank = True
+        blank = True,
+        max_length = 255
     )
 
     def __unicode__(self):

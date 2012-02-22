@@ -84,7 +84,7 @@
 	  {% for page in album.pages %}
 	  <div class="albumListItem{% if forloop.counter0|divisibleby:"5" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
 	    <a href="{% if opened_using_secret_hash %}{{ page.get_secret_url }}{% else %}{{ page.get_absolute_url }}{% endif %}">
-	      <img src="" alt="" class="albumListItemImage" />
+	      <img src="{{ page.get_cover_url }}" alt="Page {{ page.pageNumber }} of album {{ album.title }}" class="albumListItemImage" />
 	      <p class="albumListItemTitle">Page {{ page.pageNumber }}</p>
 	    </a>
 	    {% if current_user_can_delete %}
