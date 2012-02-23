@@ -28,7 +28,7 @@ def computeValidationHashForShoppingCart(request, exclude_addresses = True, extr
         for item in items:
             hash_base += unicode(item.album) + unicode(item.count) + unicode(item.deliveryAddress)
 
-    return hashlib.sha256(hash_base).hexdigest()
+    return hashlib.sha256(hash_base.encode("ascii", "backslashreplace")).hexdigest()
 
 
 

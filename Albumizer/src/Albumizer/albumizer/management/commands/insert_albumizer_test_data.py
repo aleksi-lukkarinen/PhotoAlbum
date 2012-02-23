@@ -604,8 +604,10 @@ class Command(BaseCommand):
                                 images_of_collection = selected_collection[IMAGE_FILE_DICT_IMAGES_KEY]
                                 selected_image = images_of_collection[
                                             self._albumRandomizer.randrange(0, len(images_of_collection))]
-                                image_file = ImageFile(open(selected_image[IMAGE_FILE_DICT_PATH_KEY], "rb"))
-                                new_content.image.save("this-will-be-overridden.jpg", image_file, True)
+                                image_path = selected_image[IMAGE_FILE_DICT_PATH_KEY]
+                                image_extension = image_path.split(".")[-1]
+                                image_file = ImageFile(open(image_path, "rb"))
+                                new_content.image.save(".".join("dummy", image_extension), image_file, True)
                                 image_file.close()
 
                             new_content.save()

@@ -1197,72 +1197,11 @@ def show_order_summary_GET(request):
     validation_hash = utils.computeValidationHashForShoppingCart(request,
                         exclude_addresses = False, extra_key = ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY)
 
-    items = ShoppingCartItem.items_of_user_with_albums_and_addresses(request.user)
-    items_by_address = {}
-
-    order_total_price = 0.00
-
-    for item in items:
-        item_price = item.album.price_excluding_vat_and_shipping()[0]
-        single_item_subtotal = item.count * item_price
-        order_total_price += single_item_subtotal
-
-        if not item.deliveryAddress in items_by_address.keys():
-            items_by_address[item.deliveryAddress] = {"items": []}
-
-        items_by_address[item.deliveryAddress]["items"].append({
-            "title": item.album.title,
-            "description": item.album.description,
-            "creator": item.album.owner,
-            "coverUrl": "",
-            "number_of_units": item.count,
-            "unit_price": item_price,
-            "single_item_subtotal": single_item_subtotal
-        })
-
-    price_of_items = order_total_price
-
-
-    current_date = datetime.now()
-    dispatch_timedelta = timedelta(days = 3)
-    delivery_timedelta = timedelta(days = 14)
-
-    single_shipping_expense = settings.SHIPPING_EXPENSES
-    total_shipping_expenses = 0.00
-    for address, items in items_by_address.items():
-        items_by_address[address]["estimated_dispatch_date"] = current_date + dispatch_timedelta
-        items_by_address[address]["estimated_delivery_date"] = current_date + delivery_timedelta
-
-        item_group_subtotal_before_shipping = 0.00
-        for item_info in items["items"]:
-            item_group_subtotal_before_shipping += item_info["single_item_subtotal"]
-
-        items_by_address[address]["item_group_subtotal_before_shipping"] = item_group_subtotal_before_shipping
-
-        items_by_address[address]["shipping_expenses"] = single_shipping_expense
-
-        item_group_subtotal_with_shipping = item_group_subtotal_before_shipping + single_shipping_expense
-        items_by_address[address]["item_group_subtotal_with_shipping"] = item_group_subtotal_with_shipping
-
-        total_shipping_expenses += single_shipping_expense
-
-    order_total_price += total_shipping_expenses
-
-    order_total_price_before_vat = order_total_price
-    vat_percentage = settings.VAT_PERCENTAGE
-    vat_amount = vat_percentage / 100.0 * order_total_price
-    order_total_price += vat_amount
-
+    order_info = ShoppingCartItem.order_info_for_user(request.user)
 
     template_parameters = {
         "validation_hash": validation_hash,
-        "items_by_address": items_by_address,
-        "price_of_items": price_of_items,
-        "total_shipping_expenses": total_shipping_expenses,
-        "order_total_price_before_vat": order_total_price_before_vat,
-        "vat_percentage": vat_percentage,
-        "vat_amount": vat_amount,
-        "order_total_price": order_total_price
+        "order_info": order_info
     }
     return render_to_response('order/summary.html', RequestContext(request, template_parameters))
 
@@ -1342,6 +1281,7 @@ def report_order_as_successful_GET(request, order_id):
     checksum = hashlib.md5(checksum_source).hexdigest()
 
     template_parameters = {
+        "order": order,
         "sps_address": sps_address,
         "sps_seller_id": sps_seller_id,
         "sps_payment_id": sps_payment_id,
