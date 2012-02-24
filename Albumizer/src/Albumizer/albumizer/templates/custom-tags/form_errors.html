@@ -1,0 +1,21 @@
+{% if field_errors or non_field_errors %}
+<div class="commonFormErrorList ui-state-highlight ui-corner-all">
+	<span class="ui-icon ui-icon-info"></span>
+	<span class="errorMessage">
+		Please correct the following errors:
+	</span>
+	<table>
+	{% for field, errors in field_errors %}
+		<tr>
+			<td>{{field}}:</td>
+			<td>{{errors }}</td>
+		</td>
+	{% endfor%}
+	{% for error in non_field_errors %}
+		<tr>
+			<td colspan="2">{{error}}</td>
+		</td>
+	{% endfor %}
+	</table>
+</div>
+{% endif %}
