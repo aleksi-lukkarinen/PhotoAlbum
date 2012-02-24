@@ -118,7 +118,6 @@ body {
 .dialog input.text {
   padding-left:              0.3em;
 }
-
 h1 {
   background:                #ffffff;
 	color:                     #339933;
@@ -129,7 +128,6 @@ h1 {
 
 p {
 	margin-bottom:             1em;
-	font-size:                 110%;
 }
 
 figure,
@@ -503,7 +501,6 @@ clear:both;
 
 
 
-
 #frmRegister .prompt {
 	margin-bottom:             2em;
 }
@@ -528,6 +525,20 @@ clear:both;
 	width:                     12em;
 }
 
+
+.confirmationForm input {
+/* some customizations to fix the alignment of the terms and conditions checkbox */
+	float:left;
+	margin-right:1em;
+}
+.confirmationForm div label {
+	width:20em;
+}
+.confirmationForm div.helpRow,
+.confirmationForm div.errorRow {
+	margin:0;
+	padding:0;
+}
 
 
 
@@ -1346,7 +1357,18 @@ clear:both;
 
 
 
+/* general form rules */
+.commonForm p.required label {
+  font-weight:bold;
+}
 
+.commonForm p .helptext {
+  display:block;
+  margin-left:13em;
+  padding-left:3px;
+  padding-top:0.2em;
+  color:                     #888888;
+}
 .commonForm .formSectionTitle {
   padding:                   0.5em;
   background-color:          #777777;
@@ -1357,7 +1379,10 @@ clear:both;
 
 .commonForm fieldset {
   border:                    none;
+  margin-bottom:             2em;
+  padding:                   1em 1em 1em 1em;
 }
+
 
 .commonForm label {
   display:                   inline-block;
@@ -1371,11 +1396,11 @@ clear:both;
   min-height:                3em;
 } 
 
-.commonForm .requiredLabel {
+.commonForm .required {
   font-weight:               bold;
 }
 
-.commonForm .requiredLabel .ui-icon {
+.commonForm .fieldRow label .ui-icon {
   display:                   inline-block;
   position:                  absolute;
   margin:                    -0.2em 0em 0em 0.4em;
@@ -1397,7 +1422,6 @@ clear:both;
 }
 
 .commonForm .fieldRow label {
-  float:                     left;
   padding-top:               0.2em;
 }
 
@@ -1413,11 +1437,23 @@ clear:both;
 .commonForm .helpRow {
   margin-top:                0.2em;
   padding-left:              13em;
+  margin-left: 3px;
   color:                     #888888;
 }
 
 .commonForm .errorRow {
   margin:                    0.5em 0em 2em 13em;
+  padding-left: 3px;
+}
+
+.commonForm fieldset .errorlist {
+  list-style-type: none;
+  color:                     #dd0000;
+  font-weight:               bold;
+  margin-left: 13em;
+  padding-top: 1em;
+  padding-left: 3px;
+  padding-bottom: 0.2em;
 }
 
 .commonForm .errorMessage {
@@ -1430,16 +1466,18 @@ clear:both;
   margin-bottom:             2em;
 }
 
-.commonFormErrorList td {
-  vertical-align:            top;
+.commonFormErrorList .errorlist {
+padding-left:1em;
 }
+.commonFormErrorList .errorlist {
 
-.commonFormErrorList td li {
-  margin-left:               2em;
+display: inline-block;
+list-style-type: none;
+	
 }
-
 .commonFormErrorList .ui-icon {
   margin-right:              0.5em;
+  display: inline-block;
 }
 
 .commonFormErrorList .errorMessage {
@@ -1447,11 +1485,6 @@ clear:both;
   margin-top:                0.1em;
   color:                     black;
   font-weight:               normal;
-}
-
-.commonForm fieldset {
-  margin-bottom:             2em;
-  padding:                   0em 1em 1em 1em;
 }
 
 

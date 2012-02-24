@@ -36,31 +36,32 @@
 	    If you want to register into the service, please enter the necessary information below.
 	    The fields with a star next to their label are required.
 	  </p>
+	  
+	  {% form_error_list allForms%}
+	  
     <div class="formSectionTitle ui-widget-header">Account Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-	  {{ userAuthForm.as_p }}
+	  {% include "basicform.html" with form=userAuthForm %}
 	  </fieldset>
 	  
     <div class="formSectionTitle ui-widget-header">Personal Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-		{{userProfileForm.as_p }}
-    
+	  {% include "basicform.html" with form=userProfileForm %}    
 	  </fieldset>
 	
     <div class="formSectionTitle ui-widget-header">Delivery Address</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-	{{ addressForm.as_p }}
-	
+	  {% include "basicform.html" with form=addressForm %}   
 	  </fieldset>
     <div class="formSectionTitle ui-widget-header">Confirmation</div>
-    <fieldset class="ui-widget-content ui-corner-bottom">
+    <fieldset class="ui-widget-content ui-corner-bottom confirmationForm">
       <div class="infoRow">
         The Terms and Conditions of Albumizer&reg; Service contain important information about using the Service,
         including your rights and obligations. Also, the Privacy Policy of Albumizer&reg; Service describes how
         the information you give to the Service is handled. These documents must be read, fully understood and
         accepted before using this Service.
       </div>
-	{{ registerForm.as_p }}
+	  {% include "basicform.html" with form=registerForm %}
 	</fieldset>
       
       <input type="submit" name="cmdRegister" id="id_cmdRegister" value="Register" />
