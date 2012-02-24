@@ -1,13 +1,13 @@
 ﻿# This Python file uses the following encoding: utf-8
 
 import json, hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import Random
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import ImageField, Max, Q
-from django.db.models.signals import post_init, post_save
+from django.db.models.signals import post_save
 from django.utils.html import escape
 
 
@@ -331,8 +331,6 @@ class Album(models.Model):
             
             album_info_list is a list of lists containing an Album object and a quantity, like
             [[album1, 3], [album2, 23], [album3, 1]] .
-            
-            Returns an dictionary of    
         """
         item_infos = {}
         sub_total_price_for_all_albums = 0.00
@@ -348,6 +346,122 @@ class Album(models.Model):
         return {
             "items": item_infos,
             "sub_total": sub_total_price_for_all_albums
+        }
+
+    @staticmethod
+    def price_for_several_albums_including_vat_and_shipping(album_info_list):
+        """ 
+            Calculates a prices for several albums, including VAT and shipping.
+            
+            album_info_list is a list of lists containing an Album object and a quantity, like
+            [[album1, 3, address1], [album2, 23, address2], [album3, 1, address3]] .
+        """
+#        order_total_price = 0.00
+#
+#        for item in items:
+#            item_price = item.album.price_excluding_vat_and_shipping()[0]
+#            single_item_subtotal = item.count * item_price
+#            order_total_price += single_item_subtotal
+#
+#            if not item.deliveryAddress in items_by_address.keys():
+#                items_by_address[item.deliveryAddress] = {"items": []}
+#
+#            items_by_address[item.deliveryAddress]["items"].append({
+#                "title": item.album.title,
+#                "description": item.album.description,
+#                "creator": item.album.owner,
+#                "coverUrl": "",
+#                "number_of_units": item.count,
+#                "unit_price": item_price,
+#                "single_item_subtotal": single_item_subtotal
+#            })
+#
+#        price_of_items = order_total_price
+#
+#
+#        current_date = datetime.now()
+#        dispatch_timedelta = timedelta(days = 3)
+#        delivery_timedelta = timedelta(days = 14)
+#
+#        single_shipping_expense = settings.SHIPPING_EXPENSES
+#        sub_total_shipping_expenses = 0.00
+#        for address, items in items_by_address.items():
+#            items_by_address[address]["estimated_dispatch_date"] = current_date + dispatch_timedelta
+#            items_by_address[address]["estimated_delivery_date"] = current_date + delivery_timedelta
+#
+#            item_group_subtotal_before_shipping = 0.00
+#            for item_info in items["items"]:
+#                item_group_subtotal_before_shipping += item_info["single_item_subtotal"]
+#
+#            items_by_address[address]["item_group_subtotal_before_shipping"] = item_group_subtotal_before_shipping
+#
+#            items_by_address[address]["shipping_expenses"] = single_shipping_expense
+#
+#            item_group_subtotal_with_shipping = item_group_subtotal_before_shipping + single_shipping_expense
+#            items_by_address[address]["item_group_subtotal_with_shipping"] = item_group_subtotal_with_shipping
+#
+#            sub_total_shipping_expenses += single_shipping_expense
+#
+#        order_total_price += sub_total_shipping_expenses
+#
+#        order_total_price_before_vat = order_total_price
+#        vat_percentage = settings.VAT_PERCENTAGE
+#        vat_amount = vat_percentage / 100.0 * order_total_price
+#        order_total_price += vat_amount
+
+        items_by_address = {}
+        sub_total_price_for_all_albums = 0.00
+        for (album, quantity, address) in album_info_list:
+            unit_price, sub_total_for_single_album, sub_total_price_for_all_albums = \
+                album.price_excluding_vat_and_shipping(quantity, sub_total_price_for_all_albums)
+
+            if not address in items_by_address.keys():
+                items_by_address[address] = {"items": []}
+
+            items_by_address[address]["items"].append({
+                "album": album,
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "sub_total": sub_total_for_single_album
+            })
+
+        current_date = datetime.now()
+        dispatch_timedelta = timedelta(days = 3)
+        delivery_timedelta = timedelta(days = 14)
+
+        single_shipping_expense = settings.SHIPPING_EXPENSES
+        sub_total_shipping_expenses = 0.00
+        for address, items in items_by_address.items():
+            items_by_address[address]["estimated_dispatch_date"] = current_date + dispatch_timedelta
+            items_by_address[address]["estimated_delivery_date"] = current_date + delivery_timedelta
+
+            item_group_subtotal_before_shipping = 0.00
+            for item_info in items["items"]:
+                item_group_subtotal_before_shipping += item_info["sub_total"]
+
+            items_by_address[address]["item_group_subtotal_before_shipping"] = item_group_subtotal_before_shipping
+
+            items_by_address[address]["shipping_expenses"] = single_shipping_expense
+
+            item_group_subtotal_with_shipping = item_group_subtotal_before_shipping + single_shipping_expense
+            items_by_address[address]["item_group_subtotal_with_shipping"] = item_group_subtotal_with_shipping
+
+            sub_total_shipping_expenses += single_shipping_expense
+
+        order_total_price_before_vat = sub_total_price_for_all_albums + sub_total_shipping_expenses
+
+        vat_percentage = settings.VAT_PERCENTAGE
+        vat_amount = vat_percentage / 100.0 * order_total_price_before_vat
+        order_total_price = order_total_price_before_vat + vat_amount
+
+        return {
+            "items_by_address": items_by_address,
+            "price_of_items": sub_total_price_for_all_albums,
+            "shipping_expenses": sub_total_shipping_expenses,
+            "order_total_price_before_vat": order_total_price_before_vat,
+            "vat_percentage": vat_percentage,
+            "vat_amount": vat_amount,
+            "order_total_price": order_total_price
         }
 
     def deletePage(self, page_number):
@@ -569,7 +683,7 @@ def get_album_photo_upload_path(page_content_model_instance, original_filename):
 
     security_hash_base = username + album_id + page_number + placeholder_number + unicode(settings.SECRET_KEY)
     #security_hash_base += unicode(datetime.now())
-    security_hash = hashlib.md5(security_hash_base).hexdigest()
+    security_hash = hashlib.md5(security_hash_base.encode("ascii", "backslashreplace")).hexdigest()
 
     filename = "%s-%s-%s-%s-%s.%s" % (username, album_id, page_number, placeholder_number, security_hash, extension)
     path = "photos/albums/%s/%s/%s/%s" % (username, album_id, page_number, filename)
@@ -786,6 +900,18 @@ class ShoppingCartItem(models.Model):
         items = ShoppingCartItem.items_of_user_with_albums(user)
         album_count_list = [(i.album, i.count) for i in items]
         return Album.price_for_several_albums_excluding_vat_and_shipping(album_count_list)
+
+    @staticmethod
+    def order_info_for_user(user):
+        """ 
+            Returns information about items in given user's shopping cart
+            treating the cart content as a complete order.
+            
+            Returns a dictionary, see Album.price_for_several_albums_including_vat_and_shipping().
+        """
+        items = ShoppingCartItem.items_of_user_with_albums(user)
+        album_count_address_list = [(i.album, i.count, i.deliveryAddress) for i in items]
+        return Album.price_for_several_albums_including_vat_and_shipping(album_count_address_list)
 
     @staticmethod
     def does_exist(user, album_id):

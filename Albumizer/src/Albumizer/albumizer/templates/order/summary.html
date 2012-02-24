@@ -46,31 +46,31 @@
 					  <div class="title">Order Summary</div>
 					  <div class="line items">
 	            <span class="heading">Items:</span>
-	            <span class="value">{{ price_of_items|floatformat:"2" }} &euro;</span>
+	            <span class="value">{{ order_info.price_of_items|floatformat:"2" }} &euro;</span>
 					  </div>
 	          <div class="line shipping">
 	            <span class="heading">Shipping:</span>
-	            <span class="value">{{ total_shipping_expenses|floatformat:"2" }} &euro;</span>
+	            <span class="value">{{ order_info.shipping_expenses|floatformat:"2" }} &euro;</span>
 	          </div>
 	          <hr class="subSeparator" />
 	          <div class="line totalBeforeVAT">
 	            <span class="heading">Total before VAT:</span>
-	            <span class="value">{{ order_total_price_before_vat|floatformat:"2" }} &euro;</span>
+	            <span class="value">{{ order_info.order_total_price_before_vat|floatformat:"2" }} &euro;</span>
 	          </div>
 	          <div class="line vat">
-	            <span class="heading">VAT ({{ vat_percentage|floatformat:"1" }} %):</span>
-	            <span class="value">{{ vat_amount|floatformat:"2" }} &euro;</span>
+	            <span class="heading">VAT ({{ order_info.vat_percentage|floatformat:"1" }} %):</span>
+	            <span class="value">{{ order_info.vat_amount|floatformat:"2" }} &euro;</span>
 	          </div>
 	          <hr class="separator" />
 	          <div class="line orderTotal">
 	            <span class="heading">Order Total:</span>
-	            <span class="value"><nobr>{{ order_total_price|floatformat:"2" }} &euro;</nobr></span>
+	            <span class="value"><nobr>{{ order_info.order_total_price|floatformat:"2" }} &euro;</nobr></span>
 	          </div>
 	          <div style="clear: both;"></div>
 					</div>
 					<div style="clear: both;"></div>
 	      </div>
-	      {% for address, item_group in items_by_address.items %}
+	      {% for address, item_group in order_info.items_by_address.items %}
 	        <div class="itemsOfSingleAddress ui-corner-all">
 	          <div class="addressGroupHeader ui-corner-all">
 		          <div class="address">
@@ -126,19 +126,19 @@
 		          {% for item_info in item_group.items %}
 		            <div class="singleItem ui-corner-all {% if forloop.last %}last{% endif %}">
 		              <div class="image">
-		                <img src="{{ item_info.coverUrl }}" alt="Cover of {{ item_info.title }}" 
-		                               title="Cover of {{ item_info.title }}" />
+		                <img src="{{ item_info.album.get_cover_url }}" alt="Cover of {{ item_info.album.title }}" 
+		                               title="Cover of {{ item_info.album.title }}" />
 		              </div>
 		              <div class="titleRow">
-		                <span class="title">{{ item_info.title }}</span> &mdash; 
-		                <span class="creator">{{ item_info.creator }}</span>
+		                <span class="title">{{ item_info.album.title }}</span> &mdash; 
+		                <span class="creator">{{ item_info.album.owner }}</span>
 		              </div>
-		              <div class="description">{{ item_info.description }}</div>
+		              <div class="description">{{ item_info.album.description }}</div>
 	                <div class="priceAndQuantity">
 	                  <span class="content">
-		                  {{ item_info.number_of_units }} piece{{ item_info.number_of_units|pluralize }},
+		                  {{ item_info.quantity }} piece{{ item_info.quantity|pluralize }},
 		                  {{ item_info.unit_price|floatformat:"2" }} &euro;/piece
-		                  <span class="subtotal">Subtotal: {{ item_info.single_item_subtotal|floatformat:"2" }} &euro;</span>
+		                  <span class="subtotal">Subtotal: {{ item_info.sub_total|floatformat:"2" }} &euro;</span>
 		                </span>
 	                </div>
 	                <div style="clear: both;"></div>

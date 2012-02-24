@@ -1316,9 +1316,22 @@ clear:both;
   padding:                   0em;
 }
 
+#checkoutSuccessful .paymentServices {
+  background:                #88cc55;
+  padding:                   0.3em 0.5em;
+  width:                     100%;
+  margin-bottom:             1em;
+}
+
+#checkoutSuccessful .paymentServices .groupContent {
+  background:                #ffffff;
+  padding:                   0.8em;
+  text-align:                center;
+}
+
 #checkoutSuccessful #id_frmSPSPayment .spsContainer {
-	display:                   inline-block;
-	text-align:                center;
+  display:                   inline-block;
+  text-align:                center;
 }
 
 #checkoutSuccessful #id_frmSPSPayment .spsContainer .spsLogo {
