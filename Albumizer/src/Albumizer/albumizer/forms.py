@@ -51,6 +51,13 @@ class CommonAlbumizerBaseForm(forms.BaseForm):
     
     error_css_class = 'error'
     required_css_class = 'required'
+    
+    
+    def __init__(self, *args, **kwargs):
+        """ override default label suffix """
+        kwargs["label_suffix"]=kwargs.get("label_suffix", '')
+        super(CommonAlbumizerBaseForm, self).__init__(*args, **kwargs)
+        
     def add_common_error(self, error_string):
         """ Adds an error message, which is not related to any particular field. """
         if not error_string:
@@ -95,7 +102,47 @@ COMPILED_RE_VALID_USER_ID = re.compile(RE_VALID_USER_ID)
 RE_VALID_PHONE_NUMBER = "^\+?[ 0-9]+$"
 COMPILED_RE_VALID_PHONE_NUMBER = re.compile(RE_VALID_PHONE_NUMBER)
 
-class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):    
+class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
+    
+    username = forms.CharField(
+        min_length = 5,
+        max_length = 30,
+        label = u"Username",
+        widget = forms.TextInput(attrs = {
+            'size': '30',
+            'pattern': RE_VALID_USER_ID,
+            'required': 'required',
+            'autofocus': 'true',
+            'title': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING
+        }),
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING)},
+        help_text = u"e.g. \"lmikkola\" (5 - 30 letters A-Z, numbers 0-9 and underscores, min. 1 letter or number)"
+    )
+    first_name = forms.CharField(
+        max_length = 30,
+        label = u"First Name",
+        widget = forms.TextInput(attrs = {
+            'size':'30',
+            'required': 'required',
+            'title': REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING
+        }),
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_FIRST_NAME_MISSING)},
+        help_text = u"e.g. \"Terhi-Anneli\" or \"Derek\" (max. 30 characters)"
+    )
+    last_name = forms.CharField(
+        max_length = 30,
+        label = u"Last Name",
+        widget = forms.TextInput(attrs = {
+            'size':'30',
+            'required': 'required',
+            'title': REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING
+        }),
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_LAST_NAME_MISSING)},
+        help_text = u"e.g. \"Virtanen-Kulmala\" or \"Smith\" (max. 30 characters)"
+    )
     password = forms.CharField(
         min_length = 8,
         max_length = 50,
@@ -110,13 +157,37 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
         help_text = u"8 - 50 characters"
     )
     txtPasswordAgain = forms.CharField(
-        required = False,
+        required = True,
         label = u"Re-Enter Password",
         widget = forms.PasswordInput(attrs = {
             'size':'50',
             'required': 'required',
             'title': REGISTRATION_FORM_ERR_MSG_SECOND_PASSWORD_MISSING,
             'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_SECOND_PASSWORD_MISSING
+        })
+    )
+    
+    email = forms.EmailField(
+        max_length = 100,
+        label = u"Email",
+        widget = AlbumizerEmailInput(attrs = {
+            'size':'50',
+            'required': 'required',
+            'placeholder': 'firstname.lastname@domain',
+            'title': REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING
+        }),
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_FIRST_EMAIL_MISSING)},
+        help_text = u"real address like \"matti.virtanen@company.com\" (max. 100 characters)"
+    )
+    txtEmailAgain = forms.CharField(
+        label = u"Re-Enter Email",
+        widget = AlbumizerEmailInput(attrs = {
+            'size':'50',
+            'required': 'required',
+            'placeholder': 'firstname.lastname@domain',
+            'title': REGISTRATION_FORM_ERR_MSG_SECOND_EMAIL_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_SECOND_EMAIL_MISSING
         })
     )
     def save(self, commit=True):
@@ -127,11 +198,73 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
         if commit:
             user.save()
         return user
+    
+    def clean_username(self):
+        """ Ensure that given userid is valid and that no user with that userid does already exist """
+        userid = self.cleaned_data.get("username")
+        if not userid:
+            raise ValidationError(REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING)
+
+        userid = userid.strip()
+        if not re.match(COMPILED_RE_VALID_USER_ID, userid):
+            raise ValidationError(u"User name can contain only letters A-Z, numbers 0-9 and underscores.")
+
+        if User.objects.filter(username__exact = userid):
+            raise ValidationError(u"This user name is already reserved. Please try another one.")
+
+        return userid
+    def clean(self):
+        """ Ensure that the two password are equal and that the two email addresses are equal. """
+        cleaned_data = self.cleaned_data
+        errors = self._errors
+
+
+        if not errors.get("email"):
+            email1 = cleaned_data.get("email")
+            email2 = cleaned_data.get("txtEmailAgain")
+
+            if email1 != email2:
+                error_message = (u"The email fields did not contain the same address. " +
+                                 u"Make sure the address is written correctly.")
+
+                error_list = errors.get("txtEmailAgain")
+                if not error_list:
+                    error_list = ErrorList()
+
+                error_list.append(error_message)
+                errors["txtEmailAgain"] = error_list
+
+        if not errors.get("password"):
+            password1 = cleaned_data.get("password")
+            password2 = cleaned_data.get("txtPasswordAgain")
+
+            if password1 != password2:
+                error_message = (u"The password fields did not contain the same password. " +
+                                 u"Make sure the password is written correctly.")
+
+                error_list = errors.get("txtPasswordAgain")
+                if not error_list:
+                    error_list = ErrorList()
+
+                error_list.append(error_message)
+                errors["txtPasswordAgain"] = error_list
+        self._errors = errors
+        return cleaned_data
     class Meta:
         model = User
-        fields =('username', 'password', 'txtPasswordAgain', 'first_name', 'last_name', 'email')
+        fields =('username', 'password', 'txtPasswordAgain', 'first_name', 'last_name', 'email', 'txtEmailAgain')
         
 class UserProfileForm(CommonAlbumizerBaseForm, ModelForm):
+    gender = forms.ChoiceField(
+        label = u"Gender",
+        choices = UserProfile.GENDER_CHOICES,
+        error_messages = {'required': (REGISTRATION_FORM_ERR_MSG_GENDER_MISSING)},
+        widget = forms.RadioSelect(attrs = {
+            'required': 'required',
+            'title': REGISTRATION_FORM_ERR_MSG_GENDER_MISSING,
+            'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_GENDER_MISSING
+        })
+    )
     class Meta:
         model = UserProfile
         exclude=('user',)

@@ -723,12 +723,18 @@ def edit_album_POST(request, album_id):
 def get_registration_information_GET(request):
     """ Displays a form which allows user to register himself/herself into this service. """
     assert request.method == "GET"
+    authform = UserAuthForm(prefix = "auth")
+    profileform = UserProfileForm(prefix = "userprofile")
+    addressform = AddressModelForm(prefix = "address")
+    registerform = RegistrationModelForm(prefix = "register")
+    allforms = (authform, profileform, addressform, registerform)
     template_parameters = {
         "is_registration_page": True,
-        "userAuthForm":UserAuthForm(prefix = "auth"),
-        "registerForm": RegistrationModelForm(prefix = "register"),
-        "userProfileForm": UserProfileForm(prefix = "userprofile"),
-        "addressForm": AddressModelForm(prefix = "address")
+            "userAuthForm":authform,
+            "registerForm": registerform,
+            "userProfileForm": profileform,
+            "addressForm": addressform,
+            "allForms":allforms
     }
     return render_to_response("accounts/register2.html",
                               RequestContext(request, template_parameters))
@@ -749,7 +755,8 @@ def get_registration_information_POST(request):
             "userAuthForm":authform,
             "registerForm": registerform,
             "userProfileForm": profileform,
-            "addressForm": addressform
+            "addressForm": addressform,
+            "allForms":allforms
         }
         return render_to_response("accounts/register2.html",
                                   RequestContext(request, template_parameters))

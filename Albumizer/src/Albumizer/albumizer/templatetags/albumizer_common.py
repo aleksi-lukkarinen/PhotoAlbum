@@ -13,7 +13,18 @@ from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Page
 register = template.Library()
 
 
+@register.inclusion_tag("custom-tags/form_errors.html")
+def form_error_list(forms):
+    errors=[]
+    nonfielderrors=[]
+    
+    for form in forms:
+        for (field, err) in form.field_errors().items():
+            errors.append([form.fields[field].label, err])
+        for err in form.non_field_errors():
+            nonfielderrors.append(err)
 
+    return {"field_errors":errors, "non_field_errors":nonfielderrors}
 
 def new_pseudo_unique_id():
     """ Creates an id, which most likely is unique in the context of a single html page. """

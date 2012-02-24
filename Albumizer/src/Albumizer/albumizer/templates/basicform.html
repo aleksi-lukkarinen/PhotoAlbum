@@ -1,0 +1,24 @@
+
+{% for field in form.visible_fields %}
+  <div class="fieldRow {{field.css_classes}}">
+  	<label for="{{field.id_for_label }}">
+  	{{ field.label }}
+  	{% if field.field.required %}
+  		<span title="This field is required" class="ui-icon ui-icon-star"></span>
+  	{% endif %}
+  	</label>
+  	{{ field }}
+  </div>
+  <div class="helpRow">{{ field.help_text }}</div>
+  {% if field.errors %}
+	  <div class="errorRow">
+      {% for error in field.errors %}
+        <div class="errorMessage">{{ error }}</div>
+      {% endfor %}
+	  </div>
+	{% endif %}
+{% endfor %}
+
+{% for field in form.hidden_fields %}
+	{{field}}
+{% endfor %}
