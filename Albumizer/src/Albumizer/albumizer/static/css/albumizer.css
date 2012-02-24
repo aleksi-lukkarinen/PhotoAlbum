@@ -160,29 +160,7 @@ img {
 
 
 
-.paymentInfo .paymentDetails {
-  margin:                    1em 0em;
-  padding:                   1em 3em;
-	background:                #f8f8f8;
-	border:                    1px solid #eeeeee;
-}
 
-.paymentInfo .paymentDetails th {
-	padding:                   0.2em;
-  text-align:                left;
-  color:                     #888888;
-  width:                     12em;
-}
-
-.paymentInfo .orderInfo {
-	margin:                    2em 0em;
-}
-
-.paymentInfo .closing {
-  margin-top:                3em;
-  font-size:                 120%;
-  font-style:                italic;
-}
 
 
 
@@ -1294,21 +1272,9 @@ clear:both;
 	margin-bottom:             2em;
 }
 
-#checkoutSuccessful .paymentServiceLink {
-  display:                   inline-block;
-  border:                    none;
-  background:                #ffffff;
-  color:                     #336699;
-  text-decoration:           underline;
-  cursor:                    pointer;
-  margin:                    0em;
-  padding:                   0em;
-}
-
 #checkoutSuccessful .paymentServices {
   background:                #88cc55;
   padding:                   0.3em 0.5em;
-  width:                     100%;
   margin-bottom:             1em;
 }
 
@@ -1319,8 +1285,18 @@ clear:both;
 }
 
 #checkoutSuccessful #id_frmSPSPayment .spsContainer {
-  display:                   inline-block;
   text-align:                center;
+}
+
+#checkoutSuccessful .paymentServiceLink {
+  display:                   inline-block;
+  border:                    none;
+  background:                #ffffff;
+  color:                     #336699;
+  text-decoration:           underline;
+  cursor:                    pointer;
+  margin:                    0em;
+  padding:                   0em;
 }
 
 #checkoutSuccessful #id_frmSPSPayment .spsContainer .spsLogo {
@@ -1337,6 +1313,134 @@ clear:both;
   background:                #ffffff;
   color:                     #777777;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.paymentInfo .orderInfo {
+  margin:                    2em 0em;
+}
+
+.paymentInfo .closing {
+  margin-top:                3em;
+  font-size:                 120%;
+  font-style:                italic;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.paymentDetails {
+	display:                   inline-block;
+  background:                #88cc55;
+  padding:                   0.3em 0.5em;
+  margin-bottom:             1em;
+}
+
+.paymentDetails .groupHeader {
+  background:                #f6fff6;
+  padding:                   0.8em;
+  margin-bottom:             0.3em;
+  font-size:                 110%;
+  font-weight:               bold;
+}
+
+.paymentDetails .groupContent {
+  background:                #ffffff;
+  padding:                   0.8em;
+  font-size:                 110%;
+}
+
+.paymentDetails .groupContent .detail {
+  clear:                     both;
+  padding:                   0.3em 0em;  
+}
+
+.paymentDetails .groupContent .detailTitle {
+	float:                     left;	
+}
+
+.paymentDetails .groupContent .detailValue {
+	margin-left:               15em;
+	min-width:                 15em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.orderBrowser .statusUnknown .line1 {
+	margin-top:                3em;
+	margin-bottom:             2em;
+}
+
+.orderBrowser .statusUnknown .line2 {
+  margin-bottom:             4em;
+}
+
+
+
+
+
 
 
 

@@ -356,59 +356,6 @@ class Album(models.Model):
             album_info_list is a list of lists containing an Album object and a quantity, like
             [[album1, 3, address1], [album2, 23, address2], [album3, 1, address3]] .
         """
-#        order_total_price = 0.00
-#
-#        for item in items:
-#            item_price = item.album.price_excluding_vat_and_shipping()[0]
-#            single_item_subtotal = item.count * item_price
-#            order_total_price += single_item_subtotal
-#
-#            if not item.deliveryAddress in items_by_address.keys():
-#                items_by_address[item.deliveryAddress] = {"items": []}
-#
-#            items_by_address[item.deliveryAddress]["items"].append({
-#                "title": item.album.title,
-#                "description": item.album.description,
-#                "creator": item.album.owner,
-#                "coverUrl": "",
-#                "number_of_units": item.count,
-#                "unit_price": item_price,
-#                "single_item_subtotal": single_item_subtotal
-#            })
-#
-#        price_of_items = order_total_price
-#
-#
-#        current_date = datetime.now()
-#        dispatch_timedelta = timedelta(days = 3)
-#        delivery_timedelta = timedelta(days = 14)
-#
-#        single_shipping_expense = settings.SHIPPING_EXPENSES
-#        sub_total_shipping_expenses = 0.00
-#        for address, items in items_by_address.items():
-#            items_by_address[address]["estimated_dispatch_date"] = current_date + dispatch_timedelta
-#            items_by_address[address]["estimated_delivery_date"] = current_date + delivery_timedelta
-#
-#            item_group_subtotal_before_shipping = 0.00
-#            for item_info in items["items"]:
-#                item_group_subtotal_before_shipping += item_info["single_item_subtotal"]
-#
-#            items_by_address[address]["item_group_subtotal_before_shipping"] = item_group_subtotal_before_shipping
-#
-#            items_by_address[address]["shipping_expenses"] = single_shipping_expense
-#
-#            item_group_subtotal_with_shipping = item_group_subtotal_before_shipping + single_shipping_expense
-#            items_by_address[address]["item_group_subtotal_with_shipping"] = item_group_subtotal_with_shipping
-#
-#            sub_total_shipping_expenses += single_shipping_expense
-#
-#        order_total_price += sub_total_shipping_expenses
-#
-#        order_total_price_before_vat = order_total_price
-#        vat_percentage = settings.VAT_PERCENTAGE
-#        vat_amount = vat_percentage / 100.0 * order_total_price
-#        order_total_price += vat_amount
-
         items_by_address = {}
         sub_total_price_for_all_albums = 0.00
         for (album, quantity, address) in album_info_list:
@@ -1013,7 +960,10 @@ class Order(models.Model):
         auto_now_add = True,
         verbose_name = u"purchase date"
     )
-    status = models.ForeignKey(OrderStatus)
+    status = models.ForeignKey(
+        OrderStatus,
+        default = OrderStatus.ordered()
+    )
     statusClarification = models.CharField(
         blank = True,
         max_length = 255,
@@ -1028,14 +978,20 @@ class Order(models.Model):
             return None
         return order_resultset[0]
 
-    def total_price(self):
-        """ Calculates and returns the total price for this order. """
-        items = self.items()
-        total = 0.0
-        for i in items:
-            total += i.count * i.album.price_excluding_vat_and_shipping()[0]
-        total += settings.SHIPPING_EXPENSES
-        return total
+    def info(self):
+        """ 
+            Returns information about items belonging to this order.
+            
+            Returns a dictionary, see Album.price_for_several_albums_including_vat_and_shipping().
+            In addition, the returned dictionary contains keys "order" containing this Order instance,
+            and if this order has been paid, "payment" containing the corresponding SPSPayment instance. 
+        """
+        album_count_address_list = [(i.album, i.count, i.deliveryAddress) for i in self.items()]
+        order_info = Album.price_for_several_albums_including_vat_and_shipping(album_count_address_list)
+        order_info["order"] = self
+        if self.is_paid():
+            order_info["payment"] = self.payment()
+        return order_info
 
     @models.permalink
     def get_absolute_url(self):
@@ -1047,8 +1003,30 @@ class Order(models.Model):
         return user == self.orderer
 
     def is_paid(self):
-        """ Returns True if this order is paid, otherwise False. """
+        """ Returns True if this order is paid (via Simple Payments), otherwise False. """
         return SPSPayment.exists_for_order(self)
+
+    def is_just_ordered(self):
+        """ Returns True if this order has just been ordered but has not been paid yet, otherwise False. """
+        return self.status == OrderStatus.ordered()
+
+    def is_paid_and_being_processed(self):
+        """ Returns True if this order has been paid and is currently being processed, otherwise False. """
+        return self.status == OrderStatus.paid_and_being_processed()
+
+    def is_sent(self):
+        """ Returns True if this order has already been sent to the delivery address, otherwise False. """
+        return self.status == OrderStatus.sent()
+
+    def is_blocked(self):
+        """ Returns True if this order is currently blocked for some reason, otherwise False. """
+        return self.status == OrderStatus.blocked()
+
+    def payment(self):
+        """ Returns (Simple Payments) payment for this order, if one exists. """
+        if not self.is_paid():
+            return None
+        return SPSPayment.of_order(self)
 
     def items(self):
         """ Return all items of this order. """

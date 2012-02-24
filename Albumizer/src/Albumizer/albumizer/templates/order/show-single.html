@@ -4,16 +4,53 @@
 
 
 
-{% block page_title %}Order #{{ order.id }}{% endblock %}
+{% block page_title %}Order #{{ order_info.order.id }}{% endblock %}
 
 
 
 {% block page_content %}
 
-  <h1>Order #{{ order.id }}</h1>
-  {% show_messages %}
-
-  
-
+  <div class="orderBrowser">
+	  <h1>Order #{{ order_info.order.id }} on {{ order_info.order.purchaseDate }}</h1>
+	  {% show_messages %}
+	
+	  {% if order_info.order.is_just_ordered %}
+	    <div class="statusOrdered">
+	      <div class="prompt"> 
+		      This order has been placed successfully, but it won't be processed until we receive your payment.<br />
+		      The accepted payment methods are listed below. Please initiate the payment by clicking
+		      the link of the payment service you want to use.  
+	      </div>
+	      
+	    </div>
+	  {% else %}
+	    {% if order_info.order.is_paid_and_being_processed %}
+	  
+	      {% payment_details order_info.payment %}
+	      
+	      
+	    {% else %}
+	      {% if order_info.order.is_sent %}
+	        
+	        
+	        
+	      {% else %}
+	        {% if order_info.order.is_blocked %}
+	      
+	      
+	      
+	        {% else %}
+	          <div class="statusUnknown">
+	            <div class="prompt line1">
+	              Something unexpected has happened, and consequently this order is in unknown state.
+	              Please kindly contant to our customer service.
+	            </div>
+	            <div class="prompt line2">We regret any inconvenience this may have caused to you.</div>
+	          </div>
+	        {% endif %}
+	      {% endif %}    
+	    {% endif %}
+	  {% endif %}
+  </div>
 
 {% endblock %}

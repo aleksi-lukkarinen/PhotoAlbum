@@ -1261,6 +1261,11 @@ def report_order_as_successful_GET(request, order_id):
     if not order:
         return resource_not_found_message(request, "order")
 
+    if order.is_paid():
+        return HttpResponseRedirect(reverse("show_single_order", args = [order_id]))
+
+    order_info = order.info()
+
     sps_address = settings.SIMPLE_PAYMENT_SERVICE_URL
     sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
     sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
@@ -1275,13 +1280,14 @@ def report_order_as_successful_GET(request, order_id):
     sps_error_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_UNSUCCESSFUL])
 
     sps_payment_id = unicode(order_id)
-    amount = utils.convert_money_into_two_decimal_string(order.total_price())
+    amount = utils.convert_money_into_two_decimal_string(order_info.get("order_total_price"))
 
     checksum_source = "pid=%s&sid=%s&amount=%s&token=%s" % (sps_payment_id, sps_seller_id, amount, sps_secret)
     checksum = hashlib.md5(checksum_source).hexdigest()
 
     template_parameters = {
         "order": order,
+        "order_info": order_info,
         "sps_address": sps_address,
         "sps_seller_id": sps_seller_id,
         "sps_payment_id": sps_payment_id,
@@ -1319,10 +1325,9 @@ def report_sps_payment_status_GET(request, status):
     if our_checksum != sps_checksum:
         return HttpResponseBadRequest()
 
-    order_qs = Order.objects.filter(id__exact = payment_id)
-    if not order_qs:
+    order = Order.by_id(payment_id)
+    if not order:
         return HttpResponseServerError()
-    order = order_qs[0]
 
     template_parameters = {}
 
@@ -1332,17 +1337,19 @@ def report_sps_payment_status_GET(request, status):
 
         new_payment = SPSPayment(
             order = order,
-            amount = order.total_price(),
+            amount = order.info().get("order_total_price"),
             referenceCode = reference,
             clarification = ""
         )
         new_payment.save()
+        order.status = OrderStatus.paid_and_being_processed()
+        order.save()
 
-        template_parameters = {"payment": new_payment}
+        template_parameters = {"order_info": order.info()}
         return render_to_response('payment/sps/%s.html' % status,
                                   RequestContext(request, template_parameters))
 
-    template_parameters = {"order": order}
+    template_parameters = {"order_info": order.info()}
     return render_to_response('payment/sps/%s.html' % status,
                               RequestContext(request, template_parameters))
 
@@ -1367,12 +1374,7 @@ def show_single_order_GET(request, order_id):
     if not order.is_made_by(request.user):
         return access_denied_message(request, "order")
 
-    payment = SPSPayment.of_order(order)
-
-    template_parameters = {
-        "order": order,
-        "payment": payment
-    }
+    template_parameters = {"order_info": order.info()}
     return render_to_response_as_public('order/show-single.html', RequestContext(request, template_parameters))
 
 @login_required

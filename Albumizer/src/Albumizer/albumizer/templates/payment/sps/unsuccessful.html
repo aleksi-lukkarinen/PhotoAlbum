@@ -13,7 +13,7 @@
 
 {% block message_page_content %}
 
-  <div class="paymentInfo">
+  <div class="paymentInfo prompt">
     Something unexpected happened during handling of your payment via Simple Payments service.
     We have detected this situation and are resolving any technical issues possibly having occurred.
     Please try to make the payment soon again and kindly contact to our customer service
@@ -21,7 +21,7 @@
 
     <div class="orderInfo">
       Unfortunately, we cannot process your order yet, because it is still unpaid.  
-      You can check the status of your order <a href="{{ order.get_absolute_url }}">here</a>.
+      You can check the status of your order <a href="{{ order_info.order.get_absolute_url }}">here</a>.
     </div>
 
     We regret any inconvinience this situation might have caused to you. 

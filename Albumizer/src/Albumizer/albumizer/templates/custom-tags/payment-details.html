@@ -1,0 +1,37 @@
+{% load url from future %}
+
+  {% if payment %}
+    <div class="paymentDetails ui-corner-all">
+      <div class="groupHeader ui-corner-all">Payment Details</div>
+      <div class="groupContent ui-corner-all">
+        <div class="detail">
+          <div class="detailTitle">Order Date:</div>
+          <div class="detailValue" title="{{ payment.order.purchaseDate|date:"c" }}">{{ payment.order.purchaseDate|date:"j.n.Y \a\t G.i" }}</div>
+        </div>
+        <div class="detail">
+          <div class="detailTitle">Payer:</div>
+          <div class="detailValue">{{ payment.order.orderer.first_name }} {{ payment.order.orderer.last_name }}</div>
+        </div>
+        <div class="detail">
+          <div class="detailTitle">Payee:</div>
+          <div class="detailValue">Albumizer Plc.</div>
+        </div>
+        <div class="detail">
+          <div class="detailTitle">Amount:</div>
+          <div class="detailValue">{{ payment.amount|floatformat:"2" }} &euro;</div>
+        </div>
+        <div class="detail">
+          <div class="detailTitle">Via:</div>
+          <div class="detailValue">Simple Payments</div>
+        </div>
+        <div class="detail">
+          <div class="detailTitle">Transaction Date:</div>
+          <div class="detailValue" title="{{ payment.transactionDate|date:"c" }}">{{ payment.transactionDate|date:"j.n.Y \a\t G.i" }}</div>
+        </div>
+        <div class="detail">
+          <div class="detailTitle">Reference #:</div>
+          <div class="detailValue">{{ payment.referenceCode }}</div>
+        </div>
+      </div>
+    </div>
+  {% endif %}

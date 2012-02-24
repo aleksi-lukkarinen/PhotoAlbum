@@ -23,7 +23,7 @@ def new_pseudo_unique_id():
 
 
 
-@register.inclusion_tag("custom-tags/random_picks_album_list.html", takes_context = True)
+@register.inclusion_tag("custom-tags/random-picks-album-list.html", takes_context = True)
 def random_picks_album_list(context, number_of_random_picks = 4):
     """ Outputs HTML and JavaScript code needed to render the Random Picks list of albums. """
     random_picks = Album.pseudo_random_public_ones(number_of_random_picks)
@@ -105,5 +105,14 @@ def show_messages(context):
     return {
         "messages": context.get("messages")
     }
+
+
+
+
+@register.inclusion_tag("custom-tags/payment-details.html")
+def payment_details(payment):
+    """ Outputs HTML code needed to render details of a payment. """
+    return {"payment": payment}
+
 
 
