@@ -510,7 +510,7 @@ clear:both;
 .confirmationForm input {
 /* some customizations to fix the alignment of the terms and conditions checkbox */
 	float:                     left;
-  margin-top:                0.2em;
+  margin-top:                0.35em;
   margin-right:              1em;
 }
 

@@ -1,14 +1,16 @@
 ﻿# This Python file uses the following encoding: utf-8
 
-import json, hashlib
+import hashlib, json, os
 from datetime import datetime, timedelta
 from random import Random
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import ImageField, Max, Q
+from django.db.models.fields.files import ImageFieldFile
 from django.db.models.signals import post_save
 from django.utils.html import escape
+import Image
 
 
 
@@ -36,44 +38,79 @@ def serialize_into_json(object_to_serialize):
 
 
 
+FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL = "thumb-large"
+FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL = "thumb-small"
+
+class AlbumizerImageFieldFile(ImageFieldFile):
+    """ ImageFieldFile subclass, which is able to save give image with small and large thumbnails. """
+    @staticmethod
+    def _modify_to_thumbnail_path(path, extension_prefix_to_add):
+        """ 
+            Adds an prefix to files extension, e.g. "this.jpg" --> "this.thumb.jpg",
+            and changes the actual extension to "jpg" (because thumbnails are saved as jpegs).
+        """
+        path_parts = path.split(".")
+        path_parts.insert(-1, extension_prefix_to_add)
+        path_parts[-1] = "jpg"
+        changed_path = ".".join(path_parts)
+        return changed_path
+
+    def _create_thumbnail(self, width, height, target_path):
+        """ Creates a thumbnail image based on the original, which must be saved already. """
+        thumbnail_image = Image.open(self.path)
+        thumbnail_image.thumbnail((width, height), Image.ANTIALIAS)
+        thumbnail_image.save(target_path, "JPEG")
+
+    def _delete_thumbnail(self, path):
+        """ Deletes a file poined by given path, if it exists. """
+        if os.path.exists(path):
+            os.remove(path)
+
+    def large_thumbnail_path(self):
+        """ Returns path of the large thumbnail image. """
+        return self._modify_to_thumbnail_path(self.path, FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL)
+
+    def small_thumbnail_path(self):
+        """ Returns path of the small thumbnail image. """
+        return self._modify_to_thumbnail_path(self.path, FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL)
+
+    def large_thumbnail_url(self):
+        """ Returns path of the large thumbnail image. """
+        return self._modify_to_thumbnail_path(self.url, FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL)
+
+    def small_thumbnail_url(self):
+        """ Returns path of the small thumbnail image. """
+        return self._modify_to_thumbnail_path(self.url, FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL)
+
+    def save(self, name, content, save = True):
+        """ Lets the superclass to save the original image and creates the two thumbnail images. """
+        super(AlbumizerImageFieldFile, self).save(name, content, save)
+        self._create_thumbnail(self.field.small_thumb_width, self.field.small_thumb_height, \
+                                    self.small_thumbnail_path())
+        self._create_thumbnail(self.field.large_thumb_width, self.field.large_thumb_height, \
+                                    self.large_thumbnail_path())
+
+    def delete(self, save = True):
+        """ Deletes the thumbnail images and the lets the superclass to delete the original image. """
+        self._delete_thumbnail(self.small_thumbnail_path())
+        self._delete_thumbnail(self.large_thumbnail_path())
+        super(AlbumizerImageFieldFile, self).delete(save)
+
+
+
 
 class AlbumizerImageField(ImageField):
-    """
-    
-    
-    """
+    """ ImageField subclass, which is able to save give image with small and large thumbnails. """
+    attr_class = AlbumizerImageFieldFile
 
-
-
-
-#def usermodel_get_addresses(self):
-#    """ Returns this user's addresses. """
-#    return Address.objects.filter(owner__exact = self)
-#
-#def usermodel_get_albums(self):
-#    """ Returns this user's albums. """
-#    return Album.objects.filter(owner__exact = self)
-#
-#def usermodel_get_facebook_profile(self):
-#    """ Returns this user's Facebook profile, if one exists. """
-#    profile_qs = FacebookProfile.objects.filter(userProfile__exact = self.get_profile())
-#    if profile_qs.count() > 0:
-#        return profile_qs[0]
-#    return None
-#
-#def usermodel_get_orders(self):
-#    """ Returns this user's orders. """
-#    return Order.objects.filter(orderer__exact = self)
-#
-#def usermodel_get_shopping_cart_items(self):
-#    """ Returns items in this user's shopping cart. """
-#    return ShoppingCartItem.objects.filter(user__exact = self)
-#
-#User.add_to_class("addresses", usermodel_get_addresses)
-#User.add_to_class("albums", usermodel_get_albums)
-#User.add_to_class("facebook_profile", usermodel_get_facebook_profile)
-#User.add_to_class("orders", usermodel_get_orders)
-#User.add_to_class("shopping_cart", usermodel_get_shopping_cart_items)
+    def __init__(self, small_thumb_width = 100, small_thumb_height = 100,
+                 large_thumb_width = 300, large_thumb_height = 300, *args, **kwargs):
+        """ Store sizes of large and small thumbnail. """
+        self.small_thumb_width = small_thumb_width
+        self.small_thumb_height = small_thumb_height
+        self.large_thumb_width = large_thumb_width
+        self.large_thumb_height = large_thumb_height
+        super(AlbumizerImageField, self).__init__(*args, **kwargs)
 
 
 
@@ -233,12 +270,51 @@ class Album(models.Model):
         return ("albumizer.views.show_single_album_with_hash", (),
                         {"album_id": self.id, "secret_hash": self.secretHash})
 
-    def get_cover_url(self):
-        """ Returns url of this album's cover image, if one can be found. Otherwise, returns an empty string. """
+    def url_of_small_cover(self):
+        """ 
+            Returns the url of this album's small cover image, if one can be found. "Cover image" is the first
+            found when iterating through pages ordered by their pageNumber field.
+            
+            If the small thumbnail of the image in question does not exist, existence of the larger thumbnail
+            is checked and its url is returned if the image exists. 
+            
+            If the large thumbnail of the image in question does not exist either,
+            the url of the actual image is returned.
+             
+            If there is no images in this album, this method returns an empty string. 
+        """
         for page in self.pages():
             image_content = page.image_content()
             for content in image_content:
                 if content.image:
+                    if os.path.exists(content.image.small_thumbnail_path()):
+                        return content.image.small_thumbnail_url()
+                    if os.path.exists(content.image.large_thumbnail_path()):
+                        return content.image.large_thumbnail_url()
+                    return content.image.url
+        return ""
+
+    def url_of_large_cover(self):
+        """ 
+            Returns the url of this album's large cover image, if one can be found. "Cover image" is the first
+            found when iterating through pages ordered by their pageNumber field.
+            
+            If the large thumbnail of the image in question does not exist, existence of the smaller thumbnail
+            is checked and its url is returned if the image exists.
+            
+            If the small thumbnail of the image in question does not exist either,
+            the url of the actual image is returned.
+             
+            If there is no images in this album, this method returns an empty string. 
+        """
+        for page in self.pages():
+            image_content = page.image_content()
+            for content in image_content:
+                if content.image:
+                    if os.path.exists(content.image.large_thumbnail_path()):
+                        return content.image.large_thumbnail_url()
+                    if os.path.exists(content.image.small_thumbnail_path()):
+                        return content.image.small_thumbnail_url()
                     return content.image.url
         return ""
 
@@ -433,7 +509,8 @@ class Album(models.Model):
             "description": escape(self.description),
             "ownerUname": escape(self.owner.username),
             "creationDate": self.creationDate,
-            "coverUrl": self.get_cover_url()
+            "urlOfSmallCover": self.url_of_small_cover(),
+            "urlOfLargeCover": self.url_of_large_cover()
         }
 
     @staticmethod
@@ -576,6 +653,50 @@ class Page(models.Model):
                 return content.image.url
         return ""
 
+    def url_of_small_cover(self):
+        """ 
+            Returns the url of this page's small cover image, if one can be found. "Cover image" is the first
+            found when iterating through pages content in ascending order.
+            
+            If the small thumbnail of the image in question does not exist, existence of the larger thumbnail
+            is checked and its url is returned if the image exists. 
+            
+            If the large thumbnail of the image in question does not exist either,
+            the url of the actual image is returned.
+             
+            If there are no images on this page, this method returns an empty string. 
+        """
+        for content in self.image_content():
+            if content.image:
+                if os.path.exists(content.image.small_thumbnail_path()):
+                    return content.image.small_thumbnail_url()
+                if os.path.exists(content.image.large_thumbnail_path()):
+                    return content.image.large_thumbnail_url()
+                return content.image.url
+        return ""
+
+    def url_of_large_cover(self):
+        """ 
+            Returns the url of this page's large cover image, if one can be found. "Cover image" is the first
+            found when iterating through pages content in ascending order.
+            
+            If the large thumbnail of the image in question does not exist, existence of the smaller thumbnail
+            is checked and its url is returned if the image exists.
+            
+            If the small thumbnail of the image in question does not exist either,
+            the url of the actual image is returned.
+             
+            If there are no images on this page, this method returns an empty string. 
+        """
+        for content in self.image_content():
+            if content.image:
+                if os.path.exists(content.image.large_thumbnail_path()):
+                    return content.image.large_thumbnail_url()
+                if os.path.exists(content.image.small_thumbnail_path()):
+                    return content.image.small_thumbnail_url()
+                return content.image.url
+        return ""
+
     def content(self):
         """  """
         return PageContent.objects.filter(page = self).order_by("placeHolderID")
@@ -633,7 +754,7 @@ def get_album_photo_upload_path(page_content_model_instance, original_filename):
     security_hash = hashlib.md5(security_hash_base.encode("ascii", "backslashreplace")).hexdigest()
 
     filename = "%s-%s-%s-%s-%s.%s" % (username, album_id, page_number, placeholder_number, security_hash, extension)
-    path = "photos/albums/%s/%s/%s/%s" % (username, album_id, page_number, filename)
+    path = "photos/albums/%s/%s/%s/%s/%s/%s" % (username[0], username[1], username, album_id, page_number, filename)
 
     if len(path) > 250:
         path = path.split(".")[0][:245] + ".%s" % extension
@@ -650,7 +771,7 @@ class PageContent(models.Model):
     content = models.CharField(
         max_length = 255
     )
-    image = models.ImageField(
+    image = AlbumizerImageField(
         upload_to = get_album_photo_upload_path,
         blank = True,
         max_length = 255
@@ -960,10 +1081,7 @@ class Order(models.Model):
         auto_now_add = True,
         verbose_name = u"purchase date"
     )
-    status = models.ForeignKey(
-        OrderStatus,
-        default = OrderStatus.ordered()
-    )
+    status = models.ForeignKey(OrderStatus)
     statusClarification = models.CharField(
         blank = True,
         max_length = 255,

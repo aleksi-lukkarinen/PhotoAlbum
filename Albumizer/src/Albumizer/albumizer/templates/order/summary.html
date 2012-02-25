@@ -126,7 +126,7 @@
 		          {% for item_info in item_group.items %}
 		            <div class="singleItem ui-corner-all {% if forloop.last %}last{% endif %}">
 		              <div class="image">
-		                <img src="{{ item_info.album.get_cover_url }}" alt="Cover of {{ item_info.album.title }}" 
+		                <img src="{{ item_info.album.url_of_small_cover }}" alt="Cover of {{ item_info.album.title }}" 
 		                               title="Cover of {{ item_info.album.title }}" />
 		              </div>
 		              <div class="titleRow">

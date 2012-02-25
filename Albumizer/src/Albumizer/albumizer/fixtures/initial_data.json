@@ -57,14 +57,10 @@
         "pk": 1,
         "model": "sites.site",
         "fields": {
-            "name": "group024.webcourse.niksula.hut.fi",
-            "domain":"group024.webcourse.niksula.hut.fi"
+            "name": "tla.albumizer.aalto.fi:8000/",
+            "domain":"tla.albumizer.aalto.fi:8000/"
         }
     },
-
-
-
-
 
 
 
