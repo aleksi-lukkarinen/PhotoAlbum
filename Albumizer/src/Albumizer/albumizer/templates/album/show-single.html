@@ -57,8 +57,8 @@
     </div>
     <div class="detailRow">
       <td class="price">
-        {% if album.price > 0 %}
-          {{ album.price|floatformat:"2" }} &euro; / piece + shipping
+        {% if album.price_excluding_vat_and_shipping.0 > 0 %}
+          {{ album.price_excluding_vat_and_shipping.0|floatformat:"2" }} &euro; / piece + shipping + VAT
         {% endif %}
       </td>
     </div>

@@ -16,7 +16,9 @@ import Image
 
 
 def json_serialization_handler(object_to_serialize):
-    """ Serializes objects, which are not supported by the Python's json package. """
+    """ 
+        Serializes objects, which are not supported by the Python's json package.
+    """
     if hasattr(object_to_serialize, 'isoformat'):    # for datetimes: serialize them into a standard format
         return object_to_serialize.isoformat()
     else:
@@ -38,11 +40,14 @@ def serialize_into_json(object_to_serialize):
 
 
 
+
 FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL = "thumb-large"
 FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL = "thumb-small"
 
 class AlbumizerImageFieldFile(ImageFieldFile):
-    """ ImageFieldFile subclass, which is able to save give image with small and large thumbnails. """
+    """ 
+        ImageFieldFile subclass, which is able to save give image with small and large thumbnails.
+    """
     @staticmethod
     def _modify_to_thumbnail_path(path, extension_prefix_to_add):
         """ 
@@ -56,34 +61,48 @@ class AlbumizerImageFieldFile(ImageFieldFile):
         return changed_path
 
     def _create_thumbnail(self, width, height, target_path):
-        """ Creates a thumbnail image based on the original, which must be saved already. """
+        """ 
+            Creates a thumbnail image based on the original, which must be saved already.
+        """
         thumbnail_image = Image.open(self.path)
         thumbnail_image.thumbnail((width, height), Image.ANTIALIAS)
         thumbnail_image.save(target_path, "JPEG")
 
     def _delete_thumbnail(self, path):
-        """ Deletes a file poined by given path, if it exists. """
+        """ 
+            Deletes a file poined by given path, if it exists.
+        """
         if os.path.exists(path):
             os.remove(path)
 
     def large_thumbnail_path(self):
-        """ Returns path of the large thumbnail image. """
+        """ 
+            Returns path of the large thumbnail image.
+        """
         return self._modify_to_thumbnail_path(self.path, FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL)
 
     def small_thumbnail_path(self):
-        """ Returns path of the small thumbnail image. """
+        """ 
+            Returns path of the small thumbnail image.
+        """
         return self._modify_to_thumbnail_path(self.path, FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL)
 
     def large_thumbnail_url(self):
-        """ Returns path of the large thumbnail image. """
+        """ 
+            Returns path of the large thumbnail image.
+        """
         return self._modify_to_thumbnail_path(self.url, FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL)
 
     def small_thumbnail_url(self):
-        """ Returns path of the small thumbnail image. """
+        """ 
+            Returns path of the small thumbnail image.
+        """
         return self._modify_to_thumbnail_path(self.url, FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL)
 
     def save(self, name, content, save = True):
-        """ Lets the superclass to save the original image and creates the two thumbnail images. """
+        """ 
+            Lets the superclass to save the original image and creates the two thumbnail images.
+        """
         super(AlbumizerImageFieldFile, self).save(name, content, save)
         self._create_thumbnail(self.field.small_thumb_width, self.field.small_thumb_height, \
                                     self.small_thumbnail_path())
@@ -91,7 +110,9 @@ class AlbumizerImageFieldFile(ImageFieldFile):
                                     self.large_thumbnail_path())
 
     def delete(self, save = True):
-        """ Deletes the thumbnail images and the lets the superclass to delete the original image. """
+        """ 
+            Deletes the thumbnail images and the lets the superclass to delete the original image.
+        """
         self._delete_thumbnail(self.small_thumbnail_path())
         self._delete_thumbnail(self.large_thumbnail_path())
         super(AlbumizerImageFieldFile, self).delete(save)
@@ -100,12 +121,16 @@ class AlbumizerImageFieldFile(ImageFieldFile):
 
 
 class AlbumizerImageField(ImageField):
-    """ ImageField subclass, which is able to save give image with small and large thumbnails. """
+    """ 
+        ImageField subclass, which is able to save give image with small and large thumbnails.
+    """
     attr_class = AlbumizerImageFieldFile
 
     def __init__(self, small_thumb_width = 100, small_thumb_height = 100,
                  large_thumb_width = 300, large_thumb_height = 300, *args, **kwargs):
-        """ Store sizes of large and small thumbnail. """
+        """ 
+            Store sizes of large and small thumbnail. 
+        """
         self.small_thumb_width = small_thumb_width
         self.small_thumb_height = small_thumb_height
         self.large_thumb_width = large_thumb_width
@@ -116,8 +141,9 @@ class AlbumizerImageField(ImageField):
 
 
 class UserProfile(models.Model):
-    """ Represents additional information about a single user. """
-
+    """ 
+        Represents additional information about a single user.
+    """
     GENDER_CHOICES = (
         (u"M", u"Male"),
         (u"F", u"Female")
@@ -152,7 +178,7 @@ class UserProfile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     """
         Post-save event handler to make sure that a new user profile is 
-        created as soon as a new user is created to Django's user table.
+        created as soon as a new user is created into Django's user table.
     """
     if created:
         profile = UserProfile(user = instance)
@@ -211,7 +237,9 @@ class FacebookProfile(models.Model):
 
 
 class Album(models.Model):
-    """ Represents a single album. """
+    """ 
+        Represents a single album.
+    """
     owner = models.ForeignKey(User)
     title = models.CharField(
         max_length = 255,
@@ -242,7 +270,9 @@ class Album(models.Model):
     _randomizer = Random()
 
     def save(self, *args, **kwargs):
-        """ Generate/validate album data before saving. """
+        """ 
+            Generate/validate album data before saving.
+        """
         if len(self.title.strip()) < 5:
             raise ValueError, "Length of album's title must be 5-255 non-whitespace characters (%s)." % self.title
 
@@ -319,29 +349,41 @@ class Album(models.Model):
         return ""
 
     def is_owned_by(self, user):
-        """ Checks if this album is owned by a given user. """
+        """ 
+            Checks if this album is owned by a given user.
+        """
         return user == self.owner
 
     def is_editable_to_user(self, user):
-        """ Checks if this album is editable to a given user. """
+        """ 
+            Checks if this album is editable to a given user.
+        """
         return self.is_owned_by(user)
 
     def is_visible_to_user(self, user):
-        """ Checks if this album is visible to a given user. """
+        """ 
+            Checks if this album is visible to a given user.
+        """
         return self.isPublic or self.is_owned_by(user)
 
     def is_hidden_from_user(self, user):
-        """ Checks if this album is hidden from a given user. """
+        """ 
+            Checks if this album is hidden from a given user.
+        """
         return not self.is_visible_to_user(user)
 
     @staticmethod
     def does_exist(album_id):
-        """ Returns True, if an album having given id exists. Otherwise returns False. """
+        """ 
+            Returns True, if an album having given id exists. Otherwise returns False.
+        """
         return Album.objects.filter(id__exact = album_id).exists()
 
     @staticmethod
     def by_id(album_id):
-        """ Returns an album having given id, if one exists. Otherwise returns None. """
+        """ 
+            Returns an album having given id, if one exists. Otherwise returns None.
+        """
         album_resultset = Album.objects.filter(id__exact = album_id)
         if not album_resultset:
             return None
@@ -349,7 +391,9 @@ class Album(models.Model):
 
     @staticmethod
     def by_id_and_secret_hash(album_id, secret_hash):
-        """ Returns an album having given id and secret hash, if one exists. Otherwise returns None. """
+        """ 
+            Returns an album having given id and secret hash, if one exists. Otherwise returns None.
+        """
         album_resultset = Album.objects.filter(id__exact = album_id, secretHash__exact = secret_hash)
         if not album_resultset:
             return None
@@ -357,24 +401,34 @@ class Album(models.Model):
 
     @staticmethod
     def ones_owned_by(user):
-        """ Returns a queryset of albums owned by given user and ordered by title. """
+        """ 
+            Returns a queryset of albums owned by given user and ordered by title.
+        """
         return Album.objects.filter(owner = user).order_by('title')
 
     @staticmethod
     def ones_visible_to(user):
-        """ Returns a queryset of albums visible to a given user. """
+        """ 
+            Returns a queryset of albums visible to a given user.
+        """
         return Album.objects.filter(Q(isPublic = True) | Q(owner = user)).order_by('title')
 
     def pages(self):
-        """ Return a queryset of all pages of this album. """
+        """ 
+            Return a queryset of all pages of this album.
+        """
         return Page.objects.filter(album__exact = self).order_by("pageNumber")
 
     def has_pages(self):
-        """ Return True if this album has at least one page. Otherwise returns False. """
+        """ 
+            Return True if this album has at least one page. Otherwise returns False.
+        """
         return Page.objects.filter(album__exact = self).exists()
 
     def price_excluding_vat_and_shipping(self, quantity = None, cumulative_total = None):
-        """ Calculates a price for a number of a single album, excluding VAT and shipping. """
+        """ 
+            Calculates a price for a number of a single album, excluding VAT and shipping.
+        """
         if quantity and quantity < 0:
             raise ValueError, "Quantity of an album cannot be negative"
 
@@ -488,7 +542,9 @@ class Album(models.Model):
         }
 
     def deletePage(self, page_number):
-        """deletes the given page from this album"""
+        """ 
+            Deletes the given page from this album.
+        """
         query = self.pages().filter(pageNumber = page_number)[:1]
         if query:
             #delete page
@@ -502,7 +558,9 @@ class Album(models.Model):
                 page.save()
 
     def as_api_dict(self):
-        """ Returns this album as an dictionary containing values wanted to be exposed in the public api. """
+        """ 
+            Returns this album as an dictionary containing values wanted to be exposed in the public api.
+        """
         return {
             "id": self.id,
             "title": escape(self.title),
@@ -515,12 +573,16 @@ class Album(models.Model):
 
     @staticmethod
     def list_as_api_dict(album_list):
-        """ Returns a list of albums as an dictionary containing values wanted to be exposed in the public api. """
+        """ 
+            Returns a list of albums as an dictionary containing values wanted to be exposed in the public api.
+        """
         return [album.as_api_dict() for album in album_list]
 
     @staticmethod
     def latest_public_ones(how_many = 20):
-        """ Returns some latest publicly visible albums. """
+        """ 
+            Returns some latest publicly visible albums.
+        """
         if how_many < 1:
             how_many = 1
         if how_many > 99:
@@ -529,12 +591,16 @@ class Album(models.Model):
 
     @classmethod
     def latest_public_ones_as_json(cls, how_many = 20):
-        """ Returns some latest publicly visible albums as json. """
+        """ 
+            Returns some latest publicly visible albums as json.
+        """
         return serialize_into_json(cls.list_as_api_dict(cls.latest_public_ones(how_many)))
 
     @classmethod
     def pseudo_random_public_ones(cls, how_many = 4):
-        """ Returns some pseudo-random publicly visible albums. """
+        """ 
+            Returns some pseudo-random publicly visible albums.
+        """
         if how_many < 1:
             how_many = 1
         if how_many > 9:
@@ -563,7 +629,9 @@ class Album(models.Model):
 
     @classmethod
     def pseudo_random_public_ones_as_json(cls, how_many = 4):
-        """ Returns some pseudo-random publicly visible albums as json. """
+        """ 
+            Returns some pseudo-random publicly visible albums as json.
+        """
         return serialize_into_json(cls.list_as_api_dict(cls.pseudo_random_public_ones(how_many)))
 
     class Meta():
@@ -576,7 +644,9 @@ class Album(models.Model):
 
 
 class Layout(models.Model):
-    """Represents a single layout"""
+    """ 
+        Represents a single layout.
+    """
     name = models.CharField(
         max_length = 255,
         unique = True,
@@ -617,7 +687,9 @@ class Layout(models.Model):
 
 
 class Page(models.Model):
-    """ Represents a single page. """
+    """ 
+        Represents a single page of an album.
+    """
     album = models.ForeignKey(Album)
     pageNumber = models.IntegerField(
         verbose_name = u"page number"
@@ -647,7 +719,9 @@ class Page(models.Model):
         return ("albumizer.views.show_single_page_with_hash", (), view_parameters)
 
     def get_cover_url(self):
-        """ Returns url of this page's cover image, if one can be found. Otherwise, returns an empty string. """
+        """ 
+            Returns url of this page's cover image, if one can be found. Otherwise, returns an empty string.
+        """
         for content in self.image_content():
             if content.image:
                 return content.image.url
@@ -698,20 +772,28 @@ class Page(models.Model):
         return ""
 
     def content(self):
-        """  """
+        """  
+        
+        """
         return PageContent.objects.filter(page = self).order_by("placeHolderID")
 
     def image_content(self):
-        """  """
+        """  
+        
+        """
         return self.content().filter(placeHolderID__contains = "_image_")
 
     def caption_content(self):
-        """  """
+        """  
+        
+        """
         return self.content().filter(placeHolderID__contains = "_caption_")
 
     @staticmethod
     def by_album_id_and_page_number(album_id, page_number):
-        """ Returns a page of an album by album's id and page number, if one exists. Otherwise returns None. """
+        """ 
+            Returns a page of an album by album's id and page number, if one exists. Otherwise returns None.
+        """
         page_queryset = Page.objects.filter(album__id__exact = album_id, pageNumber = page_number)
         if not page_queryset:
             return None
@@ -743,6 +825,9 @@ class Page(models.Model):
 
 
 def get_album_photo_upload_path(page_content_model_instance, original_filename):
+    """
+        Generates full path for an uploaded image, relative to the mediaroot.
+    """
     username = page_content_model_instance.page.album.owner.username
     album_id = unicode(page_content_model_instance.page.album.id)
     page_number = unicode(page_content_model_instance.page.pageNumber)
@@ -762,7 +847,9 @@ def get_album_photo_upload_path(page_content_model_instance, original_filename):
     return path
 
 class PageContent(models.Model):
-    """ Represents a single piece of content in a placeholder. """
+    """ 
+        Represents a single piece of content in a placeholder.
+    """
     page = models.ForeignKey(Page, related_name = "pagecontents")
     placeHolderID = models.CharField(
         max_length = 255,
@@ -789,7 +876,9 @@ class PageContent(models.Model):
 
 
 class Country(models.Model):
-    """ Represents a single country. """
+    """ 
+        Represents a single country.
+    """
     code = models.CharField(
         primary_key = True,
         max_length = 10,
@@ -807,7 +896,9 @@ class Country(models.Model):
 
     @staticmethod
     def by_code(country_code):
-        """ Returns a country having given code, if one exists. Otherwise returns None. """
+        """ 
+            Returns a country having given code, if one exists. Otherwise returns None.
+        """
         country_resultset = Country.objects.filter(code__exact = country_code)
         if not country_resultset:
             return None
@@ -822,7 +913,9 @@ class Country(models.Model):
 
 
 class State(models.Model):
-    """ Represents a single state, like Texas (and there are states in other countries than USA, too). """
+    """ 
+        Represents a single state, like Texas (and there are states in other countries than USA, too).
+    """
     name = models.CharField(
         unique = True,
         max_length = 100
@@ -840,7 +933,9 @@ class State(models.Model):
 
 
 class Address(models.Model):
-    """ Represents a single address of a human (customer). """
+    """ 
+        Represents a single address of a human (customer).
+    """
     owner = models.ForeignKey(User)
     postAddressLine1 = models.CharField(
         max_length = 100,
@@ -901,7 +996,9 @@ class Address(models.Model):
 
     @staticmethod
     def addresses_of_user(user):
-        """ Return a queryset of all addresses of given user. """
+        """ 
+            Return a queryset of all addresses of given user.
+        """
         return Address.objects.filter(owner__exact = user)
 
     class Meta():
@@ -913,7 +1010,9 @@ class Address(models.Model):
 
 
 class ShoppingCartItem(models.Model):
-    """ Contains items, which a user currently has his/her shopping cart. """
+    """ 
+        Contains items, which a user currently has his/her shopping cart.
+    """
     user = models.ForeignKey(User)
     album = models.ForeignKey(Album)
     count = models.IntegerField()
@@ -945,17 +1044,23 @@ class ShoppingCartItem(models.Model):
 
     @staticmethod
     def items_of_user(user):
-        """ Return a queryset of all items in given user's shopping cart. """
+        """ 
+            Return a queryset of all items in given user's shopping cart. 
+        """
         return ShoppingCartItem.objects.filter(user__exact = user)
 
     @staticmethod
     def items_of_user_with_albums(user):
-        """ Return a queryset of all items in given user's shopping cart preloading albums. """
+        """ 
+            Return a queryset of all items in given user's shopping cart preloading albums. 
+        """
         return ShoppingCartItem.objects.select_related('album').filter(user__exact = user)
 
     @staticmethod
     def items_of_user_with_albums_and_addresses(user):
-        """ Return a queryset of all items in given user's shopping cart preloading albums and addresses. """
+        """ 
+            Return a queryset of all items in given user's shopping cart preloading albums and addresses.
+        """
         return ShoppingCartItem.objects.select_related('album', 'deliveryAddress').filter(user__exact = user)
 
     @staticmethod
@@ -983,7 +1088,9 @@ class ShoppingCartItem(models.Model):
 
     @staticmethod
     def does_exist(user, album_id):
-        """ Returns True, if given item exist in given user's shopping cart. Otherwise returns False. """
+        """ 
+            Returns True, if given item exist in given user's shopping cart. Otherwise returns False. 
+        """
         return ShoppingCartItem.objects.filter(user = user, album = album_id).exists()
 
     @staticmethod
@@ -1042,12 +1149,16 @@ class OrderStatus(models.Model):
 
     @staticmethod
     def ordered():
-        """ Returns an OrderStatus, in which the order has been made but not paid yet. """
+        """ 
+            Returns an OrderStatus, in which the order has been made but not paid yet. 
+        """
         return OrderStatus.objects.get(code__exact = "ordered")
 
     @staticmethod
     def paid_and_being_processed():
-        """ Returns an OrderStatus, in which the order is already paid and is currently being processed. """
+        """ 
+            Returns an OrderStatus, in which the order is already paid and is currently being processed. 
+        """
         return OrderStatus.objects.get(code__exact = "paid")
 
     @staticmethod
@@ -1060,7 +1171,9 @@ class OrderStatus(models.Model):
 
     @staticmethod
     def sent():
-        """ Returns an OrderStatus, in which the order is already processed and sent to the customer. """
+        """ 
+            Returns an OrderStatus, in which the order is already processed and sent to the customer. 
+        """
         return OrderStatus.objects.get(code__exact = "sent")
 
     def __unicode__(self):
@@ -1075,7 +1188,9 @@ class OrderStatus(models.Model):
 
 
 class Order(models.Model):
-    """ Represents a single order (containing many albums) as a whole. """
+    """ 
+        Represents a single order (containing many albums) as a whole. 
+    """
     orderer = models.ForeignKey(User)
     purchaseDate = models.DateTimeField(
         auto_now_add = True,
@@ -1090,7 +1205,9 @@ class Order(models.Model):
 
     @staticmethod
     def by_id(order_id):
-        """ Returns an order having given id, if one exists. Otherwise returns None. """
+        """ 
+            Returns an order having given id, if one exists. Otherwise returns None. 
+        """
         order_resultset = Order.objects.filter(id__exact = order_id)
         if not order_resultset:
             return None
@@ -1117,37 +1234,53 @@ class Order(models.Model):
         return ("show_single_order", (), view_parameters)
 
     def is_made_by(self, user):
-        """ Checks if this order is made by a given user. """
+        """ 
+            Checks if this order is made by a given user. 
+        """
         return user == self.orderer
 
     def is_paid(self):
-        """ Returns True if this order is paid (via Simple Payments), otherwise False. """
+        """ 
+            Returns True if this order is paid (via Simple Payments), otherwise False. 
+        """
         return SPSPayment.exists_for_order(self)
 
     def is_just_ordered(self):
-        """ Returns True if this order has just been ordered but has not been paid yet, otherwise False. """
+        """ 
+            Returns True if this order has just been ordered but has not been paid yet, otherwise False. 
+        """
         return self.status == OrderStatus.ordered()
 
     def is_paid_and_being_processed(self):
-        """ Returns True if this order has been paid and is currently being processed, otherwise False. """
+        """ 
+            Returns True if this order has been paid and is currently being processed, otherwise False. 
+        """
         return self.status == OrderStatus.paid_and_being_processed()
 
     def is_sent(self):
-        """ Returns True if this order has already been sent to the delivery address, otherwise False. """
+        """ 
+            Returns True if this order has already been sent to the delivery address, otherwise False. 
+        """
         return self.status == OrderStatus.sent()
 
     def is_blocked(self):
-        """ Returns True if this order is currently blocked for some reason, otherwise False. """
+        """ 
+            Returns True if this order is currently blocked for some reason, otherwise False. 
+        """
         return self.status == OrderStatus.blocked()
 
     def payment(self):
-        """ Returns (Simple Payments) payment for this order, if one exists. """
+        """ 
+            Returns (Simple Payments) payment for this order, if one exists.
+        """
         if not self.is_paid():
             return None
         return SPSPayment.of_order(self)
 
     def items(self):
-        """ Return all items of this order. """
+        """ 
+            Return all items of this order. 
+        """
         return OrderItem.items_of_order(self)
 
     def __unicode__(self):
@@ -1163,7 +1296,9 @@ class Order(models.Model):
 
 
 class SPSPayment(models.Model):
-    """ Represents a payment related to an order when paid via the Simple Payments service. """
+    """ 
+        Represents a payment related to an order when paid via the Simple Payments service.
+    """
     order = models.OneToOneField(Order)
     amount = models.DecimalField(
         max_digits = 10,
@@ -1189,7 +1324,9 @@ class SPSPayment(models.Model):
 
     @staticmethod
     def of_order(order):
-        """ Returns payment of given order, if one exists. """
+        """ 
+            Returns payment of given order, if one exists. 
+        """
         payment_qs = SPSPayment.objects.filter(order__exact = order)
         if payment_qs.count() < 1:
             return None
@@ -1197,7 +1334,9 @@ class SPSPayment(models.Model):
 
     @staticmethod
     def exists_for_order(order):
-        """ Checks if a payment for given order exists. """
+        """ 
+            Checks if a payment for given order exists. 
+        """
         return SPSPayment.objects.filter(order__exact = order).exists()
 
     def __unicode__(self):
@@ -1212,7 +1351,9 @@ class SPSPayment(models.Model):
 
 
 class OrderItem(models.Model):
-    """ Represents a single item (line) in an order. """
+    """ 
+        Represents a single item (line) in an order. 
+    """
     order = models.ForeignKey(Order)
     album = models.ForeignKey(Album)
     count = models.IntegerField()
@@ -1227,7 +1368,9 @@ class OrderItem(models.Model):
 
     @staticmethod
     def items_of_order(order):
-        """ Returns items of given order, if there are any. """
+        """ 
+            Returns items of given order, if there are any.
+        """
         return OrderItem.objects.filter(order__exact = order)
 
     class Meta():
