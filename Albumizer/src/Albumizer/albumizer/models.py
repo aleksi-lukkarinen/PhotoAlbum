@@ -15,32 +15,6 @@ import Image
 
 
 
-def json_serialization_handler(object_to_serialize):
-    """ 
-        Serializes objects, which are not supported by the Python's json package.
-    """
-    if hasattr(object_to_serialize, 'isoformat'):    # for datetimes: serialize them into a standard format
-        return object_to_serialize.isoformat()
-    else:
-        raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % \
-                                (type(object_to_serialize), repr(object_to_serialize))
-
-
-
-
-def serialize_into_json(object_to_serialize):
-    """ 
-        Serializes objects into json using Python's json package. In debug mode, the format is clearer,
-        but in production, unnecessary line breaks and indenting is left out. 
-    """
-    if settings.DEBUG:
-        return json.dumps(object_to_serialize, sort_keys = True, indent = 4, default = json_serialization_handler)
-    else:
-        return json.dumps(object_to_serialize, default = json_serialization_handler)
-
-
-
-
 FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL = "thumb-large"
 FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL = "thumb-small"
 
@@ -68,7 +42,8 @@ class AlbumizerImageFieldFile(ImageFieldFile):
         thumbnail_image.thumbnail((width, height), Image.ANTIALIAS)
         thumbnail_image.save(target_path, "JPEG")
 
-    def _delete_thumbnail(self, path):
+    @staticmethod
+    def _delete_thumbnail(path):
         """ 
             Deletes a file poined by given path, if it exists.
         """
@@ -1213,6 +1188,38 @@ class Order(models.Model):
             return None
         return order_resultset[0]
 
+    @staticmethod
+    def create_from_shopping_cart_for_user(user):
+        """
+            Creates a new order based on the current content of given user's shopping cart.
+            Returns the created Order instance.
+            
+            If given user's shopping cart is empty, a ShoppingCartEmptyError will be raised. 
+        """
+        cart_items = ShoppingCartItem.items_of_user(user)
+        if not cart_items:
+            raise ShoppingCartEmptyError("Unable to create an order from an empty shopping cart.")
+
+        new_order = Order(
+            orderer = user,
+            status = OrderStatus.ordered()
+        )
+        new_order.save()
+
+        for cart_item in cart_items:
+            new_order_item = OrderItem(
+                order = new_order,
+                album = cart_item.album,
+                count = cart_item.count,
+                deliveryAddress = cart_item.deliveryAddress
+            )
+            new_order_item.save()
+
+        cart_items.delete()
+
+        return new_order
+
+
     def info(self):
         """ 
             Returns information about items belonging to this order.
@@ -1378,6 +1385,51 @@ class OrderItem(models.Model):
         ordering = ["order", "album"]
         verbose_name = u"order item"
         verbose_name_plural = u"order items"
+
+
+
+
+class AlbumizerModelError(Exception):
+    """
+        Base class for exceptions defined in this module.
+    """
+    pass
+
+
+
+
+class ShoppingCartEmptyError(AlbumizerModelError):
+    """
+        This exception is raised when some operation is tried to perform with an empty shopping cart. 
+    """
+    def __init__(self, error_message):
+        self.message = error_message
+
+
+
+
+def json_serialization_handler(object_to_serialize):
+    """ 
+        Serializes objects, which are not supported by the Python's json package.
+    """
+    if hasattr(object_to_serialize, 'isoformat'):    # for datetimes: serialize them into a standard format
+        return object_to_serialize.isoformat()
+    else:
+        raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % \
+                                (type(object_to_serialize), repr(object_to_serialize))
+
+
+
+
+def serialize_into_json(object_to_serialize):
+    """ 
+        Serializes objects into json using Python's json package. In debug mode, the format is clearer,
+        but in production, unnecessary line breaks and indenting is left out. 
+    """
+    if settings.DEBUG:
+        return json.dumps(object_to_serialize, sort_keys = True, indent = 4, default = json_serialization_handler)
+    else:
+        return json.dumps(object_to_serialize, default = json_serialization_handler)
 
 
 

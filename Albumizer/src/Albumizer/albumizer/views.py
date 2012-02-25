@@ -17,7 +17,7 @@ from django.template import RequestContext
 from django.utils import simplejson as json
 import facebook_api
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
-        Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
+        Address, ShoppingCartItem, ShoppingCartEmptyError, Order, SPSPayment, OrderStatus, OrderItem
 from forms import AlbumCreationForm, LoginForm, RegistrationForm, RegistrationModelForm, AddPageForm, \
         EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm, UserAuthForm
 import utils
@@ -1223,25 +1223,11 @@ def show_order_summary_POST(request):
         request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
-    cart_items = ShoppingCartItem.items_of_user(request.user)
-
-
-    new_order = Order(
-        orderer = request.user,
-        status = OrderStatus.ordered()
-    )
-    new_order.save()
-
-    for cart_item in cart_items:
-        new_order_item = OrderItem(
-            order = new_order,
-            album = cart_item.album,
-            count = cart_item.count,
-            deliveryAddress = cart_item.deliveryAddress
-        )
-        new_order_item.save()
-
-    cart_items.delete()
+    new_order = None
+    try:
+        new_order = Order.create_from_shopping_cart_for_user(request.user)
+    except ShoppingCartEmptyError as e:
+        return simple_message(request, "Shopping Cart Is Empty", e.message)
 
     return HttpResponseRedirect(reverse("report_order_as_successful", args = [new_order.id]))
 
