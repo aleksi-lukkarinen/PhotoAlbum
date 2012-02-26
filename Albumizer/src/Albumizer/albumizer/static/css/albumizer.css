@@ -316,7 +316,7 @@ img {
 .randomPickAlbumsListTable {
   clear:                     both;
 	width:                     100%;
-	padding-top:               2em;
+	padding-top:               1em;
 	border:                    1px solid #ccffaa;
 }
 
@@ -328,7 +328,7 @@ img {
 
 .randomPickAlbumsListItemContainer {
 	display:                   inline-block;
-  width:                     15.3em;
+  width:                     15.1em;
   height:                    19.5em;
   overflow:                  hidden;
 }
@@ -356,6 +356,9 @@ img {
   overflow:                  hidden;
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
+  -moz-box-shadow:           2px 2px 5px #888;
+  -webkit-box-shadow:        2px 2px 5px #888;
+  box-shadow:                2px 2px 5px #888;
 }
 
 .randomPickAlbumsListItemTitle {
@@ -825,6 +828,9 @@ clear:both;
   overflow:                  hidden;
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
+	-moz-box-shadow:           2px 2px 5px #888;
+	-webkit-box-shadow:        2px 2px 5px #888;
+	box-shadow:                2px 2px 5px #888;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn img:hover {
@@ -1307,6 +1313,9 @@ clear:both;
   overflow:                  hidden;
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
+  -moz-box-shadow:           2px 2px 5px #888;
+  -webkit-box-shadow:        2px 2px 5px #888;
+  box-shadow:                2px 2px 5px #888;
 }
 
 

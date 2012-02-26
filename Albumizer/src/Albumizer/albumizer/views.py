@@ -1339,8 +1339,8 @@ def report_sps_payment_status_GET(request, status):
     template_parameters = {}
 
     if status == SPS_STATUS_SUCCESSFUL:
-        #if order.is_paid():
-        #    return HttpResponseRedirect(order.get_absolute_url())
+        if order.is_paid():
+            return HttpResponseRedirect(order.get_absolute_url())
 
         new_payment = SPSPayment(
             order = order,
@@ -1348,7 +1348,7 @@ def report_sps_payment_status_GET(request, status):
             referenceCode = reference,
             clarification = ""
         )
-        #new_payment.save()
+        new_payment.save()
         order.status = OrderStatus.paid_and_being_processed()
         order.save()
 
