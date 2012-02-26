@@ -17,17 +17,19 @@
     <div class="prompt">
 		  Your payment via Simple Payments service has been arrived.
 		  You should receive an email confirmation in a few minutes.
+    </div>
 	
-	    <div class="orderInfo">
-	      Your order is now being processed, and you will receive an email confirmation
-	      when it is sent from our warehouse.<br />
-	      You can check the status of your order <a href="{{ order_info.order.get_absolute_url }}">here</a>.
-	      Should you have any inquiries about your order, please kindly contact our customer service.
-	    </div>
+    {% payment_details order_info.payment_info %}
+
+    <div class="prompt orderInfo">
+      Your order is now being processed, and you will receive an email confirmation
+      when it is sent from our warehouse.<br />
+      You can check the status of your order <a href="{{ order_info.order.get_absolute_url }}">here</a>.
+      Should you have any inquiries about your order, please kindly contact our customer service.
     </div>
 
-    {% payment_details order_info.payment %}
-    
+    {% order_details %}{% end_order_details %}
+
 	  <div class="closing">
 	    Thank you for ordering our products! We hope to see you here producing and discovering great new albums!
 	  </div>    

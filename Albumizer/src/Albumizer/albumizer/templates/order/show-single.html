@@ -11,34 +11,56 @@
 {% block page_content %}
 
   <div class="orderBrowser">
-	  <h1>Order #{{ order_info.order.id }} on {{ order_info.order.purchaseDate }}</h1>
+	  <h1>Order #{{ order_info.order.id }} on 
+	     <span title="{{ order_info.order.purchaseDate|date:"c" }}">{{ order_info.order.purchaseDate|date:"j.n.Y \a\t G.i" }}</span>
+	  </h1>
 	  {% show_messages %}
 	
 	  {% if order_info.order.is_just_ordered %}
 	    <div class="statusOrdered">
-	      <div class="prompt"> 
+	      <div class="prompt">
 		      This order has been placed successfully, but it won't be processed until we receive your payment.<br />
 		      The accepted payment methods are listed below. Please initiate the payment by clicking
 		      the link of the payment service you want to use.  
 	      </div>
 	      
+        {% payment_services %}
+        
+		    <div class="disclaimer">
+		      After you initiate the payment, you will be directed to the system of the payment service you chose.
+		      The payment will be completed in the systems of that payment service.
+		    </div>
+		    <div class="disclaimer">
+		      No banking information will be asked or handled by or is to be entered into the Albumizer service.
+		      We only receive information about completion of the payment. 
+		    </div>
+		    <div class="disclaimer">
+		      If we do not receive your payment during 7 days from placement
+		      of your order, the order will be automatically removed.
+		    </div>
 	    </div>
 	  {% else %}
 	    {% if order_info.order.is_paid_and_being_processed %}
-	  
-	      {% payment_details order_info.payment %}
-	      
-	      
+	      <div class="statusPaidAndBeingProcessed">
+	        <div class="prompt">
+	          Payment for this order has been received successfully, and the order is currently being processed.
+	        </div>
+        </div>
 	    {% else %}
 	      {% if order_info.order.is_sent %}
-	        
-	        
-	        
+	        <div class="statusSent">
+	          <div class="prompt">
+	            This order is processed and all items have been sent to the corresponding delivery addresses.  
+	          </div>
+	        </div>
 	      {% else %}
 	        {% if order_info.order.is_blocked %}
-	      
-	      
-	      
+	          <div class="statusBlocked">
+	            <div class="prompt">
+	              This processing of this order is temporarily blocked. 
+	              If you have questions, please contact to our customer support.   
+	            </div>
+	          </div>
 	        {% else %}
 	          <div class="statusUnknown">
 	            <div class="prompt line1">
@@ -51,6 +73,23 @@
 	      {% endif %}    
 	    {% endif %}
 	  {% endif %}
+
+	  
+    <div class="prompt orderSummaryTitle">Details of this order:</div> 
+
+	  {% order_details %}
+	    {% if order_info.payment_info %}
+        {% payment_details order_info.payment_info no_margins=True width=65em %}
+      {% endif %}
+    {% end_order_details %}
+
+    <div class="disclaimer">
+      Should you have any inquiries about your order or the Albumizer service, please don't hesitate to contact
+      our customer support.
+    </div>
+	  
   </div>
+
+  {% random_picks_album_list 8 %}
 
 {% endblock %}

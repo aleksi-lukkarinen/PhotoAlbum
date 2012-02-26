@@ -10,7 +10,8 @@ from django.forms.widgets import Input
 from django.forms import ModelForm
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
-from utils import computeValidationHashForShoppingCart, validationHashForShoppingCartIsValid
+
+
 
 
 CHECKOUT_ERR_MSG_INVALID_HASH = \
@@ -48,16 +49,16 @@ class AlbumizerSearchCriteriaInput(Input):
 
 class CommonAlbumizerBaseForm(forms.BaseForm):
     """  """
-    
+
     error_css_class = 'error'
     required_css_class = 'required'
-    
-    
+
+
     def __init__(self, *args, **kwargs):
         """ override default label suffix """
-        kwargs["label_suffix"]=kwargs.get("label_suffix", '')
+        kwargs["label_suffix"] = kwargs.get("label_suffix", '')
         super(CommonAlbumizerBaseForm, self).__init__(*args, **kwargs)
-        
+
     def add_common_error(self, error_string):
         """ Adds an error message, which is not related to any particular field. """
         if not error_string:
@@ -103,7 +104,7 @@ RE_VALID_PHONE_NUMBER = "^\+?[ 0-9]+$"
 COMPILED_RE_VALID_PHONE_NUMBER = re.compile(RE_VALID_PHONE_NUMBER)
 
 class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
-    
+
     username = forms.CharField(
         min_length = 5,
         max_length = 30,
@@ -166,7 +167,7 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
             'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_SECOND_PASSWORD_MISSING
         })
     )
-    
+
     email = forms.EmailField(
         max_length = 100,
         label = u"Email",
@@ -190,15 +191,15 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
             'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_SECOND_EMAIL_MISSING
         })
     )
-    def save(self, commit=True):
-        
+    def save(self, commit = True):
+
         #must override default behavior when setting password
-        user = super(UserAuthForm, self).save(commit=False)
+        user = super(UserAuthForm, self).save(commit = False)
         user.set_password(self.cleaned_data["password"])
         if commit:
             user.save()
         return user
-    
+
     def clean_username(self):
         """ Ensure that given userid is valid and that no user with that userid does already exist """
         userid = self.cleaned_data.get("username")
@@ -252,8 +253,8 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
         return cleaned_data
     class Meta:
         model = User
-        fields =('username', 'password', 'txtPasswordAgain', 'first_name', 'last_name', 'email', 'txtEmailAgain')
-        
+        fields = ('username', 'password', 'txtPasswordAgain', 'first_name', 'last_name', 'email', 'txtEmailAgain')
+
 class UserProfileForm(CommonAlbumizerBaseForm, ModelForm):
     gender = forms.ChoiceField(
         label = u"Gender",
@@ -267,13 +268,13 @@ class UserProfileForm(CommonAlbumizerBaseForm, ModelForm):
     )
     class Meta:
         model = UserProfile
-        exclude=('user',)
+        exclude = ('user',)
 
 class AddressModelForm(CommonAlbumizerBaseForm, ModelForm):
     class Meta:
         model = Address
-        exclude=('owner',)
-        
+        exclude = ('owner',)
+
 class RegistrationModelForm(CommonAlbumizerForm):
     chkServiceConditionsAccepted = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {
@@ -523,7 +524,7 @@ class UserInformationForm(CommonAlbumizerForm):
         return cleaned_data
 
 class AddressForm(CommonAlbumizerForm):
-    
+
     txtPostAddress1 = forms.CharField(
         required = False,
         max_length = 100,
@@ -567,7 +568,7 @@ class AddressForm(CommonAlbumizerForm):
 
 class RegistrationForm(UserInformationForm, AddressForm):
     """ Form class representing registration form used to add new users to database. """
-    
+
 
     chkServiceConditionsAccepted = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {
@@ -790,13 +791,13 @@ def build_delivery_address_form(request):
     def clean_hdnValidationHash(self):
         """ Ensures that the validation hash gotten from sent form is correct. """
         given_hash = self.cleaned_data.get("hdnValidationHash")
-        our_hash = computeValidationHashForShoppingCart(request)
+        our_hash = ShoppingCartItem.validation_hash_for_shopping_cart(request)
         if not given_hash == our_hash:
             self.add_common_error(CHECKOUT_ERR_MSG_INVALID_HASH)
 
     items = ShoppingCartItem.items_of_user_with_albums_and_addresses(request.user)
     addresses = Address.addresses_of_user(request.user)
-    validation_hash = computeValidationHashForShoppingCart(request)
+    validation_hash = ShoppingCartItem.validation_hash_for_shopping_cart(request)
 
     field_dict = {}
     address_field_dict = {}

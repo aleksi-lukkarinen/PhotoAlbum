@@ -148,6 +148,43 @@ def access_denied_message(request, resource_name):
 
 
 
+def generate_sps_parameters_for_order(order_id, order_total_price_as_number):
+    """
+    
+    """
+    sps_address = settings.SIMPLE_PAYMENT_SERVICE_URL
+    sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
+    sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
+
+    our_protocol = "http"
+    our_domain = Site.objects.get_current().domain
+
+    our_url_start = "%s://%s" % (our_protocol, our_domain)
+    report_view_name = "report_sps_payment_status"
+    sps_success_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_SUCCESSFUL])
+    sps_cancel_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_CANCELED])
+    sps_error_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_UNSUCCESSFUL])
+
+    sps_payment_id = unicode(order_id)
+    amount = utils.convert_money_into_two_decimal_string(order_total_price_as_number)
+
+    checksum_source = "pid=%s&sid=%s&amount=%s&token=%s" % (sps_payment_id, sps_seller_id, amount, sps_secret)
+    checksum = hashlib.md5(checksum_source).hexdigest()
+
+    return {
+        "sps_address": sps_address,
+        "seller_id": sps_seller_id,
+        "payment_id": sps_payment_id,
+        "amount": amount,
+        "checksum": checksum,
+        "success_url": sps_success_url,
+        "cancel_url": sps_cancel_url,
+        "error_url": sps_error_url
+    }
+
+
+
+
 @prevent_all_caching
 def welcome_page(request):
     """
@@ -1093,7 +1130,7 @@ def edit_shopping_cart_POST(request):
 
 
     if proceed_to_checkout and not has_errors:
-        validation_part = "?v=%s" % utils.computeValidationHashForShoppingCart(request)
+        validation_part = "?v=%s" % ShoppingCartItem.validation_hash_for_shopping_cart(request)
         return HttpResponseRedirect(reverse("get_delivery_addresses") + validation_part)
 
     return HttpResponseRedirect(reverse("edit_shopping_cart"))
@@ -1131,7 +1168,7 @@ def get_delivery_addresses_GET(request):
     """ Allows user to edit destination addresses for content of his/her shopping cart. """
     assert request.method == "GET"
 
-    if not utils.validationHashForShoppingCartIsValid(request):
+    if not ShoppingCartItem.is_validation_hash_valid(request):
         request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
@@ -1176,7 +1213,7 @@ def get_delivery_addresses_POST(request):
         #print "%s (%s), %s (%s)" % (unicode(item), unicode(type(item)), unicode(address), unicode(type(address)))
 
     if request.POST.get("cmdSummary"):
-        validation_part = "?v=%s" % utils.computeValidationHashForShoppingCart(request, exclude_addresses = False)
+        validation_part = "?v=%s" % ShoppingCartItem.validation_hash_for_shopping_cart(request, exclude_addresses = False)
         return HttpResponseRedirect(reverse("show_order_summary") + validation_part)
 
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
@@ -1197,18 +1234,23 @@ def show_order_summary_GET(request):
     """ Shows user a summary about his/her order and lets him/her to finally place the order. """
     assert request.method == "GET"
 
-    if not utils.validationHashForShoppingCartIsValid(request, exclude_addresses = False):
+    if not ShoppingCartItem.is_validation_hash_valid(request, exclude_addresses = False):
         request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
 
-    validation_hash = utils.computeValidationHashForShoppingCart(request,
+    validation_hash = ShoppingCartItem.validation_hash_for_shopping_cart(request,
                         exclude_addresses = False, extra_key = ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY)
 
     order_info = ShoppingCartItem.order_info_for_user(request.user)
 
+    order_details_options = {
+        "show_place_order_button": True
+    }
+
     template_parameters = {
         "validation_hash": validation_hash,
-        "order_info": order_info
+        "order_info": order_info,
+        "order_details_options": order_details_options
     }
     return render_to_response('order/summary.html', RequestContext(request, template_parameters))
 
@@ -1218,7 +1260,7 @@ def show_order_summary_POST(request):
     """ Creates an order based on the content of user's shopping cart. """
     assert request.method == "POST"
 
-    if not utils.validationHashForShoppingCartIsValid(request,
+    if not ShoppingCartItem.is_validation_hash_valid(request,
                     exclude_addresses = False, extra_key = ORDER_SUMMARY_EXTRA_VALIDATION_HASH_KEY):
         request.user.message_set.create(message = CHECKOUT_ERR_MSG_INVALID_HASH)
         return HttpResponseRedirect(reverse("edit_shopping_cart"))
@@ -1238,10 +1280,8 @@ def show_order_summary_POST(request):
 @prevent_all_caching
 def report_order_as_successful_GET(request, order_id):
     """
-        Actually creates an order based on the content of user's shopping cart and
-        acknowledges user about the fact. After this, the shopping cart will be empty.
-        User will be asked to pay the order via the Simple Payments service by clicking
-        a link leading to the service.
+        Acknowledges user about successful checkout process. User will be asked to pay
+        the order via the Simple Payments service by clicking a link leading to the service.
     """
     assert request.method == "GET"
 
@@ -1258,37 +1298,11 @@ def report_order_as_successful_GET(request, order_id):
         return HttpResponseRedirect(reverse("show_single_order", args = [order_id]))
 
     order_info = order.info()
-
-    sps_address = settings.SIMPLE_PAYMENT_SERVICE_URL
-    sps_seller_id = settings.SIMPLE_PAYMENT_SERVICE_SELLER_ID
-    sps_secret = settings.SIMPLE_PAYMENT_SERVICE_SECRET
-
-    our_protocol = "http"
-    our_domain = Site.objects.get_current().domain
-
-    our_url_start = "%s://%s" % (our_protocol, our_domain)
-    report_view_name = "report_sps_payment_status"
-    sps_success_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_SUCCESSFUL])
-    sps_cancel_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_CANCELED])
-    sps_error_url = our_url_start + reverse(report_view_name, args = [SPS_STATUS_UNSUCCESSFUL])
-
-    sps_payment_id = unicode(order_id)
-    amount = utils.convert_money_into_two_decimal_string(order_info.get("order_total_price"))
-
-    checksum_source = "pid=%s&sid=%s&amount=%s&token=%s" % (sps_payment_id, sps_seller_id, amount, sps_secret)
-    checksum = hashlib.md5(checksum_source).hexdigest()
+    sps_parameters = generate_sps_parameters_for_order(order.id, order_info.get("order_total_price"))
 
     template_parameters = {
-        "order": order,
         "order_info": order_info,
-        "sps_address": sps_address,
-        "sps_seller_id": sps_seller_id,
-        "sps_payment_id": sps_payment_id,
-        "sps_amount": amount,
-        "sps_checksum": checksum,
-        "sps_success_url": sps_success_url,
-        "sps_cancel_url": sps_cancel_url,
-        "sps_error_url": sps_error_url
+        "sps_parameters": sps_parameters
     }
     return render_to_response('order/successful.html', RequestContext(request, template_parameters))
 
@@ -1325,8 +1339,8 @@ def report_sps_payment_status_GET(request, status):
     template_parameters = {}
 
     if status == SPS_STATUS_SUCCESSFUL:
-        if order.is_paid():
-            return HttpResponseRedirect(order.get_absolute_url())
+        #if order.is_paid():
+        #    return HttpResponseRedirect(order.get_absolute_url())
 
         new_payment = SPSPayment(
             order = order,
@@ -1334,7 +1348,7 @@ def report_sps_payment_status_GET(request, status):
             referenceCode = reference,
             clarification = ""
         )
-        new_payment.save()
+        #new_payment.save()
         order.status = OrderStatus.paid_and_being_processed()
         order.save()
 
@@ -1367,7 +1381,13 @@ def show_single_order_GET(request, order_id):
     if not order.is_made_by(request.user):
         return access_denied_message(request, "order")
 
-    template_parameters = {"order_info": order.info()}
+    order_info = order.info()
+    template_parameters = {"order_info": order_info}
+
+    if order.is_just_ordered():
+        sps_parameters = generate_sps_parameters_for_order(order.id, order_info.get("order_total_price"))
+        template_parameters["sps_parameters"] = sps_parameters
+
     return render_to_response_as_public('order/show-single.html', RequestContext(request, template_parameters))
 
 @login_required

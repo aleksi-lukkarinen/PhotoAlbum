@@ -57,8 +57,8 @@
         "pk": 1,
         "model": "sites.site",
         "fields": {
-            "name": "tla.albumizer.aalto.fi:8000/",
-            "domain":"tla.albumizer.aalto.fi:8000/"
+            "name": "tla.albumizer.aalto.fi:8000",
+            "domain":"tla.albumizer.aalto.fi:8000"
         }
     },
 

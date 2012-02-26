@@ -13,12 +13,14 @@
 
 {% block message_page_content %}
 
-  <div class="paymentInfo prompt">
-    Your payment via Simple Payments service was cancelled by you. Unfortunately, we cannot process
-    your order yet, because it is still unpaid.<br />
-    Please make the payment soon, so that we can start to process your order.
-
-    <div class="orderInfo">
+  <div class="paymentInfo">
+    <div class="prompt">
+	    Your payment via Simple Payments service was cancelled by you. Unfortunately, we cannot process
+	    your order yet, because it is still unpaid.<br />
+	    Please make the payment soon, so that we can start to process your order.
+    </div>
+    
+    <div class="prompt orderInfo">
 	    You can check the status of your order <a href="{{ order_info.order.get_absolute_url }}">here</a>.
 	    Should you have any inquiries about your order, please kindly contact our customer service.
     </div>

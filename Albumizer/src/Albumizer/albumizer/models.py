@@ -1094,6 +1094,46 @@ class ShoppingCartItem(models.Model):
         """
         ShoppingCartItem.objects.filter(user__exact = user).delete()
 
+    @staticmethod
+    def validation_hash_for_shopping_cart(request, exclude_addresses = True, extra_key = None):
+        """ 
+            Generates a hash which can be used to ensure that content
+            of shopping cart does not change during checkout process.
+        """
+        hash_base = unicode(request.user.username) + request.META.get("REMOTE_ADDR") + \
+                    request.META.get("REMOTE_HOST") + request.META.get("HTTP_USER_AGENT") + \
+                    settings.SECRET_KEY
+
+        if extra_key:
+            hash_base += extra_key
+
+        items = ShoppingCartItem.items_of_user(request.user)
+        if exclude_addresses:
+            for item in items:
+                hash_base += unicode(item.album) + unicode(item.count)
+        else:
+            for item in items:
+                hash_base += unicode(item.album) + unicode(item.count) + unicode(item.deliveryAddress)
+
+        return hashlib.sha256(hash_base.encode("ascii", "backslashreplace")).hexdigest()
+
+    @staticmethod
+    def is_validation_hash_valid(request, exclude_addresses = True, extra_key = None):
+        """ 
+            Validates hash returned by ShoppingCartItem.validation_hash_for_shopping_cart().
+        """
+        if request.method == "GET":
+            given_hash = request.GET.get("v")
+        else:
+            given_hash = request.POST.get("v")
+
+        if not given_hash:
+            return False
+
+        our_hash = ShoppingCartItem.validation_hash_for_shopping_cart(request, exclude_addresses, extra_key)
+
+        return our_hash == given_hash
+
     def __unicode__(self):
         return u"%s, %s, %d, %s" % (self.user, self.album, self.count, self.additionDate)
 
@@ -1232,7 +1272,7 @@ class Order(models.Model):
         order_info = Album.price_for_several_albums_including_vat_and_shipping(album_count_address_list)
         order_info["order"] = self
         if self.is_paid():
-            order_info["payment"] = self.payment()
+            order_info["payment_info"] = self.payment().info()
         return order_info
 
     @models.permalink
@@ -1329,6 +1369,19 @@ class SPSPayment(models.Model):
         help_text = u"clarifying information related to the payment"
     )
 
+    def info(self):
+        return {
+            "payment": self,
+            "order_date": self.order.purchaseDate,
+            "payer": self.order.orderer.first_name + u" " + self.order.orderer.last_name,
+            "payee": u"Albumizer Plc.",
+            "amount": self.amount,
+            "via": SPSPayment.service_name(),
+            "transaction_date": self.transactionDate,
+            "reference_code": self.referenceCode,
+            "clarification": self.clarification
+        }
+
     @staticmethod
     def of_order(order):
         """ 
@@ -1345,6 +1398,13 @@ class SPSPayment(models.Model):
             Checks if a payment for given order exists. 
         """
         return SPSPayment.objects.filter(order__exact = order).exists()
+
+    @staticmethod
+    def service_name():
+        """ 
+            Returns canonical name of this payment service. 
+        """
+        return "Simple Payments"
 
     def __unicode__(self):
         return u"%s, %s, %f" % (self.order, self.transactionDate, self.amount)
