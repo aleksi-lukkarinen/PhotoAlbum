@@ -1,7 +1,7 @@
 @charset "utf-8";
 
 
-* {
+*:not(fieldset, input[type="submit"]) {
   margin:                    0em;
   padding:                   0em;
 }
@@ -12,6 +12,7 @@ body {
   background:                #ffffff;
   color:                     #000000;
 }
+
 
 #pageContainer {
   margin:                    0em auto;
@@ -1396,6 +1397,9 @@ clear:both;
   padding:                   1em 1em 1em 1em;
 }
 
+.commonForm input[type="submit"] {
+  margin-top: 2em;
+}
 
 .commonForm label {
   display:                   inline-block;

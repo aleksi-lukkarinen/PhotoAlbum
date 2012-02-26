@@ -1,4 +1,5 @@
 {% extends "album/album-list.html" %}
+{% load url from future %}
 
 
 
@@ -12,6 +13,16 @@
 
 {% endblock %}
 
+{% block before_album_list %}
+<fieldset>
+<legend>Profile information</legend>
+<p>Username: {{user.username }} </p>
+<p>First name: {{ user.first_name }}</p>
+<p>Last name: {{user.last_name}} </p>
+<a href="{% url "edit_account_information" %}">Edit profile</a>
+</fieldset>
+
+{% endblock %}
 {% block no_albums %}
 
 <p>You haven't created any albums yet.</p>

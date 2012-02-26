@@ -41,13 +41,18 @@
 	    	      resizable: false,
 	    	      buttons: {
 	    	        "Log In": function() {
-                    $(this).dialog("close");
-	    	        	  $("#frmLoginDialog").submit();
+                    	$(this).dialog("close");
+	    	        	$("#frmLoginDialog").submit();
 	    	            	    	            
 	    	        },
 	    	        Cancel: function() { $(this).dialog("close"); }
 	    	      }
-	    	});
+	    	}).keyup(function(e) {
+			    if (e.keyCode == $.ui.keyCode.ENTER) {
+                	$(this).dialog("close");
+    	        	$("#frmLoginDialog").submit();
+			    }
+			});
       });
 	    {% endif %}
       

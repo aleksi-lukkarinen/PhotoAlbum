@@ -19,7 +19,8 @@ import facebook_api
 from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
         Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 from forms import AlbumCreationForm, LoginForm, RegistrationForm, RegistrationModelForm, AddPageForm, \
-        EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm, UserAuthForm
+        EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm, UserAuthForm, \
+        EditUserAuthForm
 import utils
 
 
@@ -970,7 +971,35 @@ def show_profile(request):
 @prevent_all_caching
 def edit_account_information(request):
     """ Allows user to edit his/her personal information managed by the application. """
-    return render_to_response('accounts/edit-information.html', RequestContext(request))
+    data=None
+    if request.method=="POST":
+        data=request.POST
+    userForm=EditUserAuthForm(data, prefix="auth", instance=request.user)
+    userProfileForm=UserProfileForm(data,prefix="profile", instance=request.user.get_profile())
+    address=Address.objects.filter(owner=request.user)[:1]
+    address=address[0] if address else None
+    addressForm=AddressModelForm(data,prefix="address", instance=address)
+    templateparameters={
+        "userForm":userForm,
+        "userProfileForm":userProfileForm,
+        "addressForm":addressForm
+    }
+    if request.method=="GET":
+        return render_to_response('accounts/edit-information.html', RequestContext(request, templateparameters))
+    elif request.method=="POST":
+        if not(userForm.is_valid() and addressForm.is_valid() and userProfileForm.is_valid()):
+            #request.user.message_set.create(message = "input is invalid %s, %s, %s" % (userForm.is_valid(), addressForm.is_valid(), userProfileForm.is_valid()))
+            return render_to_response('accounts/edit-information.html', RequestContext(request, templateparameters))
+        userForm.save()
+        userProfileForm.save()
+        if addressForm.has_changed():
+            newAddress=addressForm.save(commit=False)
+            newAddress.owner=request.user
+            newAddress.save()
+        request.user.message_set.create(message = "Changes saved" )
+        return HttpResponseRedirect(reverse("edit_account_information"))
+    
+    return render_to_response('accounts/edit-information.html', RequestContext(request,templateparameters))
 
 
 

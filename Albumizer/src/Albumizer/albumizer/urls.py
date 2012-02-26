@@ -23,7 +23,7 @@ urlpatterns = patterns('albumizer.views',
     (r'^accounts/$', redirect_to, {'url': "/accounts/profile/"}),
     (r'^accounts/logout/$', 'log_out'),
     (r'^accounts/profile/$', 'show_profile'),
-    (r'^accounts/information/$', 'edit_account_information'),
+    (r'^accounts/information/$', 'edit_account_information', {}, 'edit_account_information'),
     (r'^accounts/facebooklogin$', 'facebook_login'),
 
     (r'^order/$', redirect_to, {'url': '/order/information/'}),

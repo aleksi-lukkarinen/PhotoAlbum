@@ -3,6 +3,14 @@
 
 
 
+{% block page_scripts_after %}
+
+  $(function() {
+    $(".commonForm :submit").button();
+  });
+
+{% endblock %}
+
 {% block page_title %}Edit Personal Information{% endblock %}
 
 
@@ -11,5 +19,15 @@
 
   <h1>Edit Personal Information</h1>
   {% show_messages %}
-
+  <form class="commonForm" method="post">
+  	{% csrf_token %}
+    <div class="formSectionTitle ui-widget-header">Personal Information</div>
+    <fieldset class="ui-widget-content ui-corner-bottom">
+	  {% include "basicform.html" with form=userForm %}
+	  {% include "basicform.html" with form=userProfileForm %}
+	  {% include "basicform.html" with form=addressForm %}
+	  <input type="submit" value="Save changes"/>
+	</fieldset>
+	  
+</form>
 {% endblock %}
