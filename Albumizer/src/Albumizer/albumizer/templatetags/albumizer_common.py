@@ -8,7 +8,7 @@ from django.template.loader import get_template
 from django.contrib.auth.models import User
 from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Page, PageContent, \
         Country, State, Address, Order, SPSPayment, OrderStatus, OrderItem
-
+from Albumizer.albumizer.utils import convert_money_into_two_decimal_string
 
 
 
@@ -249,4 +249,19 @@ def order_details(parser, token):
     custom_content_node_list = parser.parse(("end_order_details",))
     parser.delete_first_token()
     return OrderDetailsNode(custom_content_node_list)
+
+
+
+
+@register.filter
+def mto2dstr(value):
+    return convert_money_into_two_decimal_string(value)
+
+
+
+
+
+
+
+
 

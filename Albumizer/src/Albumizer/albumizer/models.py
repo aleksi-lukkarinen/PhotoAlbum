@@ -1,6 +1,6 @@
 ﻿# This Python file uses the following encoding: utf-8
 
-import hashlib, json, os
+import hashlib, json, logging, os
 from datetime import datetime, timedelta
 from random import Random
 from django.conf import settings
@@ -11,6 +11,11 @@ from django.db.models.fields.files import ImageFieldFile
 from django.db.models.signals import post_save
 from django.utils.html import escape
 import Image
+
+
+
+
+commonLogger = logging.getLogger("albumizer")
 
 
 
@@ -38,9 +43,16 @@ class AlbumizerImageFieldFile(ImageFieldFile):
         """ 
             Creates a thumbnail image based on the original, which must be saved already.
         """
-        thumbnail_image = Image.open(self.path)
-        thumbnail_image.thumbnail((width, height), Image.ANTIALIAS)
-        thumbnail_image.save(target_path, "JPEG")
+        if not os.path.exists(self.path):
+            commonLogger.error(u"Thumbnail creation failed for image \"%s\": Image was not found." % self.path)
+            return
+
+        try:
+            thumbnail_image = Image.open(self.path)
+            thumbnail_image.thumbnail((width, height), Image.ANTIALIAS)
+            thumbnail_image.save(target_path, "JPEG")
+        except Exception as e:
+            commonLogger.error(u"Thumbnail creation failed for image \"%s\": %s" % (self.path, unicode(e)))
 
     @staticmethod
     def _delete_thumbnail(path):
@@ -64,13 +76,13 @@ class AlbumizerImageFieldFile(ImageFieldFile):
 
     def large_thumbnail_url(self):
         """ 
-            Returns path of the large thumbnail image.
+            Returns url of the large thumbnail image.
         """
         return self._modify_to_thumbnail_path(self.url, FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL)
 
     def small_thumbnail_url(self):
         """ 
-            Returns path of the small thumbnail image.
+            Returns url of the small thumbnail image.
         """
         return self._modify_to_thumbnail_path(self.url, FILE_EXTENSION_PREFIX_SMALL_THUMBNAIL)
 

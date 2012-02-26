@@ -111,24 +111,24 @@ from django.utils.safestring import mark_safe
 
 class ReadOnlyWidget(forms.Widget):
     def render(self, name, value, attrs):
-        final_attrs = self.build_attrs(attrs, name=name)
+        final_attrs = self.build_attrs(attrs, name = name)
         if hasattr(self, 'initial'):
             value = self.initial
         return mark_safe(u"<span %s>%s</span>" % (flatatt(final_attrs), escape(value) or ''))
-    
+
     def _has_changed(self, initial, data):
         return False
 
 class ReadOnlyField(forms.Field):
     widget = ReadOnlyWidget
-    def __init__(self, widget=None, label=None, initial=None, help_text=None):
-        super(type(self), self).__init__(self, label=label, initial=initial,
-            help_text=help_text, widget=widget)
+    def __init__(self, widget = None, label = None, initial = None, help_text = None):
+        super(type(self), self).__init__(self, label = label, initial = initial,
+            help_text = help_text, widget = widget)
         self.widget.initial = initial
 
     def clean(self, value):
         return self.widget.initial
-    
+
 class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
 
     username = forms.CharField(
@@ -246,7 +246,7 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
         errors = self._errors
 
 
-        if not errors.get("email") and self.fields.get("txtEmailAgain","")<>"":
+        if not errors.get("email") and self.fields.get("txtEmailAgain", "") <> "":
             email1 = cleaned_data.get("email")
             email2 = cleaned_data.get("txtEmailAgain")
 
@@ -279,12 +279,12 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
         return cleaned_data
     class Meta:
         model = User
-        fields =('username', 'password', 'txtPasswordAgain', 'first_name', 'last_name', 'email', 'txtEmailAgain')
-        
+        fields = ('username', 'password', 'txtPasswordAgain', 'first_name', 'last_name', 'email', 'txtEmailAgain')
+
 class EditUserAuthForm(UserAuthForm):
-    
+
     username = forms.CharField(
-        required=False,
+        required = False,
         min_length = 5,
         max_length = 30,
         label = u"Username",
@@ -296,9 +296,9 @@ class EditUserAuthForm(UserAuthForm):
         #some modifications to the super class
         #this is done in __init__ so the fields don't have to be copy-pasted as members in this class
         super(EditUserAuthForm, self).__init__(*args, **kwargs)
-        self.fields["password"].required=False
+        self.fields["password"].required = False
         del self.fields["password"].widget.attrs["required"]
-        self.fields["txtPasswordAgain"].required=False
+        self.fields["txtPasswordAgain"].required = False
         del self.fields["txtPasswordAgain"].widget.attrs["required"]
         del self.fields["txtEmailAgain"]
 

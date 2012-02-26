@@ -16,25 +16,25 @@
 	            <div class="title">Order Summary</div>
 	            <div class="line items">
 	              <span class="heading">Items:</span>
-	              <span class="value">{{ order_info.price_of_items|floatformat:"2" }} &euro;</span>
+	              <span class="value">{{ order_info.price_of_items|mto2dstr }} &euro;</span>
 	            </div>
 	            <div class="line shipping">
 	              <span class="heading">Shipping:</span>
-	              <span class="value">{{ order_info.shipping_expenses|floatformat:"2" }} &euro;</span>
+	              <span class="value">{{ order_info.shipping_expenses|mto2dstr }} &euro;</span>
 	            </div>
 	            <hr class="subSeparator" />
 	            <div class="line totalBeforeVAT">
 	              <span class="heading">Total before VAT:</span>
-	              <span class="value">{{ order_info.order_total_price_before_vat|floatformat:"2" }} &euro;</span>
+	              <span class="value">{{ order_info.order_total_price_before_vat|mto2dstr }} &euro;</span>
 	            </div>
 	            <div class="line vat">
 	              <span class="heading">VAT ({{ order_info.vat_percentage|floatformat:"1" }} %):</span>
-	              <span class="value">{{ order_info.vat_amount|floatformat:"2" }} &euro;</span>
+	              <span class="value">{{ order_info.vat_amount|mto2dstr }} &euro;</span>
 	            </div>
 	            <hr class="separator" />
 	            <div class="line orderTotal">
 	              <span class="heading">Order Total:</span>
-	              <span class="value"><nobr>{{ order_info.order_total_price|floatformat:"2" }} &euro;</nobr></span>
+	              <span class="value"><nobr>{{ order_info.order_total_price|mto2dstr }} &euro;</nobr></span>
 	            </div>
 	            <div style="clear: both;"></div>
 	          </div>
@@ -66,17 +66,17 @@
 	                <div class="priceTitle">Expenses:</div>
 	                <div class="priceRow subtotaBeforeShipping">
 	                  <span class="heading">Items:</span>
-	                  <span class="value">{{ item_group.item_group_subtotal_before_shipping|floatformat:"2" }} &euro;</span>
+	                  <span class="value">{{ item_group.item_group_subtotal_before_shipping|mto2dstr }} &euro;</span>
 	                </div>
 	                <div class="priceRow ShippingExpenses">
 	                  <div class="bottomBorder">
 	                    <span class="heading">Shipping:</span>
-	                    <span class="value">{{ item_group.shipping_expenses|floatformat:"2" }} &euro;</span>
+	                    <span class="value">{{ item_group.shipping_expenses|mto2dstr }} &euro;</span>
 	                  </div>
 	                </div>
 	                <div class="priceRow subtotaWithShipping">
 	                  <span class="heading">Subtotal:</span>
-	                  <span class="value">{{ item_group.item_group_subtotal_with_shipping|floatformat:"2" }} &euro;</span>
+	                  <span class="value">{{ item_group.item_group_subtotal_with_shipping|mto2dstr }} &euro;</span>
 	                </div>
 	              </div>
 	              <div class="keyDates">
@@ -107,8 +107,8 @@
 	                  <div class="priceAndQuantity">
 	                    <span class="content">
 	                      {{ item_info.quantity }} piece{{ item_info.quantity|pluralize }},
-	                      {{ item_info.unit_price|floatformat:"2" }} &euro;/piece
-	                      <span class="subtotal">Subtotal: {{ item_info.sub_total|floatformat:"2" }} &euro;</span>
+	                      {{ item_info.unit_price|mto2dstr }} &euro;/piece
+	                      <span class="subtotal">Subtotal: {{ item_info.sub_total|mto2dstr }} &euro;</span>
 	                    </span>
 	                  </div>
 	                  <div style="clear: both;"></div>

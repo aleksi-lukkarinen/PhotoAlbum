@@ -13,7 +13,6 @@ body {
   color:                     #000000;
 }
 
-
 #pageContainer {
   margin:                    0em auto;
   width:                     85em;
@@ -1087,6 +1086,10 @@ clear:both;
   background:                #ffffee;
   text-align:                center;
   margin-bottom:             0.5em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .placeOrderButton input[type="submit"] {
+  margin-top:                0.1em;
 }
 
 .orderSummary .orderSummaryContent .generalInfo .keyFigures {
