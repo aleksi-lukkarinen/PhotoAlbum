@@ -57,8 +57,8 @@
     </div>
     <div class="detailRow">
       <td class="price">
-        {% if album.price > 0 %}
-          {{ album.price|floatformat:"2" }} &euro; / piece + shipping
+        {% if album.price_excluding_vat_and_shipping.0 > 0 %}
+          {{ album.price_excluding_vat_and_shipping.0|floatformat:"2" }} &euro; / piece + shipping + VAT
         {% endif %}
       </td>
     </div>
@@ -84,7 +84,7 @@
 	  {% for page in album.pages %}
 	  <div class="albumListItem{% if forloop.counter0|divisibleby:"5" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
 	    <a href="{% if opened_using_secret_hash %}{{ page.get_secret_url }}{% else %}{{ page.get_absolute_url }}{% endif %}">
-	      <img src="{{ page.get_cover_url }}" alt="Page {{ page.pageNumber }} of album {{ album.title }}" class="albumListItemImage" />
+	      <img src="{{ page.url_of_large_cover }}" alt="Page {{ page.pageNumber }} of album {{ album.title }}" class="albumListItemImage" />
 	      <p class="albumListItemTitle">Page {{ page.pageNumber }}</p>
 	    </a>
 	    {% if current_user_can_delete %}

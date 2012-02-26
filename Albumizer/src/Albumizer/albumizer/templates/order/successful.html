@@ -15,35 +15,13 @@
 	  {% show_messages %}
 
     <div class="prompt">
-      Your <a href="{% url "show_single_order" order.id %}">order</a> has been placed successfully, but it won't be processed until
-      we receive your payment.<br />
+      Your <a href="{% url "show_single_order" order_info.order.id %}">order</a> has been placed successfully,
+      but it won't be processed until we receive your payment.<br />
       The accepted payment methods are listed below. Please initiate the payment by clicking
       the link of the payment service you want to use.  
     </div>
 
-    <div class="paymentServices ui-corner-all">
-      <div class="groupContent ui-corner-all">
-		    <form name="frmSPSPayment" id="id_frmSPSPayment" method="post" action="{{ sps_address }}">
-		      {% csrf_token %}
-			    <input type="hidden" name="sid" value="{{ sps_seller_id }}" />
-			    <input type="hidden" name="pid" value="{{ sps_payment_id }}" />
-			    <input type="hidden" name="amount" value="{{ sps_amount }}" />
-			    <input type="hidden" name="checksum" value="{{ sps_checksum }}" />
-			    <input type="hidden" name="success_url" value="{{ sps_success_url }}" />
-			    <input type="hidden" name="cancel_url" value="{{ sps_cancel_url }}" />
-			    <input type="hidden" name="error_url" value="{{ sps_error_url }}" />
-			    {% if debug %}
-			    <input type="hidden" name="dev" value="developing environment" />
-			    {% endif %}
-			    
-			    <div class="spsContainer">
-				    <div class="spsLogo">&euro;&euro;&euro;</div>
-				    <input type="submit" class="paymentServiceLink" value="Simple Payments" 
-				              title="Pay via Simple Payments service">
-				  </div>  
-			  </form>
-      </div>
-    </div>
+    {% payment_services %}
 		
     <div class="disclaimer">
       After you initiate the payment, you will be directed to the system of the payment service you chose.
@@ -53,5 +31,8 @@
       No banking information will be asked or handled by or is to be entered into the Albumizer service.
       We only receive information about completion of the payment. 
     </div>
+  </div>
+
+  {% random_picks_album_list 8 %}
 
 {% endblock %}

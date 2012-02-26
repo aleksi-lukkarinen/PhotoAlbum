@@ -14,31 +14,22 @@
 {% block message_page_content %}
 
   <div class="paymentInfo">
-	  Your payment via Simple Payments service has been arrived.
-	  You should receive an email confirmation in a few minutes.
+    <div class="prompt">
+		  Your payment via Simple Payments service has been arrived.
+		  You should receive an email confirmation in a few minutes.
+    </div>
+	
+    {% payment_details order_info.payment_info %}
 
-    <div class="orderInfo">
+    <div class="prompt orderInfo">
       Your order is now being processed, and you will receive an email confirmation
       when it is sent from our warehouse.<br />
-      You can check the status of your order <a href="{{ payment.order.get_absolute_url }}">here</a>.
+      You can check the status of your order <a href="{{ order_info.order.get_absolute_url }}">here</a>.
       Should you have any inquiries about your order, please kindly contact our customer service.
     </div>
 
-    <div class="paymentDetailsProlog">
-      Information about your payment:
-    </div>    
-	  <table class="paymentDetails">
-	    <tbody>
-	      <tr><th>Payer:</th><td>{{ payment.order.orderer.first_name }} {{ payment.order.orderer.last_name }}</td></tr>
-	      <tr><th>Payee:</th><td>Albumizer Plc.</td></tr>
-	      <tr><th>Amount:</th><td>{{ payment.amount|floatformat:"2" }} &euro;</td></tr>
-        <tr><th>Via:</th><td>Simple Payments</td></tr>
-	      <tr><th>Transaction Date:</th><td title="{{ payment.transactionDate|date:"c" }}">{{ payment.transactionDate|date:"j.n.Y \a\t G.i" }}</td></tr>
-	      <tr><th>Reference #:</th><td>{{ payment.referenceCode }}</td></tr>
-	      <tr><th>Order Date:</th><td title="{{ payment.order.purchaseDate|date:"c" }}">{{ payment.order.purchaseDate|date:"j.n.Y \a\t G.i" }}</td></tr>
-	    </tbody>
-	  </table>
-  
+    {% order_details %}{% end_order_details %}
+
 	  <div class="closing">
 	    Thank you for ordering our products! We hope to see you here producing and discovering great new albums!
 	  </div>    

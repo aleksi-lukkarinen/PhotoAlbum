@@ -1,5 +1,20 @@
 # This Python file uses the following encoding: utf-8
 
+import signal, sys
+
+def initialization_time_signal_handler(received_signal, frame):
+    if received_signal == signal.SIGINT:
+        print u"Execution of this command was aborted.\n"
+        sys.exit(0)
+
+signal.signal(signal.SIGINT, initialization_time_signal_handler)
+
+
+
+print "\nStarting up...\n\n"
+
+
+
 import fileinput, gc, json, os, re, time
 from datetime import datetime, timedelta
 from optparse import make_option
@@ -52,6 +67,8 @@ COMPILED_RE_IMAGE_FILENAME_CLEARING_PATTERNS_RET_GRP1 = [
     re.compile(r"^(.*)_LOC$"),
     re.compile(r"^\[(.*)\][ \t]*$"),
 ]
+
+
 
 
 class Command(BaseCommand):
@@ -135,7 +152,25 @@ class Command(BaseCommand):
     _qs_layout_count = 0
     _country_FI = None
     _ids_of_generated_users = []
+    _default_signal_handler = None
+    _has_been_aborted = False
 
+
+
+
+    def _signal_handler(self, received_signal, frame):
+        if received_signal == signal.SIGINT:
+            self._has_been_aborted = True
+            if self._default_signal_handler:
+                signal.signal(signal.SIGINT, self._default_signal_handler)
+            print \
+                u"\n\n\n" + \
+                u"        ----------------------------------------\n" + \
+                u"\n" + \
+                u"                    Aborting soon...\n" + \
+                u"\n" + \
+                u"        ----------------------------------------\n" + \
+                u"\n\n"
 
 
 
@@ -197,7 +232,7 @@ class Command(BaseCommand):
                 full_path = os.path.join(base_path, node)
 
                 if os.path.isfile(full_path):
-                    if node.split(".")[-1] in IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS:
+                    if node.split(".")[-1].lower() in IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS:
                         photos_at_root_dir.append(self._build_image_info(node, full_path))
 
                         if verbosity >= 2:
@@ -230,7 +265,7 @@ class Command(BaseCommand):
                 full_path = os.path.join(base_path, node)
 
                 if os.path.isfile(full_path):
-                    if node.split(".")[-1] in IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS:
+                    if node.split(".")[-1].lower() in IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS:
                         image_file_data.append(self._build_image_info(node, full_path))
 
                         if verbosity >= 2:
@@ -248,12 +283,13 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        self._default_signal_handler = signal.signal(signal.SIGINT, self._signal_handler)
+
         self.stdout.write(
                 u"\n---------------------------------\n" +
                 u"  Albumizer Test Data Generator\n" +
                 u"---------------------------------\n\n")
 
-        """ Populates the Albumizer database with random test data """
         verbosity = int(options.get("verbosity"))
         number_of_users = options.get("users")
         max_number_of_albums = options.get("albumsmax")
@@ -309,6 +345,41 @@ class Command(BaseCommand):
         if min_number_of_orders > max_number_of_orders:
             min_number_of_orders, max_number_of_orders = max_number_of_orders, min_number_of_orders
 
+        if not self._has_been_aborted:
+            self.generate_data(verbosity, number_of_users, max_number_of_albums, min_number_of_albums,
+                               min_number_of_orders, max_number_of_orders,
+                               no_images_to_albums, image_base_path)
+
+        if verbosity >= 1:
+            if not self._ids_of_generated_users:
+                self.stdout.write(u"\n\nExecution of program was aborted before any data was generated.")
+            else:
+                if not self._has_been_aborted:
+                    self.stdout.write(u"\nAll data has been generated.")
+                else:
+                    self.stdout.write(u"\n\nExecution of program was aborted before all data was generated.")
+
+                self.stdout.write(u" Program created users with the following usernames:\n");
+                number_of_generated_users = len(self._ids_of_generated_users)
+                username = User.objects.get(id__exact = self._ids_of_generated_users[0]).username
+                self.stdout.write(username.encode("ascii", "backslashreplace"))
+                for i in range(1, number_of_generated_users - 1):
+                    username = User.objects.get(id__exact = self._ids_of_generated_users[i]).username
+                    self.stdout.write(u", " + username.encode("ascii", "backslashreplace"))
+                if number_of_generated_users > 1:
+                    username = User.objects.get(id__exact =
+                                        self._ids_of_generated_users[number_of_generated_users - 1]).username
+                    self.stdout.write(u" and " + username.encode("ascii", "backslashreplace"))
+
+
+            self.stdout.write(u"\n")
+
+
+
+
+    def generate_data(self, verbosity, number_of_users, max_number_of_albums, min_number_of_albums,
+                      min_number_of_orders, max_number_of_orders, no_images_to_albums, image_base_path):
+        """ Populates the Albumizer database with random test data """
 
         self.stdout.write(u"Initializing data structures...\n\n");
 
@@ -379,10 +450,15 @@ class Command(BaseCommand):
         if verbosity >= 3:
             self.stdout.write(u"\n")
 
+        if self._has_been_aborted:
+            return
+
         image_file_data = self._retrieve_image_file_data(image_base_path, verbosity = verbosity)
         if verbosity >= 3:
             self.stdout.write(json.dumps(image_file_data, sort_keys = True, indent = 4) + u"\n")
 
+        if self._has_been_aborted:
+            return
 
         for i in range(1, len(self._trans_tbl_email_username_src)):
             self._trans_tbl_email_username[ord(self._trans_tbl_email_username_src[i])] = \
@@ -417,13 +493,25 @@ class Command(BaseCommand):
 
         self.stdout.write(u"\n\n")
 
+        if self._has_been_aborted:
+            return
+
         length_of_pause_in_seconds = 10
         for user_number in range(1, number_of_users + 1):
             if user_number % 15 == 0:
+                if self._has_been_aborted:
+                    return
                 message = u"Pausing for %d seconds:  " % length_of_pause_in_seconds
                 self.stdout.write(message.encode("ascii", "backslashreplace"))
                 for i in range(length_of_pause_in_seconds):
-                    time.sleep(1)
+                    if self._has_been_aborted:
+                        return
+
+                    try:
+                        time.sleep(1)
+                    except IOError:
+                        return
+
                     self.stdout.write("* ".encode("ascii", "backslashreplace"))
                 self.stdout.write("\n\n".encode("ascii", "backslashreplace"))
 
@@ -461,6 +549,8 @@ class Command(BaseCommand):
 
             del user_profile
 
+            if self._has_been_aborted:
+                return
 
 
 
@@ -489,6 +579,9 @@ class Command(BaseCommand):
 
                 del new_address
                 del address_data
+
+                if self._has_been_aborted:
+                    return
 
             if verbosity >= 2:
                 self.stdout.write(u"\n")
@@ -523,12 +616,14 @@ class Command(BaseCommand):
                 if verbosity >= 2:
                     message = u"  - album: %s, %s, %s\n           %s...\n\n" % \
                                       (new_album.title, new_album.isPublic,
-                                       new_album.creationDate,
+                                       new_album.creationDate.strftime("%d.%m.%Y at %H.%M.%S"),
                                        new_album.description[0:30].replace(u"\n", u"\n           "))
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
                 elif verbosity == 1:
                     self.stdout.write(u"a ")
 
+                if self._has_been_aborted:
+                    return
 
                 if verbosity >= 2:
                     message = u"    * pages:\n"
@@ -605,9 +700,9 @@ class Command(BaseCommand):
                                 selected_image = images_of_collection[
                                             self._albumRandomizer.randrange(0, len(images_of_collection))]
                                 image_path = selected_image[IMAGE_FILE_DICT_PATH_KEY]
-                                image_extension = image_path.split(".")[-1]
+                                image_extension = image_path.split(".")[-1].lower()
                                 image_file = ImageFile(open(image_path, "rb"))
-                                new_content.image.save(".".join("dummy", image_extension), image_file, True)
+                                new_content.image.save(".".join(["dummy", image_extension]), image_file, True)
                                 image_file.close()
 
                             new_content.save()
@@ -624,6 +719,9 @@ class Command(BaseCommand):
 
                     del new_page
 
+                    if self._has_been_aborted:
+                        return
+
                 if verbosity >= 2:
                     message = u"\n    * Price: %s euros\n\n" % \
                                 convert_money_into_two_decimal_string(new_album.price_excluding_vat_and_shipping()[0])
@@ -632,6 +730,8 @@ class Command(BaseCommand):
                 del new_album
                 del album_data
 
+                if self._has_been_aborted:
+                    return
 
 
 
@@ -666,18 +766,24 @@ class Command(BaseCommand):
                     if verbosity >= 2:
                         message = u"            (%s) %s, %d, %s\n" % \
                                         (unicode(item_counter).rjust(3, "0"), new_shopping_cart_item.album,
-                                         new_shopping_cart_item.count, new_shopping_cart_item.additionDate)
+                                         new_shopping_cart_item.count,
+                                         new_shopping_cart_item.additionDate.strftime("%d.%m.%Y at %H.%M.%S"))
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     elif verbosity == 1:
                         self.stdout.write(u"c ")
 
                     del new_shopping_cart_item
 
+                    if self._has_been_aborted:
+                        return
+
                 if verbosity >= 2:
                     self.stdout.write("\n".encode("ascii", "backslashreplace"))
 
             del shopping_cart_data
 
+            if self._has_been_aborted:
+                return
 
 
 
@@ -713,7 +819,7 @@ class Command(BaseCommand):
                     most_recent_order = new_order
 
                 if verbosity >= 2:
-                    message = u"  - order: %s\n" % new_order.purchaseDate
+                    message = u"  - order: %s\n" % new_order.purchaseDate.strftime("%d.%m.%Y at %H.%M.%S")
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
                 elif verbosity == 1:
                     self.stdout.write(u"o ")
@@ -739,8 +845,8 @@ class Command(BaseCommand):
                         self.stdout.write(u"i ")
 
                 if verbosity >= 2:
-                    message = u"            Total price: %s euros\n" % \
-                                    convert_money_into_two_decimal_string(new_order.total_price())
+                    message = u"            Total price: %s euros including shipping and VAT\n" % \
+                                    convert_money_into_two_decimal_string(new_order.info().get("order_total_price"))
                     if order_number < number_of_orders - 1:
                         message += u"\n"
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
@@ -788,9 +894,10 @@ class Command(BaseCommand):
 
                     if verbosity >= 2:
                         message = u"  - SPS payment for order (%s), %s euros, made %s, ref code %s\n" % \
-                                        (order.purchaseDate,
+                                        (order.purchaseDate.strftime("%d.%m.%Y at %H.%M.%S"),
                                          convert_money_into_two_decimal_string(new_sps_payment.amount),
-                                         new_sps_payment.transactionDate, new_sps_payment.referenceCode)
+                                         new_sps_payment.transactionDate.strftime("%d.%m.%Y at %H.%M.%S"),
+                                         new_sps_payment.referenceCode)
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     elif verbosity == 1:
                         self.stdout.write(u"y ")
@@ -806,23 +913,8 @@ class Command(BaseCommand):
             db.reset_queries()
             gc.collect()
 
-
-
-
-        if verbosity >= 1:
-            self.stdout.write(u"\nAll data has been created.")
-            if self._ids_of_generated_users:
-                self.stdout.write(u" Program created users with the following usernames:\n");
-                username = User.objects.get(id__exact = self._ids_of_generated_users[0]).username
-                self.stdout.write(username.encode("ascii", "backslashreplace"))
-                for i in range(1, number_of_users - 1):
-                    username = User.objects.get(id__exact = self._ids_of_generated_users[i]).username
-                    self.stdout.write(u", " + username.encode("ascii", "backslashreplace"))
-                if number_of_users > 1:
-                    username = User.objects.get(id__exact = self._ids_of_generated_users[number_of_users - 1]).username
-                    self.stdout.write(u" and " + username.encode("ascii", "backslashreplace"))
-            self.stdout.write(u"\n")
-
+            if self._has_been_aborted:
+                return
 
 
 
@@ -1335,7 +1427,7 @@ class Command(BaseCommand):
 
         return {
             "order": order,
-            "amount": order.total_price(),
+            "amount": order.info().get("order_total_price", 0.00),
             "transactionDate": transactionDate,
             "referenceCode": self._orderRandomizer.randrange(1234567890, 9876543210),
             "clarification": ""

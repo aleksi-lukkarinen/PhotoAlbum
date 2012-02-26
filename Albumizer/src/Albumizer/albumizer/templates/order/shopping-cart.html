@@ -64,8 +64,8 @@
 			      <tbody>
 			        <tr>
 			          <td class="itemColumn">
-			            <a href="{{ item.get_absolute_url }}"><img src="{{ item.get_cover_url }}"
-			                 alt="Cover of {{ item.title }}" title="Cover of {{ item.title }}" /></a>
+			            <a href="{{ item.get_absolute_url }}"><img src="{{ item.url_of_small_cover }}"
+			                 alt="Cover of {{ item.title }}" title="Cover of {{ item.title }}" class="ui-corner-all" /></a>
 			            <div class="item1stRow">
 			              <a href="{{ item.url }}">{{ item.title }}</a> &mdash;
 			              <span class="creator">{{ item.owner }}</span>

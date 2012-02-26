@@ -159,29 +159,7 @@ img {
 
 
 
-.paymentInfo .paymentDetails {
-  margin:                    1em 0em;
-  padding:                   1em 3em;
-	background:                #f8f8f8;
-	border:                    1px solid #eeeeee;
-}
 
-.paymentInfo .paymentDetails th {
-	padding:                   0.2em;
-  text-align:                left;
-  color:                     #888888;
-  width:                     12em;
-}
-
-.paymentInfo .orderInfo {
-	margin:                    2em 0em;
-}
-
-.paymentInfo .closing {
-  margin-top:                3em;
-  font-size:                 120%;
-  font-style:                italic;
-}
 
 
 
@@ -310,30 +288,37 @@ img {
 	margin-bottom:             1em;
 }
 
+.randomPickAlbumsListHeader {
+  background:                #ccffaa;
+  padding:                   0.2em 1em;
+}
+
 .randomPickAlbumsListTitle {
-	float:                     left;
+	display:                   inline-block;
 	font-size:                 150%;
 	font-weight:               bold;
-  background:                #ffffff;
-  color:                     #6699cc;
-  margin:                    0em 2em 1em 0em;
+  color:                     #779955;
+  margin-right:              1em;
+  padding:                   0.2em 0.5em;
 }
 
 .randomPickAlbumsListSeeMoreLink {
-	float:                     left;
-	display:                   block;
+  display:                   inline-block;
   margin:                    0.4em 0em 0em 0em;
+  color:                     #779955;
+  font-size:                 110%;
   text-decoration:           none;
 }
 
 .randomPickAlbumsListSeeMoreLink:hover {
-	background:                #ffffff;
-  color:                     maroon;
+  color:                     green;
 }
 
 .randomPickAlbumsListTable {
   clear:                     both;
 	width:                     100%;
+	padding-top:               1em;
+	border:                    1px solid #ccffaa;
 }
 
 .randomPickAlbumsListTable td {
@@ -343,6 +328,7 @@ img {
 }
 
 .randomPickAlbumsListItemContainer {
+	display:                   inline-block;
   width:                     15.1em;
   height:                    19.5em;
   overflow:                  hidden;
@@ -367,13 +353,17 @@ img {
 	display:                   block;
 	width:                     15em;
 	height:                    15em;
-  border:                    1px solid #eeeeee;
+  background:                #ccffaa;
   overflow:                  hidden;
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
+  -moz-box-shadow:           2px 2px 5px #888;
+  -webkit-box-shadow:        2px 2px 5px #888;
+  box-shadow:                2px 2px 5px #888;
 }
 
 .randomPickAlbumsListItemTitle {
+	display:                   inline-block;
   width:                     15em;
 	margin-top:                0.5em;
 	background:                #ffffff;
@@ -522,29 +512,55 @@ clear:both;
 }
 
 #frmRegister #id_cmdRegister {
-	margin-top:                2em;
+	margin-bottom:             2em;
 	width:                     12em;
 }
 
+.confirmationForm div label {
+  width:                     60em;
+}
 
 .confirmationForm input {
 /* some customizations to fix the alignment of the terms and conditions checkbox */
-	float:left;
-	margin-right:1em;
+	float:                     left;
+  margin-top:                0.35em;
+  margin-right:              1em;
 }
-.confirmationForm div label {
-	width:20em;
-}
+
 .confirmationForm div.helpRow,
 .confirmationForm div.errorRow {
-	margin:0;
-	padding:0;
+	margin:                    0em;
+	padding:                   0em;
 }
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#frmCreateAlbum .fieldRow label[for="id_txtAlbumDescription"] {
+  float:                     left;
+}
 
 #frmCreateAlbum #id_chkPublicAlbum {
   float:                     none;
@@ -813,6 +829,9 @@ clear:both;
   overflow:                  hidden;
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
+	-moz-box-shadow:           2px 2px 5px #888;
+	-webkit-box-shadow:        2px 2px 5px #888;
+	box-shadow:                2px 2px 5px #888;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn img:hover {
@@ -1019,263 +1038,6 @@ clear:both;
   margin:                    0em 0em 0em 1em;
 }
 
-#id_frmOrderSummary .generalInfoBackground {
-	margin-left:               67em;
-  width:                     18em;
-  min-height:                22.5em;
-  background:                #eebb77;
-}
-
-#id_frmOrderSummary .orderSummary {
-	overflow:                  visible;
-  position:                  relative;
-  right:                     67em;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo {
-	float:                     right;
-	position:                  absolute;
-	top:                       0.1em;
-	left:                      67em;
-	width:                     17em;
-  padding:                   0.3em 0.5em;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .placeOrderButton {
-	height:                    4em;
-	padding:                   1em 0.3em 0em 0.3em;
-	background:                #ffffee;
-	text-align:                center;
-	margin-bottom:             0.5em;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures {
-  height:                    15em;
-	padding:                   0.5em 0.5em;
-  background:                #ffffff;
-  text-align:                center;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures hr {
-  clear:                     all;
-	color:                     #888888;
-  border:                    none;
-  border-top:                1px solid #aaaaaa;
-  height:                    1px;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .subSeparator {
-	width:                     6em;
-	margin:                    0.5em 0.5em 0.5em 10em;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .separator {
-  width:                     15em;
-  margin:                    2em 0.5em;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .title {
-  font-size:                 110%;
-  font-weight:               bold;
-  margin-bottom:             1em;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .line {
-	clear:                     both;
-	width:                     16em;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .heading {
-  float:                     left;
-	display:                   inline-block;
-  width:                     9em;
-  text-align:                left;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .value {
-  display:                   inline-block;
-  width:                     7em;
-  text-align:                right;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .line.orderTotal {
-	text-align:                center;
-}
-
-#id_frmOrderSummary .orderSummary .generalInfo .keyFigures .orderTotal span {
-	float:                     none;
-  width:                     auto;
-  white-space:               nowrap;
-  font-size:                 130%;
-	font-weight:               bold;
-  background:                #ffffff;
-  color:                     #aa0000;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress {
-	background:                #88cc55;
-	padding:                   0.3em 0.5em;
-  width:                     65em;
-  margin-bottom:             1em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader {
-  background:                #f6fff6;
-  padding:                   0.8em;
-  margin-bottom:             0.3em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .address {
-	float:                     left;
-	width:                     20em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .address .addressTitle {
-	font-size:                 110%;
-	font-weight:               bold;
-	margin-bottom:             0.5em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .address .addressLine {
-  width:                     17em;
-	font-size:                 110%;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .price {
-  float:                     left;
-  width:                     18em;
-  font-size:                 110%;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .priceTitle {
-  font-weight:               bold;
-  margin-bottom:             0.5em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .priceRow {
-  margin-bottom:             0.2em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .ShippingExpenses {
-  margin-bottom:             0.5em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .bottomBorder {
-	width:                     14em;
-  border-bottom:             1px solid #999999;
-  padding-bottom:            0.1em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .price .heading {
-	float:                     left;
-	display:                   inline-block;
-	width:                     5em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .price .value {
-  display:                   inline-block;
-  width:                     9em;
-  text-align:                right;
-  color:                     #aa0000;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates {
-  float:                     left;
-	width:                     18em;
-  font-size:                 110%;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .title {
-  font-weight:               bold;
-  margin-bottom:             0.5em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .line {
-  margin-bottom:             0.2em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .heading {
-  float:                     left;
-  display:                   inline-block;
-  width:                     11em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .value {
-  display:                   inline-block;
-  width:                     7em;
-  text-align:                right;
-  color:                     #008800;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems {
-  background:                #ffffff;
-  padding:                   0.8em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem {
-  clear:                     both;
-  margin-bottom:             2em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem.last {
-  clear:                     both;
-  margin-bottom:             0em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .titleRow {
-  width:                     50em;
-  margin-bottom:             0.4em;
-  margin-left:               10em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .titleRow .title {
-  font-weight:               bold;
-  background:                #ffffff;
-  color:                     #336699;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .description {
-  width:                     50em;
-	margin-left:               10em;
-  margin-bottom:             1em;
-  background:                #ffffff;
-  color:                     #888888;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity {
-  width:                     50em;
-  margin-bottom:             0.4em;
-  margin-left:               10em;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content {
-  font-size:                 110%;
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content .subtotal {
-	display:                   inline-block;
-	position:                  absolute;
-	left:                      30em;
-	width:                     20em;
-
-}
-
-#id_frmOrderSummary .orderSummary .itemsOfSingleAddress .allItems .singleItem .image img {
-  display:                   block;
-  float:                     left;
-  width:                     8em;
-  height:                    8em;
-  margin-right:              1em;
-  border:                    1px solid #aaaaaa;
-  background:                #dddddd;
-  color:                     #888888;
-  padding-top:               0.3em;
-  text-align:                center;
-  overflow:                  hidden;
-  text-overflow:             ellipsis;
-  -o-text-overflow:          ellipsis;
-}
-
 #id_frmOrderSummary .disclaimer {
   padding-top:               1em;
   text-align:                right;
@@ -1297,16 +1059,342 @@ clear:both;
 
 
 
+.orderSummary .generalInfoBackground {
+  margin-left:               67em;
+  width:                     18em;
+  min-height:                18.5em;
+  background:                #eebb77;
+}
+
+.orderSummary .orderSummaryContent {
+  overflow:                  visible;
+  position:                  relative;
+  right:                     67em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo {
+  float:                     right;
+  position:                  absolute;
+  top:                       0.1em;
+  left:                      67em;
+  width:                     17em;
+  padding:                   0.3em 0.5em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .placeOrderButton {
+  height:                    4em;
+  padding:                   1em 0.3em 0em 0.3em;
+  background:                #ffffee;
+  text-align:                center;
+  margin-bottom:             0.5em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures {
+  height:                    15em;
+  padding:                   0.5em 0.5em;
+  background:                #ffffff;
+  text-align:                center;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures hr {
+  clear:                     all;
+  color:                     #888888;
+  border:                    none;
+  border-top:                1px solid #aaaaaa;
+  height:                    1px;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .subSeparator {
+  width:                     6em;
+  margin:                    0.5em 0.5em 0.5em 10em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .separator {
+  width:                     15em;
+  margin:                    2em 0.5em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .title {
+  font-size:                 110%;
+  font-weight:               bold;
+  margin-bottom:             1em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .line {
+  clear:                     both;
+  width:                     16em;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .heading {
+  float:                     left;
+  display:                   inline-block;
+  width:                     9em;
+  text-align:                left;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .value {
+  display:                   inline-block;
+  width:                     7em;
+  text-align:                right;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .line.orderTotal {
+  text-align:                center;
+}
+
+.orderSummary .orderSummaryContent .generalInfo .keyFigures .orderTotal span {
+  float:                     none;
+  width:                     auto;
+  white-space:               nowrap;
+  font-size:                 130%;
+  font-weight:               bold;
+  background:                #ffffff;
+  color:                     #aa0000;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress {
+  background:                #88cc55;
+  padding:                   0.3em 0.5em;
+  width:                     65em;
+  margin-bottom:             1em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader {
+  background:                #e0ffe0;
+  padding:                   0.8em;
+  margin-bottom:             0.3em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .address {
+  float:                     left;
+  width:                     20em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .address .addressTitle {
+  font-size:                 110%;
+  font-weight:               bold;
+  margin-bottom:             0.5em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .address .addressLine {
+  width:                     17em;
+  font-size:                 110%;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .price {
+  float:                     left;
+  width:                     18em;
+  font-size:                 110%;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .priceTitle {
+  font-weight:               bold;
+  margin-bottom:             0.5em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .priceRow {
+  margin-bottom:             0.2em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .ShippingExpenses {
+  margin-bottom:             0.5em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .bottomBorder {
+  width:                     14em;
+  border-bottom:             1px solid #999999;
+  padding-bottom:            0.1em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .price .heading {
+  float:                     left;
+  display:                   inline-block;
+  width:                     5em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .price .value {
+  display:                   inline-block;
+  width:                     9em;
+  text-align:                right;
+  color:                     #aa0000;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates {
+  float:                     left;
+  width:                     18em;
+  font-size:                 110%;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .title {
+  font-weight:               bold;
+  margin-bottom:             0.5em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .line {
+  margin-bottom:             0.2em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .heading {
+  float:                     left;
+  display:                   inline-block;
+  width:                     11em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .value {
+  display:                   inline-block;
+  width:                     7em;
+  text-align:                right;
+  color:                     #008800;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems {
+  background:                #ffffff;
+  padding:                   0.8em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem {
+  clear:                     both;
+  margin-bottom:             2em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem.last {
+  clear:                     both;
+  margin-bottom:             0em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .titleRow {
+  width:                     50em;
+  margin-bottom:             0.4em;
+  margin-left:               10em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .titleRow .title {
+  font-weight:               bold;
+  background:                #ffffff;
+  color:                     #336699;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .description {
+  width:                     50em;
+  margin-left:               10em;
+  margin-bottom:             1em;
+  background:                #ffffff;
+  color:                     #888888;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity {
+  width:                     50em;
+  margin-bottom:             0.4em;
+  margin-left:               10em;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content {
+  font-size:                 110%;
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content .subtotal {
+  display:                   inline-block;
+  position:                  absolute;
+  left:                      30em;
+  width:                     20em;
+
+}
+
+.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .image img {
+  display:                   block;
+  float:                     left;
+  width:                     8em;
+  height:                    8em;
+  margin-right:              1em;
+  border:                    1px solid #aaaaaa;
+  background:                #dddddd;
+  color:                     #888888;
+  padding-top:               0.3em;
+  text-align:                center;
+  overflow:                  hidden;
+  text-overflow:             ellipsis;
+  -o-text-overflow:          ellipsis;
+  -moz-box-shadow:           2px 2px 5px #888;
+  -webkit-box-shadow:        2px 2px 5px #888;
+  box-shadow:                2px 2px 5px #888;
+}
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#checkoutSuccessful {
+	margin-bottom:             7em;
+}
 
 #checkoutSuccessful .prompt {
 	margin-bottom:             2em;
 }
 
-#checkoutSuccessful .paymentServiceLink {
+#checkoutSuccessful .disclaimer {
+  margin-top:                1em;
+  text-align:                right;
+  background:                #ffffff;
+  color:                     #777777;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.paymentServices {
+  background:                #88cc55;
+  padding:                   0.3em 0.5em;
+  margin-bottom:             1em;
+}
+
+.paymentServices .groupContent {
+  background:                #ffffff;
+  padding:                   0.8em;
+  text-align:                center;
+}
+
+.paymentServices #id_frmSPSPayment .spsContainer {
+  text-align:                center;
+}
+
+.paymentServices #id_frmSPSPayment .spsContainer .spsLogo {
+  color:                     #3a3;
+  font-family:               "Georgia", "Times New Roman", times, serif;
+  font-size:                 55px;
+  font-weight:               bolder;
+  text-shadow:               -1px -1px 1px #FFF, 1px 1px 1px #151;
+}
+
+.paymentServices .paymentServiceLink {
   display:                   inline-block;
   border:                    none;
   background:                #ffffff;
@@ -1317,38 +1405,154 @@ clear:both;
   padding:                   0em;
 }
 
-#checkoutSuccessful .paymentServices {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.paymentInfo .prompt {
+  margin:                    2em 0em;
+}
+
+.paymentInfo .closing {
+  margin-top:                3em;
+  font-size:                 120%;
+  font-style:                italic;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.paymentDetails {
+	display:                   inline-block;
   background:                #88cc55;
   padding:                   0.3em 0.5em;
-  width:                     100%;
   margin-bottom:             1em;
 }
 
-#checkoutSuccessful .paymentServices .groupContent {
+.paymentDetails .groupHeader {
+  background:                #e0ffe0;
+  padding:                   0.8em;
+  margin-bottom:             0.3em;
+  font-size:                 110%;
+  font-weight:               bold;
+}
+
+.paymentDetails .groupContent {
   background:                #ffffff;
   padding:                   0.8em;
-  text-align:                center;
+  font-size:                 110%;
 }
 
-#checkoutSuccessful #id_frmSPSPayment .spsContainer {
-  display:                   inline-block;
-  text-align:                center;
+.paymentDetails .groupContent .detail {
+  clear:                     both;
+  padding:                   0.3em 0em;  
 }
 
-#checkoutSuccessful #id_frmSPSPayment .spsContainer .spsLogo {
-  color:                     #3a3;
-  font-family:               "Georgia", "Times New Roman", times, serif;
-  font-size:                 55px;
-  font-weight:               bolder;
-  text-shadow:               -1px -1px 1px #FFF, 1px 1px 1px #151;
+.paymentDetails .groupContent .detailTitle {
+	float:                     left;	
 }
 
-#checkoutSuccessful .disclaimer {
-  padding-top:               1em;
+.paymentDetails .groupContent .detailValue {
+	margin-left:               15em;
+	min-width:                 15em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.orderBrowser {
+	margin-bottom:             7em;
+}
+
+.orderBrowser .statusOrdered .prompt {
+  margin-bottom:             2em;
+}
+
+.orderBrowser .statusPaidAndBeingProcessed .prompt {
+  margin-bottom:             2em;
+}
+
+.orderBrowser .statusSent .prompt {
+  margin-bottom:             2em;
+}
+
+.orderBrowser .statusBlocked .prompt {
+  margin-bottom:             2em;
+}
+
+.orderBrowser .statusUnknown .line1 {
+	margin-top:                3em;
+	margin-bottom:             2em;
+}
+
+.orderBrowser .statusUnknown .line2 {
+  margin-bottom:             4em;
+}
+
+.orderBrowser .orderSummaryTitle {
+  margin-top:                3em;
+  margin-bottom:             2em;
+}
+
+.orderBrowser .disclaimer {
+  margin-top:                1em;
   text-align:                right;
   background:                #ffffff;
   color:                     #777777;
 }
+
+
+
 
 
 
@@ -1383,6 +1587,7 @@ clear:both;
   padding-top:0.2em;
   color:                     #888888;
 }
+
 .commonForm .formSectionTitle {
   padding:                   0.5em;
   background-color:          #777777;
@@ -1394,7 +1599,7 @@ clear:both;
 .commonForm fieldset {
   border:                    none;
   margin-bottom:             2em;
-  padding:                   1em 1em 1em 1em;
+  padding:                   0.5em 1em 1em 1em;
 }
 
 .commonForm input[type="submit"] {
@@ -1403,13 +1608,22 @@ clear:both;
 
 .commonForm label {
   display:                   inline-block;
+  margin-top:                0.2em;  
   width:                     13em;
+}
+
+.commonForm input[type="text"],
+.commonForm input[type="password"],
+.commonForm input[type="email"],
+.commonForm input[type="tel"],
+.commonForm select {
+	padding:                   0.1em;
 }
 
 .commonForm textarea {
   width:                     50em;
   min-width:                 10em;
-  max-width:                 60em;
+  max-width:                 57em;
   min-height:                3em;
 } 
 
@@ -1431,11 +1645,10 @@ clear:both;
 
 .commonForm .fieldRow {
   margin-top:                1em;
-  vertical-align:            top;
 }
 
-.commonForm .fieldRow div{
-  margin-left:                13em;
+.commonForm .fieldRow div {
+  margin-left:               13em;
 }
 
 .commonForm .fieldRow label {
@@ -1454,23 +1667,23 @@ clear:both;
 .commonForm .helpRow {
   margin-top:                0.2em;
   padding-left:              13em;
-  margin-left: 3px;
+  margin-left:               3px;
   color:                     #888888;
 }
 
 .commonForm .errorRow {
   margin:                    0.5em 0em 2em 13em;
-  padding-left: 3px;
+  padding-left:              3px;
 }
 
 .commonForm fieldset .errorlist {
-  list-style-type: none;
+  list-style-type:           none;
   color:                     #dd0000;
   font-weight:               bold;
-  margin-left: 13em;
-  padding-top: 1em;
-  padding-left: 3px;
-  padding-bottom: 0.2em;
+  margin-left:               13em;
+  padding-top:               1em;
+  padding-left:              3px;
+  padding-bottom:            0.2em;
 }
 
 .commonForm .errorMessage {
@@ -1484,17 +1697,17 @@ clear:both;
 }
 
 .commonFormErrorList .errorlist {
-padding-left:1em;
+  padding-left:              1em;
 }
-.commonFormErrorList .errorlist {
 
-display: inline-block;
-list-style-type: none;
-	
+.commonFormErrorList .errorlist {
+  display:                   inline-block;
+  list-style-type:           none;
 }
+
 .commonFormErrorList .ui-icon {
   margin-right:              0.5em;
-  display: inline-block;
+  display:                   inline-block;
 }
 
 .commonFormErrorList .errorMessage {

@@ -1,0 +1,28 @@
+{% load url from future %}
+
+  {% if sps_parameters %}
+
+    <div class="paymentServices ui-corner-all">
+      <div class="groupContent ui-corner-all">
+        <form name="frmSPSPayment" id="id_frmSPSPayment" method="post" action="{{ sps_parameters.sps_address }}">
+          <input type="hidden" name="sid" value="{{ sps_parameters.seller_id }}" />
+          <input type="hidden" name="pid" value="{{ sps_parameters.payment_id }}" />
+          <input type="hidden" name="amount" value="{{ sps_parameters.amount }}" />
+          <input type="hidden" name="checksum" value="{{ sps_parameters.checksum }}" />
+          <input type="hidden" name="success_url" value="{{ sps_parameters.success_url }}" />
+          <input type="hidden" name="cancel_url" value="{{ sps_parameters.cancel_url }}" />
+          <input type="hidden" name="error_url" value="{{ sps_parameters.error_url }}" />
+          {% if debug %}
+          <input type="hidden" name="dev" value="developing environment" />
+          {% endif %}
+          
+          <div class="spsContainer">
+            <div class="spsLogo">&euro;&euro;&euro;</div>
+            <input type="submit" class="paymentServiceLink" value="Simple Payments" 
+                      title="Pay via Simple Payments service">
+          </div>  
+        </form>
+      </div>
+    </div>
+
+  {% endif %}

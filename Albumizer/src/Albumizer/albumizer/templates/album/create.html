@@ -77,7 +77,7 @@
 
     <div class="formSectionTitle ui-widget-header">Album Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtAlbumTitle.name }}">{{ form.txtAlbumTitle.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtAlbumTitle }}</div>
+      <div class="fieldRow"><label class="required" for="id_{{ form.txtAlbumTitle.name }}">{{ form.txtAlbumTitle.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtAlbumTitle }}</div>
       <div class="helpRow">{{ form.txtAlbumTitle.help_text }}</div>
       {% if form.txtAlbumTitle.errors %}
         <div class="errorRow">
