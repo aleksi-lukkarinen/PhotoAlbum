@@ -1016,7 +1016,7 @@ def show_profile(request):
     except (EmptyPage, InvalidPage):
       albums = paginator.page(paginator.num_pages)
 
-    template_parameters = {'albums': albums}
+    template_parameters = {'albums': albums, "orders":Order.objects.filter(orderer=request.user)}
     return render_to_response('accounts/profile.html', RequestContext(request, template_parameters))
 
 

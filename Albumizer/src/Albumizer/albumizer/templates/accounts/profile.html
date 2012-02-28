@@ -14,14 +14,22 @@
 {% endblock %}
 
 {% block before_album_list %}
-<fieldset>
-<legend>Profile information</legend>
+<h3>Profile information</h3>
 <p>Username: {{user.username }} </p>
 <p>First name: {{ user.first_name }}</p>
 <p>Last name: {{user.last_name}} </p>
 <a href="{% url "edit_account_information" %}">Edit profile</a>
-</fieldset>
 
+{% if orders %}
+<h3>Order history</h3>
+<ul>
+{% for order in orders.all %}
+<li><a href="{{ order.get_absolute_url }}">#{{order.id}}</a>: {{order.status.code}} {{order.purchaseDate}}</li>
+{% endfor %}
+</ul>
+{% endif%}
+
+<h3>Albums</h3>
 {% endblock %}
 {% block no_albums %}
 
