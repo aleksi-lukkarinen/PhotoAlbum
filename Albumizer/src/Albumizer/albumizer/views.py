@@ -231,7 +231,25 @@ def list_all_public_albums(request):
     return render_to_response_as_public('album/list-all.html', RequestContext(request, template_parameters))
 
 
+def view_album_slideshow(request, album_id):
+    myalbum = Album.by_id(album_id)
+    if not myalbum:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
 
+    if myalbum.is_hidden_from_user(request.user):
+        return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
+
+    layouts=[]
+    for page in myalbum.pages():
+        if not page.layout in layouts:
+            layouts.append(page.layout)
+            
+    templateparameters={
+        "album":myalbum,
+        "layouts":layouts}
+    
+    return render_to_response('album/view-album-slideshow.html', RequestContext(request, templateparameters))
+    
 
 def show_single_page_GET(request, album_id, page_number):
     myalbum = Album.by_id(album_id)
@@ -998,7 +1016,7 @@ def show_profile(request):
     except (EmptyPage, InvalidPage):
       albums = paginator.page(paginator.num_pages)
 
-    template_parameters = {'albums': albums}
+    template_parameters = {'albums': albums, "orders":Order.objects.filter(orderer=request.user)}
     return render_to_response('accounts/profile.html', RequestContext(request, template_parameters))
 
 

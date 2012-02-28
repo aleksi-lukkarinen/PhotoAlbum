@@ -14,7 +14,9 @@ def common_variables(request):
         "site_name": current_site.name,
         "twitter_hashtag": settings.TWITTER_HASHTAG,
         "twitter_account": settings.TWITTER_ACCOUNT,
-        "template_cache_timeout": 5 * 60
+        "template_cache_timeout": 5 * 60,
+        #needed for webcourse environment
+        "debug": settings.DEBUG
     }
 
 
