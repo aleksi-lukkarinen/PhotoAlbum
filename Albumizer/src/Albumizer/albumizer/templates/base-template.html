@@ -126,41 +126,49 @@
     <div id="pageContainer">
       {% cache template_cache_timeout base_header request.user %}  
 		    <header id="pageHeader">
-		      <div id="pageHeaderLeftPart">
-		        <a href="/" rel="home"><figure><img src="{% get_static_prefix %}images/albumizer-title.png"
-		             alt="Albumizer Logo" /></figure></a><span id="pageHeaderSlogan">Unleash Your Imagination!</span>
-		      </div>
-		      <div id="pageHeaderRightPart">
-		        <nav>
+		      <div id="row1" class="row">
+		        <a id="logo" href="/" rel="home"><figure><img src="{% get_static_prefix %}images/albumizer-title.png" alt="Albumizer Logo" /></figure></a>
+			      <div id="slogan">Unleash Your Imagination!</div>
+		        <div id="rightPart">
 			        {% if user.is_authenticated %}
-		            <a href="{% url "albumizer.views.log_out" %}" id="headerLinkLogOut" class="header-link">Log Out</a>
-			          <a href="{% url "albumizer.views.show_profile" %}" id="headerLinkProfile" class="header-link">
-			          {% if user.first_name %}
-			            {{ user.first_name }}
-			            {% if user.last_name %}
-			              {{ user.last_name }}
+			          <span class="userName">
+				          {% if user.first_name %}
+				            {{ user.first_name }}
+				            {% if user.last_name %}
+				              {{ user.last_name }}
+				            {% endif %}
+				          {% else %}
+			              {{ user.username }}
 			            {% endif %}
-			          {% else %}
-		              {{ user.username }}
-		            {% endif %}
-		            </a>
-		            <a href="{% url "edit_shopping_cart" %}" id="headerLinkShoppingCart" class="header-link">Shopping Cart</a>
-		            <a href="{% url "create_album" %}" id="headerLinkAddAlbum" class="header-link">Create Album</a>
+		            </span>
 			        {% else %}
-			          {% if not is_registration_page %}
-		              <a href="{% url "get_registration_information" %}" id="headerLinkRegister" class="header-link">Register</a>
-		            {% endif %}
-		            {% if not is_login_page %}
-		              <a href="{% url "log_in" %}" onclick="$('#login-dialog').dialog('open'); return false;" id="headerLinkLogIn" class="header-link">Log In</a>
-		            {% endif %}
+			          <nav>
+				          {% if not is_registration_page %}
+			              <a href="{% url "get_registration_information" %}" id="headerLinkRegister" class="headerNavLink">Register</a>
+			            {% endif %}
+			            {% if not is_login_page %}
+			              <a href="{% url "log_in" %}" onclick="$('#login-dialog').dialog('open'); return false;" id="headerLinkLogIn" class="headerNavLink">Log In</a>
+			            {% endif %}
+			          </nav>
 			        {% endif %}
-		          {% if not is_album_list_page %}
-		            <a href="{% url "albumizer.views.list_all_public_albums" %}" id="headerLinkBrowse" class="header-link">Public Albums</a>
-		          {% endif %}
-		        </nav>
-		      </div>
-		      <div class="clear-floats"></div>
-		    </header>
+			      </div>
+			    </div>
+          {% if user.is_authenticated %}
+            <div id="row2" class="row">
+              <div class="table">
+		            <nav>
+		               {% if not is_album_list_page %}
+		                 <a href="{% url "albumizer.views.list_all_public_albums" %}" id="headerLinkBrowse" class="headerNavLink">Public Albums</a>
+		               {% endif %}
+		               <a href="{% url "create_album" %}" id="headerLinkAddAlbum" class="headerNavLink">Create Album</a>
+		               <a href="{% url "edit_shopping_cart" %}" id="headerLinkShoppingCart" class="headerNavLink">Shopping Cart</a>
+		               <a href="{% url "albumizer.views.show_profile" %}" id="headerLinkProfile" class="headerNavLink">Personal Profile</a>
+		               <a href="{% url "albumizer.views.log_out" %}" id="headerLinkLogOut" class="headerNavLink">Log Out</a>
+		            </nav>
+		          </div>
+	          </div>
+	        {% endif %}
+			  </header>
       {% endcache %}
 	
 	    <div id="pageContent">
