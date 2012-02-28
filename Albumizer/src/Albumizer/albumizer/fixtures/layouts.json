@@ -9,5 +9,16 @@
             "textFieldCount": 1,
             "imageFieldCount": 1
         }
+    },
+    {
+        "pk": 2,
+        "model": "albumizer.layout",
+        "fields": {
+            "cssContent": ".twoImages #image1 { \r\n  width: 300px; \r\n  height:350px;\r\n  display:inline-block;\r\n  float:left;\r\n}\r\n.twoImages #image2 { \r\n  width: 300px; \r\n  height:350px;\r\n  display:inline-block;\r\n  float:right;\r\n}\r\n.twoImages #text1 {\r\ndisplay: block;\r\nfont-size: x-large;\r\nheight: 40px;\r\ntext-align: center;\r\npadding-top: 10px;\r\n}",
+            "cssClass": "twoImages",
+            "name": "Two Images",
+            "textFieldCount": 1,
+            "imageFieldCount": 2
+        }
     }
 ]
