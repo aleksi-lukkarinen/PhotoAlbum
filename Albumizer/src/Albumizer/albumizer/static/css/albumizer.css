@@ -1058,29 +1058,24 @@ clear:both;
 
 
 
-.orderSummary .generalInfoBackground {
-  margin-left:               67em;
-  width:                     18em;
-  min-height:                18.5em;
+.generalInfoBackground {
   background:                #eebb77;
 }
 
-.orderSummary .orderSummaryContent {
-  overflow:                  visible;
-  position:                  relative;
-  right:                     67em;
+.orderSummary {
 }
 
-.orderSummary .orderSummaryContent .generalInfo {
-  float:                     right;
-  position:                  absolute;
+.orderSummary > div {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.orderSummary .generalInfo {
   top:                       0.1em;
-  left:                      67em;
-  width:                     17em;
-  padding:                   0.3em 0.5em;
+  padding:          1em;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .placeOrderButton {
+.orderSummary .generalInfo .placeOrderButton {
   height:                    4em;
   padding:                   1em 0.3em 0em 0.3em;
   background:                #ffffee;
@@ -1088,65 +1083,56 @@ clear:both;
   margin-bottom:             0.5em;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .placeOrderButton input[type="submit"] {
+.orderSummary .generalInfo .placeOrderButton input[type="submit"] {
   margin-top:                0.1em;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures {
-  height:                    15em;
+.orderSummary .generalInfo .keyFigures {
   padding:                   0.5em 0.5em;
   background:                #ffffff;
   text-align:                center;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures hr {
-  clear:                     all;
+.orderSummary .generalInfo .keyFigures hr {
   color:                     #888888;
   border:                    none;
   border-top:                1px solid #aaaaaa;
   height:                    1px;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .subSeparator {
-  width:                     6em;
-  margin:                    0.5em 0.5em 0.5em 10em;
+.orderSummary .subSeparator {
+  width: 3em;
+  float: right;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .separator {
-  width:                     15em;
-  margin:                    2em 0.5em;
+.orderSummary .separator {
+  margin:                    0.5em;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .title {
+.orderSummary .title {
   font-size:                 110%;
   font-weight:               bold;
   margin-bottom:             1em;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .line {
-  clear:                     both;
-  width:                     16em;
+.orderSummary .line {
+  clear:both;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .heading {
-  float:                     left;
-  display:                   inline-block;
-  width:                     9em;
-  text-align:                left;
+.orderSummary .heading {
+  float:                left;
+  margin-right: 1em;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .value {
-  display:                   inline-block;
-  width:                     7em;
-  text-align:                right;
+.orderSummary .value {
+  float:                right;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .line.orderTotal {
+.orderSummary .line.orderTotal {
   text-align:                center;
 }
 
-.orderSummary .orderSummaryContent .generalInfo .keyFigures .orderTotal span {
-  float:                     none;
+.orderSummary .orderTotal span {
   width:                     auto;
   white-space:               nowrap;
   font-size:                 130%;
@@ -1155,164 +1141,139 @@ clear:both;
   color:                     #aa0000;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress {
+
+.orderSummary .itemsOfSingleAddress {
   background:                #88cc55;
   padding:                   0.3em 0.5em;
-  width:                     65em;
   margin-bottom:             1em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader {
   background:                #e0ffe0;
   padding:                   0.8em;
   margin-bottom:             0.3em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .address {
-  float:                     left;
-  width:                     20em;
+.addressGroupHeader > div {
+  display:inline-block;
+  vertical-align:top;
+  margin: 0.5em;
 }
-
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .address .addressTitle {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .address .addressTitle {
   font-size:                 110%;
   font-weight:               bold;
   margin-bottom:             0.5em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .address .addressLine {
-  width:                     17em;
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .address .addressLine {
   font-size:                 110%;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .price {
-  float:                     left;
-  width:                     18em;
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .price {
   font-size:                 110%;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .priceTitle {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .priceTitle {
   font-weight:               bold;
   margin-bottom:             0.5em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .priceRow {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .priceRow {
   margin-bottom:             0.2em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .ShippingExpenses {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .ShippingExpenses {
   margin-bottom:             0.5em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .bottomBorder {
-  width:                     14em;
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .bottomBorder {
   border-bottom:             1px solid #999999;
   padding-bottom:            0.1em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .price .heading {
-  float:                     left;
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .price .heading {
   display:                   inline-block;
-  width:                     5em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .price .value {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .price .value {
   display:                   inline-block;
-  width:                     9em;
   text-align:                right;
   color:                     #aa0000;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates {
-  float:                     left;
-  width:                     18em;
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates {
+
   font-size:                 110%;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .title {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .title {
   font-weight:               bold;
   margin-bottom:             0.5em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .line {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .line {
   margin-bottom:             0.2em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .heading {
-  float:                     left;
-  display:                   inline-block;
-  width:                     11em;
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .heading {
+
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .addressGroupHeader .keyDates .value {
+.orderSummary .itemsOfSingleAddress .addressGroupHeader .keyDates .value {
   display:                   inline-block;
-  width:                     7em;
   text-align:                right;
   color:                     #008800;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems {
+.orderSummary .itemsOfSingleAddress .allItems {
   background:                #ffffff;
   padding:                   0.8em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem {
-  clear:                     both;
+.orderSummary .itemsOfSingleAddress .allItems .singleItem {
   margin-bottom:             2em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem.last {
-  clear:                     both;
+.orderSummary .itemsOfSingleAddress .allItems .singleItem.last {
   margin-bottom:             0em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .titleRow {
-  width:                     50em;
+.orderSummary .itemsOfSingleAddress .allItems .singleItem .titleRow {
   margin-bottom:             0.4em;
-  margin-left:               10em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .titleRow .title {
+.orderSummary .itemsOfSingleAddress .allItems .singleItem .titleRow .title {
   font-weight:               bold;
   background:                #ffffff;
   color:                     #336699;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .description {
-  width:                     50em;
-  margin-left:               10em;
+.orderSummary .itemsOfSingleAddress .allItems .singleItem .description {
   margin-bottom:             1em;
   background:                #ffffff;
   color:                     #888888;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity {
-  width:                     50em;
+.orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity {
   margin-bottom:             0.4em;
-  margin-left:               10em;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content {
+.orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content {
   font-size:                 110%;
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content .subtotal {
+.orderSummary .itemsOfSingleAddress .allItems .singleItem .priceAndQuantity .content .subtotal {
   display:                   inline-block;
-  position:                  absolute;
-  left:                      30em;
-  width:                     20em;
-
 }
 
-.orderSummary .orderSummaryContent .itemsOfSingleAddress .allItems .singleItem .image img {
-  display:                   block;
-  float:                     left;
+.orderSummary .itemsOfSingleAddress .allItems .singleItem img {
+  display:                   inline-block;
   width:                     8em;
   height:                    8em;
   margin-right:              1em;
   border:                    1px solid #aaaaaa;
   background:                #dddddd;
   color:                     #888888;
-  padding-top:               0.3em;
   text-align:                center;
   overflow:                  hidden;
   text-overflow:             ellipsis;
@@ -1322,15 +1283,10 @@ clear:both;
   box-shadow:                2px 2px 5px #888;
 }
 
-
-
-
-
-
-
-
-
-
+.orderSummary .itemsOfSingleAddress .allItems .singleItem > div {
+  display: inline-block;
+  vertical-align:top;
+}
 
 
 

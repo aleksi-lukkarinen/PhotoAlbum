@@ -1112,8 +1112,8 @@ class ShoppingCartItem(models.Model):
             Generates a hash which can be used to ensure that content
             of shopping cart does not change during checkout process.
         """
-        hash_base = unicode(request.user.username) + request.META.get("REMOTE_ADDR") + \
-                    request.META.get("REMOTE_HOST") + request.META.get("HTTP_USER_AGENT") + \
+        hash_base = unicode(request.user.username) + request.META.get("REMOTE_ADDR","") + \
+                    request.META.get("REMOTE_HOST","") + request.META.get("HTTP_USER_AGENT","") + \
                     settings.SECRET_KEY
 
         if extra_key:

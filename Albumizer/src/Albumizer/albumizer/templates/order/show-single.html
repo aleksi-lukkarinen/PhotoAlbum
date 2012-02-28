@@ -78,10 +78,11 @@
     <div class="prompt orderSummaryTitle">Details of this order:</div> 
 
 	  {% order_details %}
-	    {% if order_info.payment_info %}
-        {% payment_details order_info.payment_info no_margins=True width=65em %}
-      {% endif %}
     {% end_order_details %}
+    
+	    {% if order_info.payment_info %}
+        {% payment_details order_info.payment_info %}
+      {% endif %}
 
     <div class="disclaimer">
       Should you have any inquiries about your order or the Albumizer service, please don't hesitate to contact
