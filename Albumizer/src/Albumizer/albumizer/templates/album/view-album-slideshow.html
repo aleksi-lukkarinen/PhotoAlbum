@@ -1,0 +1,86 @@
+{% load albumizer_common %}
+{% load url from future %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+{% block header_definitions_before %}
+    <style type="text/css">
+    {% for layout in layouts%}
+        {{layout.cssContent}}
+    {% endfor %}
+    </style>
+{% endblock %}
+
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+        <script
+            src='http://html5slides.googlecode.com/svn/trunk/slides.js'></script>
+        <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
+        {% if debug %}
+          <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.js"></script>
+          <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.js"></script>
+        {% else %}
+          <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-1.7.1.min.js"></script>
+          <script type="text/javascript" src="{% get_static_prefix %}scripts/jquery-ui-1.8.17.custom.min.js"></script>
+        {% endif %}
+        
+<title>{% block page_title %}Slideshow {{ album.title }}{% endblock %}</title>
+
+    <script type="text/javascript" src="{% get_static_prefix %}scripts/utils.js"></script>
+    <script type="text/javascript">
+        //<![CDATA[
+            $(function() {
+                $(".albumpagecontainer").each(function() {                    
+                    $(this).find("span.generateids").each(function(index) {
+                        this.id="text"+(index+1);
+                    });
+                    $(this).find("img.generateids").each(function(index) {
+                    
+                        this.id="image"+(index+1);
+                    });
+                });
+                $(".slideshowHelp").dialog({autoOpen:false});
+                $(".openHelp").click(function() {
+                    $(".slideshowHelp").dialog("open");
+                });
+            });
+        //]]>
+    </script>
+</head>
+<body style='display: none'>
+    <div class="slideshowHelp" title="Instructions for presenting">
+<p>Press Enter, space, right arrow to advance; Backspace, left arrow to go back.</p>
+<p>Enter full-screen mode (F11 or Shift-Command-F) before presenting.</p>
+<p>You should be able to press Ctrl+R/F5 at any time to refresh without losing your place in the presentation.</p>
+    </div>
+{% block page_content %}
+
+    <section class='slides layout-regular'>
+    {% for page in album.pages.all %}
+    <article>    
+		<h2>Page {{ page.pageNumber}}</h2>		
+        <button style="z-index:10000;" class="openHelp">Show help</button> 
+        <div class="albumpagewrapper">
+			<div class="albumpagecontainer {{page.layout.cssClass}}">
+				{% for pagecontent in page.pagecontents.all %}
+				  {% if pagecontent.content %}
+				    <span class="generateids">{{ pagecontent.content }}</span>
+				  {% endif %}
+				{% endfor %}
+                {% for pagecontent in page.pagecontents.all %}
+                  {% if pagecontent.image %}
+                    <img class="generateids" src="{{ pagecontent.image.url }}" />
+                  {% endif %}
+                {% endfor %}
+				
+			</div>
+		</div>
+    </article>
+	{%endfor%}
+	</section>
+
+{% endblock %}
+</body>
+</html>

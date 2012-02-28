@@ -8,21 +8,46 @@
             $(".previousLink a, .nextLink a").click(function(evt) {
                 evt.preventDefault();
                 var myUrl=$(this).attr("href");
+                
+                //first make sure the current page has a state object
+                var picturedata=$("#ajaxContainer").html();
+                var cssdata=$("#cssContainer").html();
+                var state={"picturedata":picturedata,
+                           "cssdata": cssdata};
+                window.history.replaceState(state, document.title, document.location);
+                
                 $("#ajaxContainer").load(myUrl+" #ajaxContainer", function() {
+                    $("#cssContainer").load(myUrl+" + #cssContainer", function() {
+                    //now push new state
+	                var picturedata=$("#ajaxContainer").html();
+	                var cssdata=$("#cssContainer").html();
+	                var state={"picturedata":picturedata,
+	                           "cssdata": cssdata};
                     try {
-                        window.history.pushState(null, document.title, myUrl);
+                        window.history.pushState(state, document.title, myUrl);
                         } catch (err) {
                         alert("error: "+err);
                         }
-                    });                
+                    });
+                    
+                    $("form").attr("action", myUrl);
+                });
             });
+            window.onpopstate=function(event) {
+              //alert(document.location+": popping "+JSON.stringify(event.state));
+              if(event.state && event.state.picturedata) {
+                $("#ajaxContainer").html(event.state.picturedata);
+                $("#cssContainer").html(event.state.cssdata);
+                $("form").attr("action", document.location);
+              }
+            };
         });
         $(function() {
             $(".actionButtonContainer input").button();
         });
       {% endblock %}
 {% block header_definitions_before %}
-	<style type="text/css">
+	<style id="cssContainer" type="text/css">
 	{{ cssContent }}
 	</style>
 {% endblock %}
@@ -56,7 +81,7 @@
 	<div id="ajaxContainer">
 		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
         {% show_messages %}
-        <div id="albumpagewrapper">
+        <div class="albumpagewrapper">
 			<div class="albumpagecontainer {{layoutCssClass}}">
 				{% for text in texts %}
 				<span id="text{{ forloop.counter}}">{{ text }}</span>

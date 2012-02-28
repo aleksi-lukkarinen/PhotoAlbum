@@ -68,7 +68,10 @@
       {{ album.description }}
     </div>
     {% endif %}
- 
+   
+    <div class="description">
+        <a href="{% url "albumizer.views.view_album_slideshow" album.id %}">View slide show</a>
+    </div> 
     {% if album.isPublic %}
       <div class="tweetButtonContainer">
         {% twitter_tweet_button_album album %}
