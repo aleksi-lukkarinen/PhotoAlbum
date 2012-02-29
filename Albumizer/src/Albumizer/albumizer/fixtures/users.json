@@ -33,6 +33,17 @@
         }
     }, 
     {
+        "pk": 4, 
+        "model": "albumizer.userprofile", 
+        "fields": {
+            "gender": "M", 
+             
+            "user": 4, 
+            "homePhone": "", 
+            "serviceConditionsAccepted": "2012-02-02 00:50:02"
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "albumizer.address", 
         "fields": {
@@ -96,6 +107,24 @@
             "user_permissions": [], 
             "password": "sha1$c3469$f9ca2d321ac882396fe27e553820706ae86e5f39", 
             "email": "tomas.heiskanen@gmail.com", 
+            "date_joined": "2012-01-25 22:08:54"
+        }
+    },
+    {
+        "pk": 4, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "testuser", 
+            "first_name": "Testi-Taavetti", 
+            "last_name": "Juuserila-Juntunen",
+            "is_active": true, 
+            "is_superuser": true, 
+            "is_staff": true, 
+            "last_login": "2012-01-31 13:43:44", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$c3469$f9ca2d321ac882396fe27e553820706ae86e5f39", 
+            "email": "test.juujun@www.net", 
             "date_joined": "2012-01-25 22:08:54"
         }
     }

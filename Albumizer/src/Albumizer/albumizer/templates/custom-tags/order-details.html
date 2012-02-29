@@ -44,94 +44,96 @@
             <div style="clear: both;"></div>
           </div>
         <div class="itemsByAddress">
-            {% for address, item_group in order_info.items_by_address.items %}
-              <div class="itemsOfSingleAddress ui-corner-all">
-                <div class="addressGroupHeader ui-corner-all">
-                  <div class="table">
-                      <div class="tableRow">
-                          <div class="address">
-                            <div class="addressTitle">Delivery Address</div>
-                            <div class="addressLine">{{ request.user.first_name }} {{ request.user.last_name }}</div>
-                            {% if address.postAddressLine1 %}
-                              <div class="addressLine">{{ address.postAddressLine1 }}</div>
-                            {% endif %}
-                            {% if address.postAddressLine2 %}
-                              <div class="addressLine">{{ address.postAddressLine2 }}</div>
-                            {% endif %}
-                            {% if address.zipCode or address.city %}
-                              <div class="addressLine">{{ address.zipCode }} {{ address.city }}</div>
-                            {% endif %}
-                            {% if address.state %}
-                              <div class="addressLine">{{ address.state }}</div>
-                            {% endif %}
-                            {% if address.country %}
-                              <div class="addressLine">{{ address.country }}</div>
-                            {% endif %}
-                          </div>
-                          <div class="separatorTd"></div>
-                          <div class="price">
-                            <div class="priceTitle">Expenses</div>
-                            <div class="line">
-                              <span class="heading">Items:</span>
-                              <span class="value">{{ item_group.item_group_subtotal_before_shipping|mto2dstr }} &euro;</span>
-                            </div>
-                            <div class="line">
-                                <span class="heading">Shipping:</span>
-                                <span class="value">{{ item_group.shipping_expenses|mto2dstr }} &euro;</span>
-                            </div>
-                            <div class="clear"></div>
-                            <hr class="separator" />
-                            <div class="line">
-                              <span class="heading">Subtotal:</span>
-                              <span class="value">{{ item_group.item_group_subtotal_with_shipping|mto2dstr }} &euro;</span>
-                            </div>
-                          </div>
-                          <div class="separatorTd"></div>
-                          <div class="keyDates">
-                            <div class="title">Key Dates</div>
-                            <div class="line dispatch">
-                              <span class="heading">Estimated Dispatch:</span>
-                              <span class="value">{{ item_group.estimated_dispatch_date|date:"j.n.Y" }}</span>
-                            </div>
-                            <div class="line delivery">
-                              <span class="heading">Estimated Delivery:</span>
-                              <span class="value">{{ item_group.estimated_delivery_date|date:"j.n.Y" }}</span>
-                            </div>
-                          </div>
+          {% for address, item_group in order_info.items_by_address.items %}
+            <div class="itemsOfSingleAddress ui-corner-all">
+              <div class="addressGroupHeader ui-corner-all">
+                <div class="table">
+                  <div class="tableRow">
+                    <div class="address">
+                      <div class="addressTitle">Delivery Address</div>
+                      <div class="addressLine">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+                      {% if address.postAddressLine1 %}
+                        <div class="addressLine">{{ address.postAddressLine1 }}</div>
+                      {% endif %}
+                      {% if address.postAddressLine2 %}
+                        <div class="addressLine">{{ address.postAddressLine2 }}</div>
+                      {% endif %}
+                      {% if address.zipCode or address.city %}
+                        <div class="addressLine">{{ address.zipCode }} {{ address.city }}</div>
+                      {% endif %}
+                      {% if address.state %}
+                        <div class="addressLine">{{ address.state }}</div>
+                      {% endif %}
+                      {% if address.country %}
+                        <div class="addressLine">{{ address.country }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="separatorTd"></div>
+                    <div class="price">
+                      <div class="priceTitle">Expenses</div>
+                      <div class="line">
+                        <span class="heading">Items:</span>
+                        <span class="value">{{ item_group.item_group_subtotal_before_shipping|mto2dstr }} &euro;</span>
+                      </div>
+                      <div class="line">
+                          <span class="heading">Shipping:</span>
+                          <span class="value">{{ item_group.shipping_expenses|mto2dstr }} &euro;</span>
+                      </div>
+                      <div class="clear"></div>
+                      <hr class="separator" />
+                      <div class="line">
+                        <span class="heading">Subtotal:</span>
+                        <span class="value">{{ item_group.item_group_subtotal_with_shipping|mto2dstr }} &euro;</span>
+                      </div>
+                    </div>
+                    <div class="separatorTd"></div>
+                    <div class="keyDates">
+                      <div class="title">Key Dates</div>
+                      <div class="line dispatch">
+                        <span class="heading">Estimated Dispatch:</span>
+                        <span class="value">{{ item_group.estimated_dispatch_date|date:"j.n.Y" }}</span>
+                      </div>
+                      <div class="line delivery">
+                        <span class="heading">Estimated Delivery:</span>
+                        <span class="value">{{ item_group.estimated_delivery_date|date:"j.n.Y" }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="allItems ui-corner-all">
-                  {% for item_info in item_group.items %}
+              </div>
+              <div class="allItems ui-corner-all">
+                {% for item_info in item_group.items %}
+                  <div class="singleItemTable {% if forloop.last %}last{% endif %}">
                     <div class="singleItem ui-corner-all">
-                    <div class="cellOfImage">                     
-                      <img src="{{ item_info.album.url_of_small_cover }}" alt="Cover of {{ item_info.album.title }}" 
+                      <div class="cellOfImage">                   
+                        <img src="{{ item_info.album.url_of_small_cover }}" alt="Cover of {{ item_info.album.title }}" 
                                        title="Cover of {{ item_info.album.title }}" class="ui-corner-all" />
                       </div>
                       <div class="itemDetails">
-                          <div class="titleRow">
-                            <span class="title">{{ item_info.album.title }}</span> &mdash; 
-                            <span class="creator">{{ item_info.album.owner }}</span>
-                          </div>
-                          <div class="description">{{ item_info.album.description }}</div>
-                          <div class="line priceAndQuantity">
-                            <span class="heading">
+                        <div class="titleRow">
+                          <span class="title">{{ item_info.album.title }}</span> &mdash; 
+                          <span class="creator">{{ item_info.album.owner }}</span>
+                        </div>
+                        <div class="description">{{ item_info.album.description }}</div>
+                        <div class="line priceAndQuantity">
+                          <span class="heading">
                             <span>{{ item_info.quantity }} piece{{ item_info.quantity|pluralize }}</span>
                             &mdash;
                             <span>{{ item_info.unit_price|mto2dstr }}&nbsp;&euro;/piece</span>
-                            </span>
-                            <span class="value subtotal">  
-                              <span>Subtotal:</span>
-                              <span>{{ item_info.sub_total|mto2dstr }}&nbsp;&euro;</span>
-                            </span>
-                          </div>
+                          </span>
+                          <span class="value subtotal">  
+                            <span>Subtotal:</span>
+                            <span>{{ item_info.sub_total|mto2dstr }}&nbsp;&euro;</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  {% endfor %}
-                </div>
+                  </div>
+                {% endfor %}
               </div>
-            {% endfor %}
-            {{ custom_content_after_items }}
+            </div>
+          {% endfor %}
+          {{ custom_content_after_items }}
       </div>
-      </div>
+    </div>
   {% endif %}

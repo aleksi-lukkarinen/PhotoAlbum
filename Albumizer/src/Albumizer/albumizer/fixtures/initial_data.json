@@ -54,10 +54,26 @@
         "pk": 1,
         "model": "sites.site",
         "fields": {
-            "name": "tla.albumizer.aalto.fi:8000",
-            "domain":"tla.albumizer.aalto.fi:8000"
+            "name": "group024.webcourse.niksula.hut.fi",
+            "domain":"group024.webcourse.niksula.hut.fi"
         }
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -125,6 +141,24 @@
         }
     },
     {
+        "pk": 4, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "testuser", 
+            "first_name": "Testi-Taavetti", 
+            "last_name": "Juuserila-Juntunen",
+            "is_active": true, 
+            "is_superuser": true, 
+            "is_staff": true, 
+            "last_login": "2012-01-31 13:43:44", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$c3469$f9ca2d321ac882396fe27e553820706ae86e5f39", 
+            "email": "test.juujun@www.net", 
+            "date_joined": "2012-01-25 22:08:54"
+        }
+    },
+    {
         "pk": 1, 
         "model": "albumizer.userprofile", 
         "fields": {
@@ -155,6 +189,17 @@
             "user": 3, 
             "homePhone": "", 
             "serviceConditionsAccepted": "2012-02-02 00:49:04"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "albumizer.userprofile", 
+        "fields": {
+            "gender": "M", 
+             
+            "user": 4, 
+            "homePhone": "", 
+            "serviceConditionsAccepted": "2012-02-02 00:50:02"
         }
     }, 
     {

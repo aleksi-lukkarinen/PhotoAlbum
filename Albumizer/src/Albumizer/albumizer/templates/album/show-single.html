@@ -120,7 +120,7 @@
     {% if album.isPublic %}
      <div class="urlContainer publicUrlContainer">
         <span class="helpText">Public URL of this album:</span>
-        <a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="self bookmark" 
+        <a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="bookmark" 
                       class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</a>
       </div>
     {% else %}

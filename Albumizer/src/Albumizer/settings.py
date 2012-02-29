@@ -22,6 +22,10 @@ TWITTER_HASHTAG = "Albumizer"
 TWITTER_ACCOUNT = "aaltowsd2012s"
 
 
+FILE_UPLOAD_PERMISSIONS = 0644
+FILE_UPLOAD_FOLDER_PERMISSIONS = 0711
+
+
 AUTHENTICATION_BACKENDS = (
     #basic username-password authentication backend
     'django.contrib.auth.backends.ModelBackend',
@@ -184,22 +188,62 @@ INSTALLED_APPS = (
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s M%(module)s P%(process)d T%(thread)d -- %(message)s"
+        },
     },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
+    "handlers": {
+        "common_log_file": {
+            "filename": "/home/group024/logs/albumizer-common.log",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+        },
+        "payments_log_file": {
+            "filename": "/home/group024/logs/albumizer-payments.log",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+        },
+        "userActions_log_file": {
+            "filename": "/home/group024/logs/albumizer-user-action.log",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["common_log_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "level": "INFO",
+            "propagate": True,
+        },
+        "django.request": {
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "albumizer": {
+            "handlers": ["common_log_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "albumizer.userActions": {
+            "handlers": ["userActions_log_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "albumizer.payments": {
+            "handlers": ["payments_log_file"],
+            "level": "INFO",
+            "propagate": False,
         },
     }
 }
+
 
 
 
