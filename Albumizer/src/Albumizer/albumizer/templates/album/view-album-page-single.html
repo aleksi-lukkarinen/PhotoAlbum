@@ -16,7 +16,7 @@
                            "cssdata": cssdata};
                 window.history.replaceState(state, document.title, document.location);
                 
-                $.getJSON(myUrl, function(data) {
+                $.getJSON(myUrl+"?ajax=1", function(data) {
                         
                         $("#ajaxContainer").html(data.ajaxContainer);
                         $("#cssContainer").html(data.cssContainer);
@@ -28,7 +28,7 @@
 	                    window.history.pushState(state, document.title, myUrl);
 	      
 	                    
-	                    $("form").attr("action", myUrl);
+	                    $(".actionButtonContainer form").attr("action", myUrl);
                  });
             });
             window.onpopstate=function(event) {
@@ -36,7 +36,7 @@
               if(event.state && event.state.picturedata) {
                 $("#ajaxContainer").html(event.state.picturedata);
                 $("#cssContainer").html(event.state.cssdata);
-                $("form").attr("action", document.location);
+                $(".actionButtonContainer form").attr("action", document.location);
               }
             };
         });
