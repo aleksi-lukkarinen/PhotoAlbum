@@ -18,6 +18,8 @@ import Image
 commonLogger = logging.getLogger("albumizer")
 
 
+PATH_OF_MISSING_COVER_IMAGE = settings.STATIC_URL + "images/missing-cover.png"
+
 
 
 FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL = "thumb-large"
@@ -52,7 +54,8 @@ class AlbumizerImageFieldFile(ImageFieldFile):
             thumbnail_image.thumbnail((width, height), Image.ANTIALIAS)
             thumbnail_image.save(target_path, "JPEG")
         except Exception as e:
-            commonLogger.error(u"Thumbnail creation failed for image \"%s\": %s" % (self.path, unicode(e)))
+            commonLogger.error(u"Thumbnail creation failed for image \"%s\": %s" %
+                               (self.path, unicode(e, errors = "ignore")))
 
     @staticmethod
     def _delete_thumbnail(path):
@@ -309,7 +312,7 @@ class Album(models.Model):
                     if os.path.exists(content.image.large_thumbnail_path()):
                         return content.image.large_thumbnail_url()
                     return content.image.url
-        return ""
+        return PATH_OF_MISSING_COVER_IMAGE
 
     def url_of_large_cover(self):
         """ 
@@ -333,7 +336,7 @@ class Album(models.Model):
                     if os.path.exists(content.image.small_thumbnail_path()):
                         return content.image.small_thumbnail_url()
                     return content.image.url
-        return ""
+        return PATH_OF_MISSING_COVER_IMAGE
 
     def is_owned_by(self, user):
         """ 
@@ -705,15 +708,6 @@ class Page(models.Model):
         }
         return ("albumizer.views.show_single_page_with_hash", (), view_parameters)
 
-    def get_cover_url(self):
-        """ 
-            Returns url of this page's cover image, if one can be found. Otherwise, returns an empty string.
-        """
-        for content in self.image_content():
-            if content.image:
-                return content.image.url
-        return ""
-
     def url_of_small_cover(self):
         """ 
             Returns the url of this page's small cover image, if one can be found. "Cover image" is the first
@@ -734,7 +728,7 @@ class Page(models.Model):
                 if os.path.exists(content.image.large_thumbnail_path()):
                     return content.image.large_thumbnail_url()
                 return content.image.url
-        return ""
+        return PATH_OF_MISSING_COVER_IMAGE
 
     def url_of_large_cover(self):
         """ 
@@ -756,7 +750,7 @@ class Page(models.Model):
                 if os.path.exists(content.image.small_thumbnail_path()):
                     return content.image.small_thumbnail_url()
                 return content.image.url
-        return ""
+        return PATH_OF_MISSING_COVER_IMAGE
 
     def content(self):
         """  
@@ -768,13 +762,13 @@ class Page(models.Model):
         """  
         
         """
-        return self.content().filter(placeHolderID__contains = "_image_")
+        return self.content().filter(placeHolderID__contains = "_image_").order_by("-placeHolderID")
 
     def caption_content(self):
         """  
         
         """
-        return self.content().filter(placeHolderID__contains = "_caption_")
+        return self.content().filter(placeHolderID__contains = "_caption_").order_by("-placeHolderID")
 
     @staticmethod
     def by_album_id_and_page_number(album_id, page_number):
@@ -1112,8 +1106,8 @@ class ShoppingCartItem(models.Model):
             Generates a hash which can be used to ensure that content
             of shopping cart does not change during checkout process.
         """
-        hash_base = unicode(request.user.username) + request.META.get("REMOTE_ADDR","") + \
-                    request.META.get("REMOTE_HOST","") + request.META.get("HTTP_USER_AGENT","") + \
+        hash_base = unicode(request.user.username) + request.META.get("REMOTE_ADDR", "") + \
+                    request.META.get("REMOTE_HOST", "") + request.META.get("HTTP_USER_AGENT", "") + \
                     settings.SECRET_KEY
 
         if extra_key:

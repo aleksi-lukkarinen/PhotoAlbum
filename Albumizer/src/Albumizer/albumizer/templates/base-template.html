@@ -14,6 +14,9 @@
     {% cache template_cache_timeout base_html_mls debug %}  
 	    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 	    
+      <link rel="icon" type="image/png" href="{% get_static_prefix %}images/favicon.png" />
+      <link rel="shortcut icon" href="{% get_static_prefix %}images/favicon.ico" />
+	    
 	    <link type="text/css" href="{% get_static_prefix %}css/sunny/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
 	    <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/albumizer.css" />
 	    {% if debug %}
@@ -124,7 +127,7 @@
     {% endcache %}
 
     <div id="pageContainer">
-      {% cache template_cache_timeout base_header request.user %}  
+      {% cache template_cache_timeout base_header request.user is_album_list_page is_registration_page is_login_page %}  
 		    <header id="pageHeader">
 		      <div id="row1" class="row">
 		        <a id="logo" href="/" rel="home"><figure><img src="{% get_static_prefix %}images/albumizer-title.png" alt="Albumizer Logo" /></figure></a>
@@ -143,6 +146,9 @@
 		            </span>
 			        {% else %}
 			          <nav>
+                  {% if not is_album_list_page %}
+                    <a href="{% url "albumizer.views.list_all_public_albums" %}" id="headerLinkBrowse" class="headerNavLink">Public Albums</a>
+                  {% endif %}
 				          {% if not is_registration_page %}
 			              <a href="{% url "get_registration_information" %}" id="headerLinkRegister" class="headerNavLink">Register</a>
 			            {% endif %}
