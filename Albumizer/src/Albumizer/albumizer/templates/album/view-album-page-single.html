@@ -5,7 +5,7 @@
 {% block page_title %}{{ albumTitle }}{% endblock %}
       {% block page_scripts_after %}
         $(function() {
-            $(".previousLink a, .nextLink a").click(function(evt) {
+            $(document).on("click", ".previousLink a, .nextLink a", function(evt) {
                 evt.preventDefault();
                 var myUrl=$(this).attr("href");
                 
@@ -16,22 +16,20 @@
                            "cssdata": cssdata};
                 window.history.replaceState(state, document.title, document.location);
                 
-                $("#ajaxContainer").load(myUrl+" #ajaxContainer", function() {
-                    $("#cssContainer").load(myUrl+" + #cssContainer", function() {
-                    //now push new state
-	                var picturedata=$("#ajaxContainer").html();
-	                var cssdata=$("#cssContainer").html();
-	                var state={"picturedata":picturedata,
-	                           "cssdata": cssdata};
-                    try {
-                        window.history.pushState(state, document.title, myUrl);
-                        } catch (err) {
-                        alert("error: "+err);
-                        }
-                    });
-                    
-                    $("form").attr("action", myUrl);
-                });
+                $.getJSON(myUrl, function(data) {
+                        
+                        $("#ajaxContainer").html(data.ajaxContainer);
+                        $("#cssContainer").html(data.cssContainer);
+                        
+	                    var picturedata=data.ajaxContainer;
+	                    var cssdata=data.cssContainer;
+	                    var state={"picturedata":picturedata,
+	                               "cssdata": cssdata};
+	                    window.history.pushState(state, document.title, myUrl);
+	      
+	                    
+	                    $("form").attr("action", myUrl);
+                 });
             });
             window.onpopstate=function(event) {
               //alert(document.location+": popping "+JSON.stringify(event.state));
@@ -79,27 +77,7 @@
     <div class="clear"></div>
 
 	<div id="ajaxContainer">
-		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
-        {% show_messages %}
-        <div class="albumpagewrapper">
-			<div class="albumpagecontainer {{layoutCssClass}}">
-				{% for text in texts %}
-				<span id="text{{ forloop.counter}}">{{ text }}</span>
-				{% endfor %}
-				{% for image in images %}
-				<img id="image{{ forloop.counter}}" src="{{ image.url }}" />
-				{% endfor %}
-			</div>
-			<div>
-			{% if previousLink %}
-				<div class="previousLink"><a href="{{ previousLink }}">&lt;&lt; Previous page</a></div>
-			{% endif %}
-			{% if nextLink %}
-				<div class="nextLink"><a href="{{ nextLink }}">Next page &gt;&gt;</a></div>
-			{% endif %}
-				<div class="clear"></div>
-			</div>
-		</div>
+	   {% include "album/view-album-page-single-ajaxContainer.html" %}
 	</div>
 
   </article>

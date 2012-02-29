@@ -22,6 +22,7 @@ from forms import AlbumCreationForm, LoginForm, AddPageForm, \
         EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm, \
         UserAuthForm, EditUserAuthForm
 import utils
+from django.template.loader import render_to_string
 
 
 SPS_STATUS_SUCCESSFUL = "successful"
@@ -291,6 +292,13 @@ def show_single_page_GET(request, album_id, page_number):
     if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
         context["previousLink"] = reverse('show_single_page', kwargs = {"album_id":album_id, "page_number":pageNumberInt - 1})
 
+    if request.is_ajax() or request.GET.get("ajax",""):
+        data={
+            "cssContainer":mypage.layout.cssContent,
+            "ajaxContainer":render_to_string('album/view-album-page-single-ajaxContainer.html',RequestContext(request, context))
+        }
+        return HttpResponse(json.dumps(data), mimetype = "application/json")
+    
     response = render_to_response_as_public('album/view-album-page-single.html', RequestContext(request, context))
     if not myalbum.isPublic:
         add_caching_preventing_headers(response)
