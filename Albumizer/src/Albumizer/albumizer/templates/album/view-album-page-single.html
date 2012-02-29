@@ -77,27 +77,6 @@
     <div class="clear"></div>
 
 	<div id="ajaxContainer">
-		<h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
-        {% show_messages %}
-        <div class="albumpagewrapper">
-			<div class="albumpagecontainer {{layoutCssClass}}">
-				{% for text in texts %}
-				<span id="text{{ forloop.counter}}">{{ text }}</span>
-				{% endfor %}
-				{% for image in images %}
-				<img id="image{{ forloop.counter}}" src="{{ image.url }}" alt="Page {{ pageNumber }}" />
-				{% endfor %}
-			</div>
-			<div>
-			{% if previousLink %}
-				<div class="previousLink"><a href="{{ previousLink }}">&lt;&lt; Previous page</a></div>
-			{% endif %}
-			{% if nextLink %}
-				<div class="nextLink"><a href="{{ nextLink }}">Next page &gt;&gt;</a></div>
-			{% endif %}
-				<div class="clear"></div>
-			</div>
-		</div>
 	   {% include "album/view-album-page-single-ajaxContainer.html" %}
 	</div>
 
