@@ -1,11 +1,10 @@
 {% load url from future %}
 
   <div id="twitter-tweet-button-album-container-{{ id }}" class="twitter-tweet-button-album-container">
-	  <a href="https://twitter.com/intent/tweet?button_hashtag={{ twitter_hashtag }}&auml;text=Hey!%20Some%20cool%20photos:%20{{ album.title|urlencode }}" 
-	     class="twitter-hashtag-button" 
-	     data-related="{{ twitter_account }}" 
-	     data-url="http://{{ site_domain }}{% url "show_single_album" album.id %}">Tweet #{{ twitter_hashtag }}</a>
-	
+    <a href="https://twitter.com/intent/tweet?button_hashtag={{ twitter_hashtag }}&text=Hey!%20Some%20cool%20photos:%20{{ album.title|urlencode }}" 
+       class="twitter-hashtag-button" 
+       data-url="http://{{ site_domain }}{% url "show_single_album" album.id %}">Tweet #{{ twitter_hashtag }}</a>
+
 	  <script>
 	    !function(d, s, id) {
 	      var js, fjs = d.getElementsByTagName(s)[0];
