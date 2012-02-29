@@ -809,18 +809,18 @@ def get_album_photo_upload_path(page_content_model_instance, original_filename):
     """
         Generates full path for an uploaded image, relative to the mediaroot.
     """
-    username = page_content_model_instance.page.album.owner.username
+    user_id = unicode(page_content_model_instance.page.album.owner.id)
     album_id = unicode(page_content_model_instance.page.album.id)
     page_number = unicode(page_content_model_instance.page.pageNumber)
     placeholder_number = unicode(page_content_model_instance.placeHolderID.split("_")[-1])
     extension = original_filename.split('.')[-1]
 
-    security_hash_base = username + album_id + page_number + placeholder_number + unicode(settings.SECRET_KEY)
+    security_hash_base = user_id + album_id + page_number + placeholder_number + unicode(settings.SECRET_KEY)
     #security_hash_base += unicode(datetime.now())
     security_hash = hashlib.md5(security_hash_base.encode("ascii", "backslashreplace")).hexdigest()
 
-    filename = "%s-%s-%s-%s-%s.%s" % (username, album_id, page_number, placeholder_number, security_hash, extension)
-    path = "photos/albums/%s/%s/%s/%s/%s/%s" % (username[0], username[1], username, album_id, page_number, filename)
+    filename = "%s-%s-%s-%s-%s.%s" % (user_id, album_id, page_number, placeholder_number, security_hash, extension)
+    path = "photos/albums/%s/%s/%s/%s" % (user_id, album_id, page_number, filename)
 
     if len(path) > 250:
         path = path.split(".")[0][:245] + ".%s" % extension

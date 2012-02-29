@@ -22,10 +22,10 @@ from random import Random
 from django import db
 from django.contrib.auth.models import User
 from django.core.files.images import ImageFile
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db.models import Max, Q
-from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, \
-        Country, State, Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
+from Albumizer.albumizer.models import UserProfile, Album, Layout, Page, PageContent, \
+        Country, Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 from Albumizer.albumizer.utils import convert_money_into_two_decimal_string
 
 
