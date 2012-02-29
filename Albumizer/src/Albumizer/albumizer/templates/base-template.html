@@ -102,7 +102,7 @@
 	        		.success(function(data, textStatus, jqXHR) {
 	        				if(data.success) {
 	        					//alert("great success, refrehing page");
-	        					window.location.href=window.location.href;
+	        					window.location.href= "{% url "albumizer.views.show_profile" %}";
 	        				} else
 	        					alert("Login failed: "+data.reason);
 	        			})
