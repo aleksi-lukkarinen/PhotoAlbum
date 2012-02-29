@@ -21,8 +21,8 @@ body {
 }
 
 #pageHeader {
-	margin-top:                1em;  
-	margin-bottom:             3em;
+  margin-top:                1em;  
+  margin-bottom:             3em;
 }
 
 #pageHeader #row1 {
@@ -35,8 +35,8 @@ body {
 }
 
 #pageHeader #row1 #slogan {
-	display:                   inline;
-	margin-left:               0.4em;
+  display:                   inline;
+  margin-left:               0.4em;
   background:                #red;
   color:                     #66cc00;
   font-size:                 200%;
@@ -110,7 +110,7 @@ body {
 }
 
 #pageFooterLeftPart {
-	float:                     left;	
+  float:                     left;  
 }
 
 #pageFooterRightPart {
@@ -122,23 +122,23 @@ body {
 }
 
 .dialog {
-	display:                   none;
+  display:                   none;
 }
 
 .dialog fieldset {
-	padding:                   0em 1em 1em 0.5em;
-	margin-top:                0.5em;
+  padding:                   0em 1em 1em 0.5em;
+  margin-top:                0.5em;
 }
 
 .dialog label, .dialog input {
-	display:                   block;
-	width:                     100%;
-	margin-right:              1em;
+  display:                   block;
+  width:                     100%;
+  margin-right:              1em;
 }
 
 .dialog label {
-	margin-top:                0.5em;
-	margin-bottom:             0.2em;
+  margin-top:                0.5em;
+  margin-bottom:             0.2em;
 }
 
 .dialog input.text {
@@ -147,25 +147,25 @@ body {
 
 h1 {
   background:                #ffffff;
-	color:                     #339933;
-	font-size:                 150%;
-	margin-bottom:             1.3em;
-	text-shadow:               1px 1px 2px #aaaaaa;
+  color:                     #339933;
+  font-size:                 150%;
+  margin-bottom:             1.3em;
+  text-shadow:               1px 1px 2px #aaaaaa;
 }
 
 p {
-	margin-bottom:             1em;
+  margin-bottom:             1em;
 }
 
 figure,
 figcaption,
 address {
-	display:                   inline;
+  display:                   inline;
   margin:                    0em;
 }
 
 img {
-	border:                    0em;
+  border:                    0em;
 }
 
 .prompt {
@@ -175,7 +175,7 @@ img {
 }
 
 .simpleMessagePageContent {
-	margin-bottom:             7em;
+  margin-bottom:             7em;
 }
 
 
@@ -198,21 +198,21 @@ img {
 
 
 .albumpagewrapper {
-	width:600px;
+  width:600px;
 }
 
 .albumpagecontainer {
-	/* use border to separate album page content from the html page */
-	border:1px solid black;
-	height:400px;
-	width:600px;
+  /* use border to separate album page content from the html page */
+  border:1px solid black;
+  height:400px;
+  width:600px;
 }
 
 .previousLink {
-	float:left;
+  float:left;
 }
 .nextLink {
-	float:right;
+  float:right;
 }
 
 
@@ -235,10 +235,10 @@ img {
 
 
 #welcomePageSplash {
-	height:                    160px;
-	border:                    1px solid #eeeeee;
-	margin-bottom:             1em;
-	background:                url("../images/front-page-banner.jpg");
+  height:                    160px;
+  border:                    1px solid #eeeeee;
+  margin-bottom:             1em;
+  background:                url("../images/front-page-banner.jpg");
 }
 
 #welcomePageMainContent {
@@ -251,17 +251,17 @@ img {
 }
 
 .welcomePageIntroductionTabHeading {
-	font-weight:               bold;
-	margin-bottom:             0.3em;
+  font-weight:               bold;
+  margin-bottom:             0.3em;
 }
 
 #welcomePageIntroductionTabs {
-	display:                   none;
+  display:                   none;
 }
 
 #welcomePageRightColumn {
   float:                     right;
-	width:                     20em;
+  width:                     20em;
   margin-bottom:             1em;
 } 
 
@@ -294,13 +294,13 @@ img {
 }
 
 .welcomePageAlbumListItem .item:hover {
-	color:                     blue;
+  color:                     blue;
 }
 
 #welcomePageAlbumList .creationDate {
-	display:                   block;
-	margin-bottom:             0.4em;
-	font-size:                 95%;
+  display:                   block;
+  margin-bottom:             0.4em;
+  font-size:                 95%;
 }
 
 
@@ -312,8 +312,8 @@ img {
 
 
 .randomPickAlbumsList {
-	margin-top:                3em;
-	margin-bottom:             1em;
+  margin-top:                3em;
+  margin-bottom:             1em;
 }
 
 .randomPickAlbumsListHeader {
@@ -322,9 +322,9 @@ img {
 }
 
 .randomPickAlbumsListTitle {
-	display:                   inline-block;
-	font-size:                 150%;
-	font-weight:               bold;
+  display:                   inline-block;
+  font-size:                 150%;
+  font-weight:               bold;
   color:                     #779955;
   margin-right:              1em;
   padding:                   0.2em 0.5em;
@@ -344,19 +344,19 @@ img {
 
 .randomPickAlbumsListTable {
   clear:                     both;
-	width:                     100%;
-	padding-top:               1em;
-	border:                    1px solid #ccffaa;
+  width:                     100%;
+  padding-top:               1em;
+  border:                    1px solid #ccffaa;
 }
 
 .randomPickAlbumsListTable td {
-	vertical-align:            top;
-	text-align:                center;
-	padding-bottom:            0.5em;
+  vertical-align:            top;
+  text-align:                center;
+  padding-bottom:            0.5em;
 }
 
 .randomPickAlbumsListItemContainer {
-	display:                   inline-block;
+  display:                   inline-block;
   width:                     15.1em;
   height:                    19.5em;
   overflow:                  hidden;
@@ -370,7 +370,7 @@ img {
 } 
 
 .randomPickAlbumsListItemWrapperHidden {
-	display:                   none;
+  display:                   none;
 }
 
 .randomPickAlbumsListTable a {
@@ -378,9 +378,9 @@ img {
 }
 
 .randomPickAlbumsListItemImage {
-	display:                   block;
-	width:                     15em;
-	height:                    15em;
+  display:                   block;
+  width:                     15em;
+  height:                    15em;
   overflow:                  hidden;
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
@@ -390,10 +390,10 @@ img {
 }
 
 .randomPickAlbumsListItemTitle {
-	display:                   inline-block;
+  display:                   inline-block;
   width:                     15em;
-	margin-top:                0.5em;
-	background:                #ffffff;
+  margin-top:                0.5em;
+  background:                #ffffff;
   color:                     #000000;
   overflow:                  hidden;
   text-overflow:             ellipsis;
@@ -449,18 +449,18 @@ clear:both;
 
 .show-twitter-tweet {
   display:                   none;
-	margin-top:                6em;
+  margin-top:                6em;
   margin-bottom:             3em;
 }
 
 .twitter-follow-button-container {
   display:                   none;
-	margin-top:                1em;
+  margin-top:                1em;
 }
 
 .twitter-tweet-button-album-container {
   visibility:                hidden;
-	margin-top:                1em;
+  margin-top:                1em;
 }
 
 .twitter-tweet-button-album-container a {
@@ -476,8 +476,8 @@ clear:both;
 
 
 .albumizerUsageNotice {
-	margin-top:                2em;
-	text-align:                center;
+  margin-top:                2em;
+  text-align:                center;
 }
 
 .albumizerUsageNotice .firstLine {
@@ -520,7 +520,7 @@ clear:both;
 
 
 #frmRegister .prompt {
-	margin-bottom:             2em;
+  margin-bottom:             2em;
 }
 
 #frmRegister #errorRowHomePhone {
@@ -532,15 +532,15 @@ clear:both;
 }
 
 #frmRegister #lblServiceConditionsAccepted {
-	display:                   inline-block;
+  display:                   inline-block;
   width:                     50em;
   position:                  absolute;
-	margin:                    0em 0em 0em 0.7em;
+  margin:                    0em 0em 0em 0.7em;
 }
 
 #frmRegister #id_cmdRegister {
-	margin-bottom:             2em;
-	width:                     12em;
+  margin-bottom:             2em;
+  width:                     12em;
 }
 
 .confirmationForm div label {
@@ -549,15 +549,15 @@ clear:both;
 
 .confirmationForm input {
 /* some customizations to fix the alignment of the terms and conditions checkbox */
-	float:                     left;
+  float:                     left;
   margin-top:                0.35em;
   margin-right:              1em;
 }
 
 .confirmationForm div.helpRow,
 .confirmationForm div.errorRow {
-	margin:                    0em;
-	padding:                   0em;
+  margin:                    0em;
+  padding:                   0em;
 }
 
 
@@ -607,7 +607,7 @@ clear:both;
 }
 
 #frmCreateAlbum .prompt {
-	margin-bottom:             2em;
+  margin-bottom:             2em;
 }
 
 
@@ -628,7 +628,7 @@ clear:both;
 
 
 #frmLogin {
-	width:                     45em;
+  width:                     45em;
 }
 
 #frmLogin .prompt {
@@ -665,8 +665,8 @@ clear:both;
 
 .albumBrowser h1 {
   float:                     left;
-	width:                     25em;
-	margin-bottom:             0.5em;
+  width:                     25em;
+  margin-bottom:             0.5em;
   margin-right:              1.5em;
 }
 
@@ -676,14 +676,14 @@ clear:both;
 
 .albumBrowser .detailRow {
   clear:                     both;
-	margin-bottom:             0.2em;
+  margin-bottom:             0.2em;
   background:                #ffffff;
   color:                     #666666;
 }
 
 .albumBrowser .description {
-	width:                     50em;
-	margin-top:                1em;
+  width:                     50em;
+  margin-top:                1em;
   margin-bottom:             1em;
 }
 
@@ -693,11 +693,11 @@ clear:both;
 
 .albumBrowser .offer-sell,
 .albumBrowser .lister {
-	display:                   none;
+  display:                   none;
 }
 
 .albumBrowser .urlContainer {
-	display:                   block;
+  display:                   block;
   margin-top:                1em;
   font-size:                 90%;
   background:                #ffffff;
@@ -712,7 +712,7 @@ clear:both;
 
 .albumBrowser .urlContainer a:hover {
   background:                #ffffff;
-	color:                     #446644;
+  color:                     #446644;
 }
 
 .albumBrowser .urlContainer .secretUrl {
@@ -734,10 +734,10 @@ clear:both;
 }
 
 .albumBrowser .noPagesNotice {
-	margin-top:                4em;
-	margin-bottom:             7em;
-	font-size:                 110%;
-	font-weight:               bold;
+  margin-top:                4em;
+  margin-bottom:             7em;
+  font-size:                 110%;
+  font-weight:               bold;
   background:                #ffffff;
   color:                     #779977;
 }
@@ -768,7 +768,7 @@ clear:both;
 
 
 #id_frmShoppingCart .promptForEmpty {
-	margin-bottom:             7em;
+  margin-bottom:             7em;
 }
 
 #id_frmShoppingCart .shoppingCartProlog {
@@ -782,9 +782,9 @@ clear:both;
 }
 
 #id_frmShoppingCart .commonActions {
-	width:                     100%;
-	text-align:                right;
-	margin:                    1em 0em 1em 0em;
+  width:                     100%;
+  text-align:                right;
+  margin:                    1em 0em 1em 0em;
 }
 
 #id_frmShoppingCart .commonActions input {
@@ -803,9 +803,9 @@ clear:both;
 }
 
 #id_frmShoppingCart .disclaimer {
-	margin-top:                1em;
-	margin-bottom:             4em;
-	text-align:                right;
+  margin-top:                1em;
+  margin-bottom:             4em;
+  text-align:                right;
   background:                #ffffff;
   color:                     #555555;
 }
@@ -815,9 +815,9 @@ clear:both;
 }
 
 #id_frmShoppingCart .shoppingCart .headerRowTable {
-	font-size:                 90%;
-	background:                #ffffff;
-	color:                     #444444;
+  font-size:                 90%;
+  background:                #ffffff;
+  color:                     #444444;
 }
 
 #id_frmShoppingCart .shoppingCart .itemRowTable,
@@ -826,20 +826,20 @@ clear:both;
 }
 
 #id_frmShoppingCart .shoppingCart tr {
-	vertical-align:            top;
+  vertical-align:            top;
 }
 
 #id_frmShoppingCart .shoppingCart th {
-	padding:                   0.2em 0.4em 0.2em 0em;
+  padding:                   0.2em 0.4em 0.2em 0em;
 }
 
 #id_frmShoppingCart .shoppingCart td {
-	padding:                   0.5em 0.4em 2em 0em;
+  padding:                   0.5em 0.4em 2em 0em;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn {
   width:                     70%;                                
-	text-align:                left;
+  text-align:                left;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn img {
@@ -854,13 +854,13 @@ clear:both;
   overflow:                  hidden;
   text-overflow:             ellipsis;
   -o-text-overflow:          ellipsis;
-	-moz-box-shadow:           2px 2px 5px #888;
-	-webkit-box-shadow:        2px 2px 5px #888;
-	box-shadow:                2px 2px 5px #888;
+  -moz-box-shadow:           2px 2px 5px #888;
+  -webkit-box-shadow:        2px 2px 5px #888;
+  box-shadow:                2px 2px 5px #888;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn img:hover {
-	border:                    1px solid #aa0000;
+  border:                    1px solid #aa0000;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn .item1stRow {
@@ -888,28 +888,28 @@ clear:both;
 
 #id_frmShoppingCart .shoppingCart .itemColumn .item2ndRow {
   margin:                    0em 0em 0em 10.5em;
-	background:                #ffffff;
+  background:                #ffffff;
   color:                     #444444;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn .item3rdRow {
-	margin:                    1em 0em 0em 10em;
+  margin:                    1em 0em 0em 10em;
 }
 
 #id_frmShoppingCart .shoppingCart .itemColumn .item3rdRow input {
-	display:                   inline-block;
-	background:                #ffffff;
+  display:                   inline-block;
+  background:                #ffffff;
   color:                     #336699;
   border:                    none;
-	text-decoration:           underline;
-	cursor:                    pointer;
-	margin:                    0em;
+  text-decoration:           underline;
+  cursor:                    pointer;
+  margin:                    0em;
   padding:                   0em;
 }
 
 #id_frmShoppingCart .shoppingCart .quantityColumn {
   width:                     10%;                                
-	text-align:                center;
+  text-align:                center;
 }
 
 #id_frmShoppingCart .shoppingCart .quantityColumn input {
@@ -930,12 +930,12 @@ clear:both;
 
 #id_frmShoppingCart .shoppingCart .unitPriceColumn {
   width:                     10%;
-	text-align:                right;       
+  text-align:                right;       
 }
 
 #id_frmShoppingCart .shoppingCart .rowTotalColumn {
   width:                     10%;                                
-	text-align:                right;           
+  text-align:                right;           
 }
 
 #id_frmShoppingCart .shoppingCart .subTotalRow {
@@ -947,9 +947,9 @@ clear:both;
 }
 
 #id_frmShoppingCart .shoppingCart .subtotalRowTable {
-	text-align:                right;
-	font-size:                 130%;
-	font-weight:               bold;
+  text-align:                right;
+  font-size:                 130%;
+  font-weight:               bold;
 }
 
 #id_frmShoppingCart .shoppingCart .subtotalRowTable .subTotal {
@@ -981,8 +981,8 @@ clear:both;
 }
 
 #id_frmDeliveryAddresses .addressListProlog .prompt {
-	margin:                    0em;
-	float:                     left;
+  margin:                    0em;
+  float:                     left;
   width:                     50em;
 }
 
@@ -1012,12 +1012,12 @@ clear:both;
 
 #id_frmDeliveryAddresses .deliveryAddresses .deliveryAddress {
   border-top:                1px solid #888888; 
-	padding:                   1em 0em 2em 0em;
+  padding:                   1em 0em 2em 0em;
 }
 
 #id_frmDeliveryAddresses .deliveryAddresses .deliveryAddress .item label {
   width:                     100%;
-	font-size:                 120%;
+  font-size:                 120%;
   font-weight:               bold;
   background:                #ffffff;
   color:                     #336699;
@@ -1089,11 +1089,10 @@ clear:both;
 }
 
 .orderSummary {
-	clear:                     both;
+  clear:                     both;
 }
 
 .orderSummary > div {
-  display:                   inline-block;
   vertical-align:            top;
 }
 
@@ -1182,19 +1181,19 @@ clear:both;
   display:                   table;
   width:                     100%;
 }
-	
+  
 .orderSummary .itemsOfSingleAddress .addressGroupHeader .tableRow {
   display:                   table-row;
 }
 
 .orderSummary .itemsOfSingleAddress .addressGroupHeader {
-	background:                #e0ffe0;
+  background:                #e0ffe0;
   padding:                   0.8em;
   margin-bottom:             0.3em;
 }
 
 .orderSummary .itemsByAddress {
-	max-width:                 65em;
+  max-width:                 65em;
 }
 
 .addressGroupHeader > div {
@@ -1277,26 +1276,33 @@ clear:both;
 .orderSummary .itemsOfSingleAddress .allItems {
   background:                #ffffff;
   padding:                   0.8em;
+}
+
+.orderSummary .itemsOfSingleAddress .allItems .singleItemTable {
   display:                   table;
+  width:                     100%;
+  margin-bottom:             1em;
+}
+
+.orderSummary .itemsOfSingleAddress .allItems .singleItemTable.last {
+  margin-bottom:             0em;
 }
 
 .orderSummary .itemsOfSingleAddress .allItems .singleItem {
-  width:                     50em;
+  width:                     100%;
   display:                   table-row;
 }
 
 .orderSummary .itemsOfSingleAddress .allItems .singleItem .cellOfImage {
   display:                   table-cell;
   width:                     10em;
-  padding-bottom:            1em;
 }
 
 .orderSummary .itemsOfSingleAddress .allItems .singleItem .cellOfImage img {
-	display:                   block;
+  display:                   block;
   width:                     8em;
   height:                    8em;
   margin-right:              1em;
-  margin-bottom:             1em;
   border:                    1px solid #aaaaaa;
   color:                     #888888;
   text-align:                center;
@@ -1310,7 +1316,6 @@ clear:both;
 
 .orderSummary .itemsOfSingleAddress .allItems .singleItem .itemDetails {
   display:                   table-cell;
-  padding-bottom:            1em;
 }
 
 .orderSummary .itemsOfSingleAddress .allItems .singleItem .titleRow {
@@ -1353,11 +1358,11 @@ clear:both;
 
 
 #checkoutSuccessful {
-	margin-bottom:             7em;
+  margin-bottom:             7em;
 }
 
 #checkoutSuccessful .prompt {
-	margin-bottom:             2em;
+  margin-bottom:             2em;
 }
 
 #checkoutSuccessful .disclaimer {
@@ -1472,7 +1477,7 @@ clear:both;
 
 
 .paymentDetails {
-	display:                   inline-block;
+  display:                   inline-block;
   background:                #88cc55;
   padding:                   0.3em 0.5em;
   margin-bottom:             1em;
@@ -1498,12 +1503,12 @@ clear:both;
 }
 
 .paymentDetails .groupContent .detailTitle {
-	float:                     left;	
+  float:                     left;  
 }
 
 .paymentDetails .groupContent .detailValue {
-	margin-left:               15em;
-	min-width:                 15em;
+  margin-left:               15em;
+  min-width:                 15em;
 }
 
 
@@ -1526,7 +1531,7 @@ clear:both;
 
 
 .orderBrowser {
-	margin-bottom:             7em;
+  margin-bottom:             7em;
 }
 
 .orderBrowser .statusOrdered .prompt {
@@ -1546,8 +1551,8 @@ clear:both;
 }
 
 .orderBrowser .statusUnknown .line1 {
-	margin-top:                3em;
-	margin-bottom:             2em;
+  margin-top:                3em;
+  margin-bottom:             2em;
 }
 
 .orderBrowser .statusUnknown .line2 {
@@ -1632,7 +1637,7 @@ clear:both;
 .commonForm input[type="email"],
 .commonForm input[type="tel"],
 .commonForm select {
-	padding:                   0.1em;
+  padding:                   0.1em;
 }
 
 .commonForm textarea {

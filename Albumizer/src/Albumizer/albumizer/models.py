@@ -53,9 +53,39 @@ class AlbumizerImageFieldFile(ImageFieldFile):
             thumbnail_image = Image.open(self.path)
             thumbnail_image.thumbnail((width, height), Image.ANTIALIAS)
             thumbnail_image.save(target_path, "JPEG")
+            if settings.FILE_UPLOAD_PERMISSIONS:
+                os.chmod(target_path, settings.FILE_UPLOAD_PERMISSIONS)
         except Exception as e:
             commonLogger.error(u"Thumbnail creation failed for image \"%s\": %s" %
                                (self.path, unicode(e, errors = "ignore")))
+
+    @staticmethod
+    def _enforce_path_permissions(target_path):
+        if not target_path or not settings.FILE_UPLOAD_FOLDER_PERMISSIONS or not settings.MEDIA_ROOT:
+            return
+
+        target_path = os.path.normpath(target_path)
+        media_root = os.path.normpath(settings.MEDIA_ROOT)
+
+        if not target_path.startswith(media_root) or not os.path.isdir(target_path):
+            return
+
+        path_parts = target_path[len(media_root) + 1:].split(os.path.sep)
+
+        partial_path = media_root
+        AlbumizerImageFieldFile._set_folder_permissions(partial_path)
+
+        for path_part in path_parts:
+            partial_path += os.path.sep + path_part
+            AlbumizerImageFieldFile._set_folder_permissions(partial_path)
+
+    @staticmethod
+    def _set_folder_permissions(path):
+        try:
+            os.chmod(path, settings.FILE_UPLOAD_FOLDER_PERMISSIONS)
+        except Exception as e:
+            commonLogger.error(u"Setting of path permissions failed for \"%s\": %s" %
+                                   (path, unicode(e, errors = "ignore")))
 
     @staticmethod
     def _delete_thumbnail(path):
@@ -98,6 +128,7 @@ class AlbumizerImageFieldFile(ImageFieldFile):
                                     self.small_thumbnail_path())
         self._create_thumbnail(self.field.large_thumb_width, self.field.large_thumb_height, \
                                     self.large_thumbnail_path())
+        self._enforce_path_permissions(os.path.split(self.path)[0])
 
     def delete(self, save = True):
         """ 
@@ -819,8 +850,9 @@ def get_album_photo_upload_path(page_content_model_instance, original_filename):
     #security_hash_base += unicode(datetime.now())
     security_hash = hashlib.md5(security_hash_base.encode("ascii", "backslashreplace")).hexdigest()
 
-    filename = "%s-%s-%s-%s-%s.%s" % (user_id, album_id, page_number, placeholder_number, security_hash, extension)
-    path = "photos/albums/%s/%s/%s/%s" % (user_id, album_id, page_number, filename)
+    filename = "photos-albums-%s-%s-%s-%s-%s.%s" % \
+                    (user_id, album_id, page_number, placeholder_number, security_hash, extension)
+    path = "photos/albums/%s/%s/%s/%s" % (user_id[0], user_id, album_id, filename)
 
     if len(path) > 250:
         path = path.split(".")[0][:245] + ".%s" % extension

@@ -304,7 +304,6 @@ def show_single_page_POST(request, album_id, page_number):
         return HttpResponseRedirect(reverse("add_page", args = [album_id]))
 
     if request.POST.get("editPage"):
-        print page_number
         return HttpResponseRedirect(reverse("edit_page", args = [album_id, page_number]))
 
     request.user.message_set.create(message = "We are sorry. You tried to perform an action unknown to us.")
