@@ -19,7 +19,7 @@ urlpatterns = patterns('albumizer.views',
     (r'^album/$', 'list_all_public_albums'),
     (r'^album/(?P<album_id>\d+)/s/(?P<secret_hash>[a-z0-9]{64})/$', 'show_single_album_with_hash'),
     (r'^album/(?P<album_id>\d+)/(?P<page_number>\d+)/s/(?P<secret_hash>[a-z0-9]{64})/$', 'show_single_page_with_hash'),
-    (r'^album/slideshow/(?P<album_id>\d+)$', 'view_album_slideshow'),
+    (r'^album/slideshow/(?P<album_id>\d+)/$', 'view_album_slideshow'),
 
     (r'^accounts/$', redirect_to, {'url': "/accounts/profile/"}),
     (r'^accounts/logout/$', 'log_out'),

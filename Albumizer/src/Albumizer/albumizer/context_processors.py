@@ -15,6 +15,9 @@ def common_variables(request):
         "twitter_hashtag": settings.TWITTER_HASHTAG,
         "twitter_account": settings.TWITTER_ACCOUNT,
         "template_cache_timeout": 5 * 60,
+        "is_album_list_page": False,
+        "is_registration_page": False,
+        "is_login_page": False,
         #needed for webcourse environment
         "debug": settings.DEBUG
     }

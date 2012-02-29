@@ -15,17 +15,17 @@ print "\nStarting up...\n\n"
 
 
 
-import fileinput, gc, json, os, re, time
+import copy, fileinput, gc, json, os, re, time
 from datetime import datetime, timedelta
 from optparse import make_option
 from random import Random
 from django import db
 from django.contrib.auth.models import User
 from django.core.files.images import ImageFile
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db.models import Max, Q
-from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, \
-        Country, State, Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
+from Albumizer.albumizer.models import UserProfile, Album, Layout, Page, PageContent, \
+        Country, Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
 from Albumizer.albumizer.utils import convert_money_into_two_decimal_string
 
 
@@ -60,6 +60,7 @@ IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS = ["jpg", "jpeg", "png"]
 
 COMPILED_RE_IMAGE_FILENAME_CLEARING_PATTERNS_RET_GRP1 = [
     re.compile(r"^[a-f0-9]{10}_[a-f0-9]{10} (.*)$"),
+    re.compile(r"^(.*).fd[0-9]{4}$"),
     re.compile(r"^(.*).jpg_DFree Photos$"),
     re.compile(r"^(.*).jpg_ Photos$"),
     re.compile(r"^(.*).jpg_$"),
@@ -117,6 +118,11 @@ class Command(BaseCommand):
             dest = "image_base_path",
             default = None,
             help = "Full path to folder containing images to be used to fill albums with"),
+        make_option("--albums-by-folders-only",
+            action = "store_true",
+            dest = "albums_by_folders_only",
+            default = False,
+            help = "Creates content of a single photo albums from a single folder of images only"),
         )
 
     _men_first_names = []
@@ -183,15 +189,15 @@ class Command(BaseCommand):
 
     def _build_image_info(self, filename, full_path):
         """ Builds a dictionary describing a single image. """
-        clear_name = ".".join(filename.split(".")[0:-1])
+        clear_name = unicode(".".join(filename.split(".")[0:-1]), errors = "ignore")
 
         for regexp in COMPILED_RE_IMAGE_FILENAME_CLEARING_PATTERNS_RET_GRP1:
             match = re.match(regexp, clear_name)
             if match:
                 clear_name = match.group(1)
 
-        clear_name = clear_name.replace("_", " ")
-        clear_name = " ".join(clear_name.split())
+        clear_name = clear_name.replace(u"_", u" ")
+        clear_name = u" ".join(clear_name.split())
 
         return {
             IMAGE_FILE_DICT_PATH_KEY: full_path,
@@ -241,7 +247,7 @@ class Command(BaseCommand):
                 elif os.path.isdir(full_path):
                     images = self._retrieve_image_file_data(full_path, 1, verbosity)
                     total_quantity += len(images)
-                    image_file_data[IMAGE_FILE_DICT_IMAGES_KEY][node] = {
+                    image_file_data[IMAGE_FILE_DICT_IMAGES_KEY][unicode(node, errors = "ignore")] = {
                         IMAGE_FILE_DICT_IMAGES_KEY: images,
                         IMAGE_FILE_DICT_QUANTITY_KEY: len(images)
                     }
@@ -254,6 +260,10 @@ class Command(BaseCommand):
                 IMAGE_FILE_DICT_QUANTITY_KEY: len(photos_at_root_dir)
             }
             total_quantity += len(photos_at_root_dir)
+
+            for (folder_name, folder_data) in image_file_data[IMAGE_FILE_DICT_IMAGES_KEY].items():
+                if not folder_data[IMAGE_FILE_DICT_QUANTITY_KEY]:
+                    del image_file_data[IMAGE_FILE_DICT_IMAGES_KEY][folder_name]
 
             image_file_data[IMAGE_FILE_DICT_QUANTITY_KEY] = total_quantity
             self.stdout.write(u"\n")
@@ -298,6 +308,7 @@ class Command(BaseCommand):
         min_number_of_orders = options.get("ordersmin")
         no_images_to_albums = options.get("no_images")
         image_base_path = options.get("image_base_path")
+        albums_by_folders_only = options.get("albums_by_folders_only")
 
         if not image_base_path and not no_images_to_albums:
             self.stdout.write(
@@ -348,7 +359,7 @@ class Command(BaseCommand):
         if not self._has_been_aborted:
             self.generate_data(verbosity, number_of_users, max_number_of_albums, min_number_of_albums,
                                min_number_of_orders, max_number_of_orders,
-                               no_images_to_albums, image_base_path)
+                               no_images_to_albums, image_base_path, albums_by_folders_only)
 
         if verbosity >= 1:
             if not self._ids_of_generated_users:
@@ -378,7 +389,8 @@ class Command(BaseCommand):
 
 
     def generate_data(self, verbosity, number_of_users, max_number_of_albums, min_number_of_albums,
-                      min_number_of_orders, max_number_of_orders, no_images_to_albums, image_base_path):
+                      min_number_of_orders, max_number_of_orders, no_images_to_albums, image_base_path,
+                      albums_by_folders_only):
         """ Populates the Albumizer database with random test data """
 
         self.stdout.write(u"Initializing data structures...\n\n");
@@ -455,7 +467,17 @@ class Command(BaseCommand):
 
         image_file_data = self._retrieve_image_file_data(image_base_path, verbosity = verbosity)
         if verbosity >= 3:
-            self.stdout.write(json.dumps(image_file_data, sort_keys = True, indent = 4) + u"\n")
+            data = copy.deepcopy(image_file_data)
+            for folder in data[IMAGE_FILE_DICT_IMAGES_KEY].keys():
+                new_info_rec_list = []
+                for info_rec in data[IMAGE_FILE_DICT_IMAGES_KEY][folder][IMAGE_FILE_DICT_IMAGES_KEY]:
+                    new_info_rec = info_rec.copy()
+                    new_info_rec[IMAGE_FILE_DICT_PATH_KEY] = \
+                            unicode(new_info_rec[IMAGE_FILE_DICT_PATH_KEY], errors = "ignore")
+                    new_info_rec_list.append(new_info_rec)
+                data[IMAGE_FILE_DICT_IMAGES_KEY][folder][IMAGE_FILE_DICT_IMAGES_KEY] = new_info_rec_list
+            output = json.dumps(data, sort_keys = True, indent = 4).encode("ascii", "backslashreplace")
+            self.stdout.write(output + u"\n")
 
         if self._has_been_aborted:
             return
@@ -495,6 +517,9 @@ class Command(BaseCommand):
 
         if self._has_been_aborted:
             return
+
+
+        image_collections = image_file_data[IMAGE_FILE_DICT_IMAGES_KEY]
 
         length_of_pause_in_seconds = 10
         for user_number in range(1, number_of_users + 1):
@@ -592,15 +617,30 @@ class Command(BaseCommand):
 
 
 
+            if albums_by_folders_only:
+                album_content_from_single_group = True
+            else:
+                album_content_from_single_group = self._albumRandomizer.randrange(0, 100) > 30
             number_of_albums = self._albumRandomizer.randrange(min_number_of_albums, max_number_of_albums + 1)
             for album_number in range(1, number_of_albums + 1):
                 album_data = self.generate_album_data(new_user)
 
-                album_title = album_data["title"]
+                if album_content_from_single_group:
+                    selected_collection_name = image_collections.keys()[self._albumRandomizer.randrange(0, len(image_collections.keys()))]
+                    selected_collection = image_collections[selected_collection_name]
+                    if self._albumRandomizer.randrange(0, 100) > 70:
+                        album_title = selected_collection_name.strip()
+                        if len(album_title) < 5:
+                            album_title = u"/\\ " + album_title + u" /\\"
+                    else:
+                        album_title = album_data["title"]
+                else:
+                    album_title = album_data["title"]
+
                 unique_album_title = album_title
                 postfix_counter = 2
                 while (Album.objects.filter(owner__exact = new_user, title__exact = unique_album_title).exists()):
-                    unique_album_title = unicode(album_title + u" " + unicode(postfix_counter))
+                    unique_album_title = album_title + u" " + unicode(postfix_counter)
                     postfix_counter += 1
 
                 new_album = Album(
@@ -614,7 +654,7 @@ class Command(BaseCommand):
                 new_album.save()
 
                 if verbosity >= 2:
-                    message = u"  - album: %s, %s, %s\n           %s...\n\n" % \
+                    message = u" - album: %s, %s, %s\n %s...\n\n" % \
                                       (new_album.title, new_album.isPublic,
                                        new_album.creationDate.strftime("%d.%m.%Y at %H.%M.%S"),
                                        new_album.description[0:30].replace(u"\n", u"\n           "))
@@ -631,6 +671,7 @@ class Command(BaseCommand):
 
                 number_of_pages = self._albumRandomizer.randrange(0, 20)
                 for page_number in range(1, number_of_pages + 1):
+                    caption_strings_of_added_images = []
                     layout = self._qs_layouts[self._albumRandomizer.randrange(0, self._qs_layout_count)]
 
                     new_page = Page(
@@ -647,16 +688,60 @@ class Command(BaseCommand):
                         self.stdout.write(u"p ")
 
 
+                    number_of_images = layout.imageFieldCount
+                    if number_of_images > 0:
+                        if verbosity >= 2:
+                            message = u"                  + images:\n"
+                            self.stdout.write(message.encode("ascii", "backslashreplace"))
+
+                        for content_number in range(1, number_of_images + 1):
+                            new_content = PageContent(
+                                page = new_page,
+                                placeHolderID = "%s_image_%s" % (layout.name, content_number)
+                            )
+
+                            if not no_images_to_albums:
+                                if not album_content_from_single_group:
+                                    selected_collection = image_collections[
+                                                image_collections.keys()[self._albumRandomizer.randrange(0, len(image_collections.keys()))]]
+                                images_of_collection = selected_collection[IMAGE_FILE_DICT_IMAGES_KEY]
+                                selected_image = images_of_collection[
+                                            self._albumRandomizer.randrange(0, len(images_of_collection))]
+                                image_path = selected_image[IMAGE_FILE_DICT_PATH_KEY]
+                                image_extension = image_path.split(".")[-1].lower()
+                                image_file = ImageFile(open(image_path, "rb"))
+                                new_content.image.save(".".join(["dummy", image_extension]), image_file, True)
+                                image_file.close()
+                                if album_content_from_single_group:
+                                    caption_strings_of_added_images.append(selected_image[IMAGE_FILE_DICT_CLEAR_NAME])
+
+                            new_content.save()
+
+                            if verbosity >= 2:
+                                message = u"                      (%s) %s, %s\n" % \
+                                    (unicode(content_number).rjust(3, "0"), new_content.placeHolderID,
+                                     unicode(image_path, errors = "ignore"))
+                                self.stdout.write(message.encode("ascii", "backslashreplace"))
+                            elif verbosity == 1:
+                                self.stdout.write(u"n ")
+
+                            del new_content
+
+
                     number_of_captions = layout.textFieldCount
                     if number_of_captions > 0:
                         if verbosity >= 2:
                             message = u"                  + captions:\n"
                             self.stdout.write(message.encode("ascii", "backslashreplace"))
                         for content_number in range(1, number_of_captions + 1):
-                            if self._albumRandomizer.randrange(0, 100) < 50:
-                                text = self.generate_title()
+                            if album_content_from_single_group and \
+                                            len(caption_strings_of_added_images) >= content_number:
+                                text = caption_strings_of_added_images[content_number - 1]
                             else:
-                                text = self.generate_description()
+                                if self._albumRandomizer.randrange(0, 100) < 50:
+                                    text = self.generate_title()
+                                else:
+                                    text = self.generate_description()
 
                             text = text[:255]
 
@@ -680,50 +765,13 @@ class Command(BaseCommand):
                             del new_content
 
 
-                    number_of_images = layout.imageFieldCount
-                    if number_of_images > 0:
-                        if verbosity >= 2:
-                            message = u"                  + images:\n"
-                            self.stdout.write(message.encode("ascii", "backslashreplace"))
-
-                        for content_number in range(1, number_of_images + 1):
-                            new_content = PageContent(
-                                page = new_page,
-                                placeHolderID = "%s_image_%s" % (layout.name, content_number)
-                            )
-
-                            if not no_images_to_albums:
-                                image_collections = image_file_data[IMAGE_FILE_DICT_IMAGES_KEY]
-                                selected_collection = image_collections[
-                                            image_collections.keys()[self._albumRandomizer.randrange(0, len(image_collections.keys()))]]
-                                images_of_collection = selected_collection[IMAGE_FILE_DICT_IMAGES_KEY]
-                                selected_image = images_of_collection[
-                                            self._albumRandomizer.randrange(0, len(images_of_collection))]
-                                image_path = selected_image[IMAGE_FILE_DICT_PATH_KEY]
-                                image_extension = image_path.split(".")[-1].lower()
-                                image_file = ImageFile(open(image_path, "rb"))
-                                new_content.image.save(".".join(["dummy", image_extension]), image_file, True)
-                                image_file.close()
-
-                            new_content.save()
-
-                            if verbosity >= 2:
-                                message = u"                      (%s) %s\n" % \
-                                    (unicode(content_number).rjust(3, "0"), new_content.placeHolderID)
-                                self.stdout.write(message.encode("ascii", "backslashreplace"))
-                            elif verbosity == 1:
-                                self.stdout.write(u"n ")
-
-                            del new_content
-
-
                     del new_page
 
                     if self._has_been_aborted:
                         return
 
                 if verbosity >= 2:
-                    message = u"\n    * Price: %s euros\n\n" % \
+                    message = u"\n * Price: %s euros\n\n" % \
                                 convert_money_into_two_decimal_string(new_album.price_excluding_vat_and_shipping()[0])
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
@@ -744,11 +792,11 @@ class Command(BaseCommand):
 
             shopping_cart_data = self.generate_shopping_cart_data(new_user)
             if not shopping_cart_data["success"] and verbosity >= 2:
-                message = u"  - no valid albums to create shopping cart with\n\n"
+                message = u" - no valid albums to create shopping cart with\n\n"
                 self.stdout.write(message.encode("ascii", "backslashreplace"))
             else:
                 if verbosity >= 2:
-                    message = u"  - shopping cart:\n"
+                    message = u" - shopping cart:\n"
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
                 item_counter = 0
@@ -800,7 +848,7 @@ class Command(BaseCommand):
                 order_data = self.generate_order_data(new_user)
                 if not order_data["success"]:
                     if verbosity >= 2:
-                        message = u"  - no valid albums and/or addresses to create orders with\n\n"
+                        message = u" - no valid albums and / or addresses to create orders with\n\n"
                         self.stdout.write(message.encode("ascii", "backslashreplace"))
                     break;
 
@@ -819,7 +867,7 @@ class Command(BaseCommand):
                     most_recent_order = new_order
 
                 if verbosity >= 2:
-                    message = u"  - order: %s\n" % new_order.purchaseDate.strftime("%d.%m.%Y at %H.%M.%S")
+                    message = u" - order: %s\n" % new_order.purchaseDate.strftime("%d.%m.%Y at %H.%M.%S")
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
                 elif verbosity == 1:
                     self.stdout.write(u"o ")
@@ -868,7 +916,7 @@ class Command(BaseCommand):
                 most_recent_order.save()
 
                 if verbosity >= 2:
-                    message = u"\n  - status of the most recent order (%s) is \"%s\"\n" % \
+                    message = u"\n - status of the most recent order (%s) is \"%s\"\n" % \
                                             (most_recent_order.purchaseDate, most_recent_order.status)
                     self.stdout.write(message.encode("ascii", "backslashreplace"))
 
