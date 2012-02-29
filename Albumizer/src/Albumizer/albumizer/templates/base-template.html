@@ -57,13 +57,6 @@
 			    }
 			});
 			
-			//log the user out of facebook too. Leaving Facebook connected would break the fb login button.
-			$("#headerLinkLogOut").click(function() {
-			 if(FB)
-			     FB.logout(function(response) {
-			         //user logged out..
-			     });
-			});
       });
 	    {% endif %}
       
@@ -89,6 +82,14 @@
 	          xfbml      : true,
 	          oauth      : true,
 	        });
+	        
+            //log the user out of facebook too. Leaving Facebook connected would break the fb login button.
+            $("#headerLinkLogOut").click(function() {
+             if(FB)
+                 FB.logout(function(response) {
+                     //user logged out..
+                 });
+            });
 	        var tokenhandler=function(response) {
 	        	if(response.status=='connected' && response.authResponse) {
 	        		var dialog=$("<div title='Facebook login'>Checking authentication token..</div>")
