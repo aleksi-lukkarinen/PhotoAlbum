@@ -56,6 +56,14 @@
     	        	$("#frmLoginDialog").submit();
 			    }
 			});
+			
+			//log the user out of facebook too. Leaving Facebook connected would break the fb login button.
+			$("#headerLinkLogOut").click(function() {
+			 if(FB)
+			     FB.logout(function(response) {
+			         //user logged out..
+			     });
+			});
       });
 	    {% endif %}
       
@@ -107,6 +115,7 @@
 	        	}
 	        };
 	        {% comment %}
+	        //Auto-login disables logut... so let's not do auto-login
 	        {% if not user.is_authenticated %}
 	        //user is not authenticated, check if the user is logged to facebook
 	        //TODO: if the user logs out, this will log her on again

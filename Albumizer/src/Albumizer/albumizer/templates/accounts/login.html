@@ -42,7 +42,7 @@
 	        <tr>
 	          <td><span class="ui-icon ui-icon-info"></span></td>
 	          <td>
-	            <span class="errorMessage">
+	            <div class="errorMessage">
 	            <strong>To be accepted, the form below is required to be adjusted as follows:</strong>
 	            <ul>
 	              {% for field in form %}
@@ -51,7 +51,7 @@
 	                {% endfor %}
 	              {% endfor %}
 	            </ul>
-	            </span>
+	            </div>
 	          </td>
 	        </tr> 
 	      {% endif %}
@@ -64,26 +64,7 @@
 
     <div class="formSectionTitle ui-widget-header">Login Information</div>
     <fieldset class="ui-widget-content ui-corner-bottom">
-      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtLoginUserName.name }}">{{ form.txtLoginUserName.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtLoginUserName }}</div>
-      <div class="helpRow">{{ form.txtLoginUserName.help_text }}</div>
-      {% if form.txtLoginUserName.errors %}
-        <div class="errorRow">
-          {% for error in form.txtLoginUserName.errors %}
-            <div class="errorMessage">{{ error }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <div class="fieldRow"><label class="requiredLabel" for="id_{{ form.txtLoginPassword.name }}">{{ form.txtLoginPassword.label }}<span class="ui-icon ui-icon-star"></span></label>{{ form.txtLoginPassword }}</div>
-      <div class="helpRow">{{ form.txtLoginPassword.help_text }}</div>
-      {% if form.txtLoginPassword.errors %}
-        <div class="errorRow">
-          {% for error in form.txtLoginPassword.errors %}
-            <div class="errorMessage">{{ error }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
+        {% include "basicform.html" with form=form %}
       <input type="submit" name="cmdLogIn" id="id_cmdLogIn" value="Log In" />
     </fieldset>
   </form>

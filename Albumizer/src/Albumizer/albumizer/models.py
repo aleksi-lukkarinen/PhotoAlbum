@@ -18,8 +18,8 @@ import Image
 commonLogger = logging.getLogger("albumizer")
 
 
-PATH_OF_MISSING_COVER_IMAGE = settings.STATIC_URL + "images/missing-cover.png"
-
+PATH_OF_MISSING_COVER_IMAGE_SMALL = settings.STATIC_URL + "images/missing-cover-small.png"
+PATH_OF_MISSING_COVER_IMAGE_LARGE = settings.STATIC_URL + "images/missing-cover-large.png"
 
 
 FILE_EXTENSION_PREFIX_LARGE_THUMBNAIL = "thumb-large"
@@ -312,7 +312,7 @@ class Album(models.Model):
                     if os.path.exists(content.image.large_thumbnail_path()):
                         return content.image.large_thumbnail_url()
                     return content.image.url
-        return PATH_OF_MISSING_COVER_IMAGE
+        return PATH_OF_MISSING_COVER_IMAGE_SMALL
 
     def url_of_large_cover(self):
         """ 
@@ -336,7 +336,7 @@ class Album(models.Model):
                     if os.path.exists(content.image.small_thumbnail_path()):
                         return content.image.small_thumbnail_url()
                     return content.image.url
-        return PATH_OF_MISSING_COVER_IMAGE
+        return PATH_OF_MISSING_COVER_IMAGE_LARGE
 
     def is_owned_by(self, user):
         """ 
@@ -728,7 +728,7 @@ class Page(models.Model):
                 if os.path.exists(content.image.large_thumbnail_path()):
                     return content.image.large_thumbnail_url()
                 return content.image.url
-        return PATH_OF_MISSING_COVER_IMAGE
+        return PATH_OF_MISSING_COVER_IMAGE_SMALL
 
     def url_of_large_cover(self):
         """ 
@@ -750,7 +750,7 @@ class Page(models.Model):
                 if os.path.exists(content.image.small_thumbnail_path()):
                     return content.image.small_thumbnail_url()
                 return content.image.url
-        return PATH_OF_MISSING_COVER_IMAGE
+        return PATH_OF_MISSING_COVER_IMAGE_LARGE
 
     def content(self):
         """  

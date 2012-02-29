@@ -118,11 +118,11 @@
 		                    <span class="heading">
 	  	                    <span>{{ item_info.quantity }} piece{{ item_info.quantity|pluralize }}</span>
 	  	                    &mdash;
-	  	                    <span>{{ item_info.unit_price|mto2dstr }} &euro;/piece</span>
+	  	                    <span>{{ item_info.unit_price|mto2dstr }}&nbsp;&euro;/piece</span>
 		                    </span>
 		                    <span class="value subtotal">  
 		                      <span>Subtotal:</span>
-		                      <span>{{ item_info.sub_total|mto2dstr }} &euro;</span>
+		                      <span>{{ item_info.sub_total|mto2dstr }}&nbsp;&euro;</span>
 		                    </span>
 		                  </div>
 	                  </div>
@@ -133,7 +133,5 @@
 	        {% endfor %}
 	        {{ custom_content_after_items }}
       </div>
-	      
-	        
 	  </div>
   {% endif %}

@@ -83,8 +83,8 @@
 			                   x-moz-errormessage="Quantities must be integers between 0 and 99."
 			                   value="{{ item_info.quantity }}" size="2" />
 			          </td>
-			          <td class="unitPriceColumn">{{ item_info.unit_price|floatformat:"2" }} &euro;</td>
-			          <td class="rowTotalColumn">{{ item_info.sub_total|floatformat:"2" }} &euro;</td>
+			          <td class="unitPriceColumn">{{ item_info.unit_price|floatformat:"2" }}&nbsp;&euro;</td>
+			          <td class="rowTotalColumn">{{ item_info.sub_total|floatformat:"2" }}&nbsp;&euro;</td>
 			        </tr>
 			      </tbody>	      
 			    </table> 
@@ -93,7 +93,7 @@
 			    <tr>
 			      <td>
 			        You have {{ cart_info.items|length }} item{{ cart_info.items|length|pluralize }} in the shopping cart.
-			        Subtotal: <span class="subTotal">{{ cart_info.sub_total|floatformat:"2" }} &euro;</span>
+			        Subtotal: <span class="subTotal">{{ cart_info.sub_total|floatformat:"2" }}&nbsp;&euro;</span>
 			      </td>
 		      </tr>
 		    </table>
