@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 import hashlib, logging, os
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -16,11 +16,11 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson as json
 import facebook_api
-from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
-        Address, ShoppingCartItem, ShoppingCartEmptyError, Order, SPSPayment, OrderStatus, OrderItem
-from forms import AlbumCreationForm, LoginForm, RegistrationForm, RegistrationModelForm, AddPageForm, \
-        EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm, UserAuthForm, \
-        EditUserAuthForm
+from models import FacebookProfile, Album, Page, PageContent, \
+        Address, ShoppingCartItem, ShoppingCartEmptyError, Order, SPSPayment, OrderStatus
+from forms import AlbumCreationForm, LoginForm, AddPageForm, \
+        EditPageForm, build_delivery_address_form, UserProfileForm, AddressModelForm, RegistrationModelForm, \
+        UserAuthForm, EditUserAuthForm
 import utils
 
 
@@ -241,19 +241,19 @@ def view_album_slideshow(request, album_id):
 
     if not myalbum.has_pages():
         request.user.message_set.create(message = "Can't start a slideshow with an empty album")
-        return HttpResponseRedirect(reverse("show_single_album", args=[myalbum.id]))
-    
-    layouts=[]
+        return HttpResponseRedirect(reverse("show_single_album", args = [myalbum.id]))
+
+    layouts = []
     for page in myalbum.pages():
         if not page.layout in layouts:
             layouts.append(page.layout)
-            
-    templateparameters={
+
+    templateparameters = {
         "album":myalbum,
         "layouts":layouts}
-    
+
     return render_to_response('album/view-album-slideshow.html', RequestContext(request, templateparameters))
-    
+
 
 def show_single_page_GET(request, album_id, page_number):
     myalbum = Album.by_id(album_id)
@@ -1020,7 +1020,7 @@ def show_profile(request):
     except (EmptyPage, InvalidPage):
       albums = paginator.page(paginator.num_pages)
 
-    template_parameters = {'albums': albums, "orders":Order.objects.filter(orderer=request.user)}
+    template_parameters = {'albums': albums, "orders":Order.objects.filter(orderer = request.user)}
     return render_to_response('accounts/profile.html', RequestContext(request, template_parameters))
 
 

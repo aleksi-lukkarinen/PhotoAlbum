@@ -15,7 +15,7 @@ print "\nStarting up...\n\n"
 
 
 
-import fileinput, gc, json, os, re, time
+import copy, fileinput, gc, json, os, re, time
 from datetime import datetime, timedelta
 from optparse import make_option
 from random import Random
@@ -60,6 +60,7 @@ IMAGE_FILE_DICT_ACCEPTED_EXTENSIONS = ["jpg", "jpeg", "png"]
 
 COMPILED_RE_IMAGE_FILENAME_CLEARING_PATTERNS_RET_GRP1 = [
     re.compile(r"^[a-f0-9]{10}_[a-f0-9]{10} (.*)$"),
+    re.compile(r"^(.*).fd[0-9]{4}$"),
     re.compile(r"^(.*).jpg_DFree Photos$"),
     re.compile(r"^(.*).jpg_ Photos$"),
     re.compile(r"^(.*).jpg_$"),
@@ -466,7 +467,17 @@ class Command(BaseCommand):
 
         image_file_data = self._retrieve_image_file_data(image_base_path, verbosity = verbosity)
         if verbosity >= 3:
-            self.stdout.write(json.dumps(image_file_data, sort_keys = True, indent = 4) + u"\n")
+            data = copy.deepcopy(image_file_data)
+            for folder in data[IMAGE_FILE_DICT_IMAGES_KEY].keys():
+                new_info_rec_list = []
+                for info_rec in data[IMAGE_FILE_DICT_IMAGES_KEY][folder][IMAGE_FILE_DICT_IMAGES_KEY]:
+                    new_info_rec = info_rec.copy()
+                    new_info_rec[IMAGE_FILE_DICT_PATH_KEY] = \
+                            unicode(new_info_rec[IMAGE_FILE_DICT_PATH_KEY], errors = "ignore")
+                    new_info_rec_list.append(new_info_rec)
+                data[IMAGE_FILE_DICT_IMAGES_KEY][folder][IMAGE_FILE_DICT_IMAGES_KEY] = new_info_rec_list
+            output = json.dumps(data, sort_keys = True, indent = 4).encode("ascii", "backslashreplace")
+            self.stdout.write(output + u"\n")
 
         if self._has_been_aborted:
             return

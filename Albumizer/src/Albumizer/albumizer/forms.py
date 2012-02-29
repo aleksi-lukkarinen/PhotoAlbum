@@ -8,8 +8,7 @@ from django.forms.forms import BoundField, NON_FIELD_ERRORS
 from django.forms.util import ErrorList, ErrorDict
 from django.forms.widgets import Input
 from django.forms import ModelForm
-from models import UserProfile, FacebookProfile, Album, Layout, Page, PageContent, Country, State, \
-        Address, ShoppingCartItem, Order, SPSPayment, OrderStatus, OrderItem
+from models import UserProfile, Album, Layout, Country, State, Address, ShoppingCartItem
 
 
 
