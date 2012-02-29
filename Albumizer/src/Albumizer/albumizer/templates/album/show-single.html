@@ -29,14 +29,14 @@
 	      <form name="frmAlbumAction" method="post" action="{% url "show_single_album" album.id %}">
 	        {% csrf_token %}
           {% if current_user_can_edit %}
-            <input type="submit" name="addPage" name="id_cmdAddPage" value="Add Page">
-            <input type="submit" name="editAlbum" name="id_cmdEditAlbum" value="Edit Album">
+            <input type="submit" name="addPage" value="Add Page">
+            <input type="submit" name="editAlbum" value="Edit Album">
           {% endif %}
           {% if is_visible_to_current_user and album.has_pages %}
-	          <input type="submit" name="addToShoppingCart" name="id_cmdAdd" value="Add to Shopping Cart">
+	          <input type="submit" name="addToShoppingCart" value="Add to Shopping Cart">
           {% endif %}
 	        {% if current_user_can_delete %}
-	          <input type="submit" name="delete" name="id_cmdDelete" value="Delete">
+	          <input type="submit" name="delete" value="Delete">
 	        {% endif %}
 	      </form>
 	    </div>
@@ -55,13 +55,13 @@
         &mdash; {{ album.pages|length }} page{{ album.pages|length|pluralize }}
       {% endif %}
     </div>
+    {% if album.price_excluding_vat_and_shipping.0 > 0 %}
     <div class="detailRow">
-      <td class="price">
-        {% if album.price_excluding_vat_and_shipping.0 > 0 %}
-          {{ album.price_excluding_vat_and_shipping.0|mto2dstr }} &euro; / piece + shipping + VAT
-        {% endif %}
-      </td>
+      <div class="price">
+          {{ album.price_excluding_vat_and_shipping.0|mto2dstr }}&nbsp;&euro; / piece + shipping + VAT
+      </div>
     </div>
+    {% endif %}
 
     {% if album.description %}
     <div class="description">
@@ -118,8 +118,8 @@
     {% if album.isPublic %}
      <div class="urlContainer publicUrlContainer">
         <span class="helpText">Public URL of this album:</span>
-        <nobr><a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="self bookmark" 
-                      class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</a></nobr>
+        <a href="http://{{ site_domain }}{{ album.get_absolute_url }}" rel="self bookmark" 
+                      class="url permalink">http://{{ site_domain }}{{ album.get_absolute_url }}</a>
       </div>
     {% else %}
       {% if not opened_using_secret_hash %}
@@ -128,7 +128,7 @@
             If you wish to let your family or friends to browse this album
             while it is private, please give them the secret URL given below:
           </span>
-          <nobr><span class="secretUrl">http://{{ site_domain }}{{ album.get_secret_url }}</span></nobr>
+          <span class="secretUrl">http://{{ site_domain }}{{ album.get_secret_url }}</span>
         </div>
       {% endif %}
     {% endif %}

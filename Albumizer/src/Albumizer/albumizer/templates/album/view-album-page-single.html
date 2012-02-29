@@ -65,8 +65,8 @@
 	      <form name="frmAlbumAction" method="post" action="{% url "show_single_page" album_id pageNumber %}">
 	        {% csrf_token %}
             {% if current_user_can_edit %}
-            <input type="submit" name="addPage" name="id_cmdAddPage" value="Add Page">
-            <input type="submit" name="editPage" name="id_cmdEditPage" value="Edit Page">
+            <input type="submit" name="addPage" value="Add Page">
+            <input type="submit" name="editPage" value="Edit Page">
             {% endif %}
 	        {% if current_user_can_delete %}
 	        {# <input type="submit" name="deletePage" name="id_cmdDeletePage" value="Delete Page"> #}
@@ -97,10 +97,10 @@
 			{% if nextLink %}
 				<div class="nextLink"><a href="{{ nextLink }}">Next page &gt;&gt;</a></div>
 			{% endif %}
-				<div class="clear" />
+				<div class="clear"></div>
 			</div>
 		</div>
-	<div>
+	</div>
 
   </article>
 {% endblock %}

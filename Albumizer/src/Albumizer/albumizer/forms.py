@@ -139,7 +139,7 @@ class UserAuthForm(CommonAlbumizerBaseForm, ModelForm):
             'size': '30',
             'pattern': RE_VALID_USER_ID,
             'required': 'required',
-            'autofocus': 'true',
+            'autofocus': 'autofocus',
             'title': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING,
             'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING
         }),
@@ -347,7 +347,7 @@ class UserInformationForm(CommonAlbumizerForm):
             'size': '30',
             'pattern': RE_VALID_USER_ID,
             'required': 'required',
-            'autofocus': 'true',
+            'autofocus': 'autofocus',
             'title': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING,
             'x-moz-errormessage': REGISTRATION_FORM_ERR_MSG_USERNAME_MISSING
         }),
@@ -645,7 +645,7 @@ class AlbumCreationForm(CommonAlbumizerForm):
         widget = forms.TextInput(attrs = {
             'size':'50',
             'required': 'required',
-            'autofocus': 'true',
+            'autofocus': 'autofocus',
             'title': ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING,
             'x-moz-errormessage': ALBUM_CREATION_ERR_MSG_ALBUM_TITLE_MISSING
         }),
@@ -704,7 +704,7 @@ class LoginForm(CommonAlbumizerForm):
         widget = forms.TextInput(attrs = {
             'size':'50',
             'required': 'required',
-            'autofocus': 'true',
+            'autofocus': 'autofocus',
             'title': LOGIN_FORM_ERR_USERNAME_MISSING,
             'x-moz-errormessage': LOGIN_FORM_ERR_USERNAME_MISSING
         }),

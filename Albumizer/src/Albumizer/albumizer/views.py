@@ -239,6 +239,10 @@ def view_album_slideshow(request, album_id):
     if myalbum.is_hidden_from_user(request.user):
         return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
 
+    if not myalbum.has_pages():
+        request.user.message_set.create(message = "Can't start a slideshow with an empty album")
+        return HttpResponseRedirect(reverse("show_single_album", args=[myalbum.id]))
+    
     layouts=[]
     for page in myalbum.pages():
         if not page.layout in layouts:

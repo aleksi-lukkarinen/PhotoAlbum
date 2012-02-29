@@ -309,7 +309,7 @@ class Album(models.Model):
                     if os.path.exists(content.image.large_thumbnail_path()):
                         return content.image.large_thumbnail_url()
                     return content.image.url
-        return ""
+        return settings.STATIC_URL+"images/nocover-small.png"
 
     def url_of_large_cover(self):
         """ 
@@ -333,7 +333,7 @@ class Album(models.Model):
                     if os.path.exists(content.image.small_thumbnail_path()):
                         return content.image.small_thumbnail_url()
                     return content.image.url
-        return ""
+        return settings.STATIC_URL+"images/nocover-large.png"
 
     def is_owned_by(self, user):
         """ 
@@ -734,7 +734,7 @@ class Page(models.Model):
                 if os.path.exists(content.image.large_thumbnail_path()):
                     return content.image.large_thumbnail_url()
                 return content.image.url
-        return ""
+        return settings.STATIC_URL+"images/nocover-small.png"
 
     def url_of_large_cover(self):
         """ 
@@ -756,7 +756,7 @@ class Page(models.Model):
                 if os.path.exists(content.image.small_thumbnail_path()):
                     return content.image.small_thumbnail_url()
                 return content.image.url
-        return ""
+        return settings.STATIC_URL+"images/nocover-large.png"
 
     def content(self):
         """  
