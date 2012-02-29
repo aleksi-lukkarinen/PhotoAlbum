@@ -6,6 +6,7 @@
 
   {% if order_info %}
     <div class="orderSummary ui-corner-all">
+        <div class="addressWrapper">
 	        {% for address, item_group in order_info.items_by_address.items %}
 	          <div class="itemsOfSingleAddress ui-corner-all">
 	            <div class="addressGroupHeader ui-corner-all">
@@ -89,6 +90,7 @@
 	            </div>
 	          </div>
 	        {% endfor %}
+	        </div>
 
 	        <div class="generalInfo generalInfoBackground ui-corner-all">
 	          {% if order_summary_options.show_place_order_button %}
