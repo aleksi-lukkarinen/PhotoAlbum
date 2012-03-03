@@ -254,6 +254,8 @@ def list_all_public_albums(request):
     return render_to_response_as_public('album/list-all.html', RequestContext(request, template_parameters))
 
 
+
+
 def view_album_slideshow(request, album_id):
     myalbum = Album.by_id(album_id)
     if not myalbum:
@@ -276,6 +278,8 @@ def view_album_slideshow(request, album_id):
         "layouts":layouts}
 
     return render_to_response('album/view-album-slideshow.html', RequestContext(request, templateparameters))
+
+
 
 
 def show_single_page_GET(request, album_id, page_number):
@@ -322,7 +326,7 @@ def show_single_page_GET(request, album_id, page_number):
         return HttpResponse(json.dumps(data), mimetype = "application/json")
 
     response = render_to_response_as_public('album/view-album-page-single.html', RequestContext(request, context))
-    if not myalbum.isPublic:
+    if not myalbum.isPublic or myalbum.is_editable_to_user(request.user):
         add_caching_preventing_headers(response)
 
     return response
@@ -439,7 +443,7 @@ def show_single_album_GET(request, album_id):
         "current_user_can_delete": album.is_editable_to_user(request.user)
     }
     response = render_to_response_as_public('album/show-single.html', RequestContext(request, template_parameters))
-    if not album.isPublic:
+    if not album.isPublic or album.is_editable_to_user(request.user):
         add_caching_preventing_headers(response)
 
     return response
