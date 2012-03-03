@@ -8,44 +8,46 @@
 {% show_messages %}
 {% block before_album_list %}{% endblock %}
 
-<div class="albumList">
-  {% if albums.object_list %}
-  {% for album in albums.object_list %}
-  <div class="albumListItem{% if forloop.counter0|divisibleby:"5" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
-	  <a href="{{ album.get_absolute_url }}">
-        <img src="{{ album.url_of_large_cover }}" alt="" class="albumListItemImage" />
-        <p class="albumListItemTitle">{{ album.title }}</p>
-      </a>
-  </div>
-  {% if forloop.counter|divisibleby:"5" %}
-  <div class="clear"></div>
-  {% endif %}
-  {% endfor %}
-  {% else %}
-  {% block no_albums %}
-  <p>There are no albums.</p>
-  {% endblock %}
-  {% endif %}
+<div class="albumListContainer{% if albums.object_list|length > 5 %} centered{% endif %}">
+	<div class="albumList">
+	  {% if albums.object_list %}
+	  {% for album in albums.object_list %}
+	  <div class="albumListItem{% if forloop.counter0|divisibleby:"5" %} firstOnRow{% endif %}{% if forloop.counter|divisibleby:"5" %} lastOnRow{% endif %}">
+		  <a href="{{ album.get_absolute_url }}">
+	        <img src="{{ album.url_of_large_cover }}" alt="" class="albumListItemImage ui-corner-top" />
+	        <p class="albumListItemTitle">{{ album.title }}</p>
+	      </a>
+	  </div>
+	  {% if forloop.counter|divisibleby:"5" %}
+	  <div class="clear"></div>
+	  {% endif %}
+	  {% endfor %}
+	  {% else %}
+	  {% block no_albums %}
+	  <p>There are no albums.</p>
+	  {% endblock %}
+	  {% endif %}
+	</div>
+	
+	<div class="clear"></div>
+	
+	{% if albums.object_list %}
+	<div class="pagination">
+	  <span class="step-links">
+	    {% if albums.has_previous %}
+	    <a href="?page={{ albums.previous_page_number }}">previous</a>
+	    {% endif %}
+	
+	    <span class="current">
+	      Page {{ albums.number }} of {{ albums.paginator.num_pages }}.
+	    </span>
+	
+	    {% if albums.has_next %}
+	    <a href="?page={{ albums.next_page_number }}">next</a>
+	    {% endif %}
+	  </span>
+	</div>
+	{% endif %}
 </div>
-
-<div class="clear"></div>
-
-{% if albums.object_list %}
-<div class="pagination">
-  <span class="step-links">
-    {% if albums.has_previous %}
-    <a href="?page={{ albums.previous_page_number }}">previous</a>
-    {% endif %}
-
-    <span class="current">
-      Page {{ albums.number }} of {{ albums.paginator.num_pages }}.
-    </span>
-
-    {% if albums.has_next %}
-    <a href="?page={{ albums.next_page_number }}">next</a>
-    {% endif %}
-  </span>
-</div>
-{% endif %}
 
 {% endblock %}

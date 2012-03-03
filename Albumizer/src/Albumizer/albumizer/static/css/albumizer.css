@@ -72,7 +72,7 @@ body {
   font-weight:               bold;
   text-decoration:           none;
   margin:                    0.3em 0em 0em 1em;
-  background:                #ffffff;
+  background:                none;
   color:                     #88cc88;
 }
 
@@ -177,7 +177,9 @@ img {
   margin-bottom:             7em;
 }
 
-
+.pathOfHTTP404 {
+	font-size:                 115%;
+}
 
 
 
@@ -391,7 +393,7 @@ img {
 .randomPickAlbumsListItemTitle {
   display:                   inline-block;
   width:                     15em;
-  margin-top:                0.5em;
+  margin-top:                1em;
   background:                #ffffff;
   color:                     #000000;
   overflow:                  hidden;
@@ -408,33 +410,53 @@ img {
     text-align:center;
 }
 
-.albumListItem {
+.albumListContainer {
 
+} 
+
+.albumListContainer.centered {
+  text-align: center;
+} 
+
+.albumListContainer .albumList {
+  display: inline-block;
+}
+
+.albumListContainer .albumListItem {
 float:left;
 text-decoration:none;
-margin:1em 1.25em;
+margin:1.2em;
 width:15em;
 }
 
-.albumList div:first-child, .albumList div.firstOnRow {
+.albumListContainer .albumList div:first-child, .albumList div.firstOnRow {
 margin-left:0em;
 }
 
-.albumList div.lastOnRow {
+.albumListContainer .albumList div.lastOnRow {
 margin-right:0em;
 }
 
-.albumListItemTitle {
+.albumListContainer .albumListItemTitle {
 font-size:1em;
 text-align:center;
 word-wrap:break-word;
 }
 
-.albumListItemImage {
+.albumListContainer .albumListItemImage {
 display:block;
 width:14.8em;
 height:14.8em;
-border:0.1em solid #eeeeee;
+  overflow:                  hidden;
+  text-overflow:             ellipsis;
+  -o-text-overflow:          ellipsis;
+  -moz-box-shadow:           2px 2px 5px #888;
+  -webkit-box-shadow:        2px 2px 5px #888;
+  box-shadow:                2px 2px 5px #888;
+}
+
+.albumListContainer .pagination {
+  text-align: left;
 }
 
 .clear {
@@ -1099,6 +1121,7 @@ clear:both;
   top:                       0.1em;
   padding:                   1em;
   float:                     right;
+  min-width:                 16em;
 }
 
 .orderSummary .generalInfo .placeOrderButton {
@@ -1192,7 +1215,7 @@ clear:both;
 }
 
 .orderSummary .itemsByAddress {
-  max-width:                 65em;
+  max-width:                 64em;
 }
 
 .addressGroupHeader > div {
@@ -1280,7 +1303,7 @@ clear:both;
 .orderSummary .itemsOfSingleAddress .allItems .singleItemTable {
   display:                   table;
   width:                     100%;
-  margin-bottom:             1em;
+  margin-bottom:             1.5em;
 }
 
 .orderSummary .itemsOfSingleAddress .allItems .singleItemTable.last {
@@ -1642,7 +1665,7 @@ clear:both;
 .commonForm textarea {
   width:                     50em;
   min-width:                 10em;
-  max-width:                 57em;
+  max-width:                 55em;
   min-height:                3em;
 } 
 

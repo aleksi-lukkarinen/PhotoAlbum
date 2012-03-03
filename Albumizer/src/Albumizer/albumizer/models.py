@@ -847,7 +847,7 @@ def get_album_photo_upload_path(page_content_model_instance, original_filename):
     extension = original_filename.split('.')[-1]
 
     security_hash_base = user_id + album_id + page_number + placeholder_number + unicode(settings.SECRET_KEY)
-    #security_hash_base += unicode(datetime.now())
+    security_hash_base += unicode(datetime.now())
     security_hash = hashlib.md5(security_hash_base.encode("ascii", "backslashreplace")).hexdigest()
 
     filename = "%s-%s-%s-%s-%s.%s" % \

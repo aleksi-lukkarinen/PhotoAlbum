@@ -4,8 +4,8 @@
 import os
 
 
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 
 PRICE_PER_ALBUM = 5

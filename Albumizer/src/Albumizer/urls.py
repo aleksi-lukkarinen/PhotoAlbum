@@ -1,8 +1,9 @@
 # This Python file uses the following encoding: utf-8
 
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls.defaults import handler404, handler500, include, patterns, url
 from django.contrib import admin
 import albumizer.urls
+
 
 
 
@@ -19,3 +20,10 @@ if settings.DEBUG:
     urlpatterns += patterns('',
     url(r'^uploads/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, }),
     )
+
+
+#
+# For error pages
+#
+handler404 = "albumizer.views.display_HTTP404"
+handler500 = "albumizer.views.display_HTTP500"

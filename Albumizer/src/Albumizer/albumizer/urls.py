@@ -1,9 +1,7 @@
 ﻿# This Python file uses the following encoding: utf-8
 
 import os
-#from django.conf import settings
 from django.conf.urls.defaults import patterns, url
-from django.core.urlresolvers import reverse
 from django.views.generic.simple import redirect_to
 import views
 
@@ -11,7 +9,7 @@ import views
 
 
 #
-# For simple accounts without need for http-method-based dispatch
+# For simple views without need for http-method-based dispatch
 #
 urlpatterns = patterns('albumizer.views',
     (r'^$', 'welcome_page'),
@@ -21,13 +19,11 @@ urlpatterns = patterns('albumizer.views',
     (r'^album/(?P<album_id>\d+)/(?P<page_number>\d+)/s/(?P<secret_hash>[a-z0-9]{64})/$', 'show_single_page_with_hash'),
     (r'^album/slideshow/(?P<album_id>\d+)/$', 'view_album_slideshow'),
 
-    (r'^accounts/$', redirect_to, {'url': "/accounts/profile/"}),
+    (r'^accounts/$', redirect_to, {'url': 'accounts/profile/'}),
     (r'^accounts/logout/$', 'log_out'),
     (r'^accounts/profile/$', 'show_profile'),
     (r'^accounts/information/$', 'edit_account_information', {}, 'edit_account_information'),
     (r'^accounts/facebooklogin$', 'facebook_login'),
-
-    (r'^order/$', redirect_to, {'url': '/order/information/'}),
 
     (r'^api/json/album/latest/$', redirect_to, {'url': '/api/json/album/latest/20/'}),
     (r'^api/json/album/latest/(?P<how_many>\d{1,2})/$', 'api_json_get_latest_albums'),
@@ -87,7 +83,7 @@ urlpatterns += patterns('',
 # For local development, when testing with DEBUG=False.
 #
 urlpatterns += patterns('',
-    url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
-        'document_root': os.path.join(os.path.dirname(__file__), 'static').replace('\\', '/'),
+    url(r"^static/(?P<path>.*)$", "django.views.static.serve", {
+        "document_root": os.path.join(os.path.dirname(__file__), "static").replace("\\", "/"),
     }),
 )

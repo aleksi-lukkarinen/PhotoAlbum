@@ -2,12 +2,11 @@
 
 import hashlib
 from datetime import datetime
-from django.template.base import FilterExpression, Library, Node, TemplateSyntaxError, resolve_variable
+from django.template.base import Library, Node, TemplateSyntaxError, resolve_variable
 from django.template.defaulttags import token_kwargs
 from django.template.loader import get_template
 from django.contrib.auth.models import User
-from Albumizer.albumizer.models import UserProfile, FacebookProfile, Album, Page, PageContent, \
-        Country, State, Address, Order, SPSPayment, OrderStatus, OrderItem
+from Albumizer.albumizer.models import Album
 from Albumizer.albumizer.utils import convert_money_into_two_decimal_string
 
 
