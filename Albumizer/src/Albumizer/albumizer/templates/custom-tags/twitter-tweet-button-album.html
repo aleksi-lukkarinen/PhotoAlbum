@@ -1,5 +1,6 @@
 {% load url from future %}
 
+{% if twitter_account and twitter_hashtag and site_domain %}
   <div id="twitter-tweet-button-album-container-{{ id }}" class="twitter-tweet-button-album-container">
     <a href="https://twitter.com/intent/tweet?button_hashtag={{ twitter_hashtag }}&amp;text=Hey!%20Some%20cool%20photos:%20{{ album.title|urlencode }}" 
        class="twitter-hashtag-button" 
@@ -30,3 +31,5 @@
       });
     //]]>
   </script>
+{% endif %}
+  

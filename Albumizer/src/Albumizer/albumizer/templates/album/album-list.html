@@ -31,11 +31,15 @@
 	
 	<div class="clear"></div>
 	
-	{% if albums.object_list %}
+	{% if albums.object_list and albums.paginator.num_pages > 1 %}
 	<div class="pagination">
 	  <span class="step-links">
+      {% if albums.paginator.num_pages > 3 and albums.number > 2 %}
+      <span class="first"><a href="?page=1">First</a></span>
+      {% endif %}
+
 	    {% if albums.has_previous %}
-	    <a href="?page={{ albums.previous_page_number }}">previous</a>
+	    <span class="previous"><a href="?page={{ albums.previous_page_number }}">Previous</a></span>
 	    {% endif %}
 	
 	    <span class="current">
@@ -43,8 +47,12 @@
 	    </span>
 	
 	    {% if albums.has_next %}
-	    <a href="?page={{ albums.next_page_number }}">next</a>
+	    <span class="next"><a href="?page={{ albums.next_page_number }}">Next</a></span>
 	    {% endif %}
+
+      {% if albums.paginator.num_pages > 3 and albums.number < albums.paginator.num_pages|add:"-1" %}
+      <span class="last"><a href="?page={{ albums.paginator.num_pages }}">Last</a></span>
+      {% endif %}
 	  </span>
 	</div>
 	{% endif %}

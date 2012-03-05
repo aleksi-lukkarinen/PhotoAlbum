@@ -1,5 +1,5 @@
 
-        <h2>You are viewing page {{ pageNumber}} from album "{{ albumTitle }}"</h2>
+        <h2 class="prompt">Page {{ pageNumber}}</h2>
         <div class="albumpagewrapper">
             <div class="albumpagecontainer {{layoutCssClass}}">
                 {% for text in texts %}
@@ -9,13 +9,23 @@
                 <img id="image{{ forloop.counter}}" src="{{ image.url }}" />
                 {% endfor %}
             </div>
-            <div>
-            {% if previousLink %}
-                <div class="previousLink"><a href="{{ previousLink }}">&lt;&lt; Previous page</a></div>
-            {% endif %}
-            {% if nextLink %}
-                <div class="nextLink"><a href="{{ nextLink }}">Next page &gt;&gt;</a></div>
-            {% endif %}
-                <div class="clear"></div>
+            <div class="linkTable">
+	            <div class="linkTableRow">
+		            <div class="linkTableLink previousLink">
+			            {% if previousLink %}
+			                <a href="{{ previousLink }}">&lt;&lt; Previous Page</a>
+			            {% endif %}
+		            </div>
+		            <div class="linkTableLink upLink">
+		              {% if upLink %}
+		                  <a href="{{ upLink }}">Back to Album</a>
+		              {% endif %}
+		            </div>
+		            <div class="linkTableLink nextLink">
+			            {% if nextLink %}
+			                <a href="{{ nextLink }}">Next Page &gt;&gt;</a>
+			            {% endif %}
+			          </div>
+	            </div>
             </div>
         </div>

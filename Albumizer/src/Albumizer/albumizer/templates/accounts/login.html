@@ -67,7 +67,9 @@
         {% include "basicform.html" with form=form %}
       <input type="submit" name="cmdLogIn" id="id_cmdLogIn" value="Log In" />
     </fieldset>
-    <div class="fb-login-button">Login with Facebook</div>
+    {% if FACEBOOK_APP_ID %}
+      <div class="fb-login-button">Login with Facebook</div>
+    {% endif %}
   </form>
 
 {% endblock %}

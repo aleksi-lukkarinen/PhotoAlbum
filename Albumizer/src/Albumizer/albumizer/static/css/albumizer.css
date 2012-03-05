@@ -209,11 +209,33 @@ img {
   width:600px;
 }
 
-.previousLink {
-  float:left;
+.linkTable {
+	display: table;
+	width: 100%;
+	margin-top: 0.5em;
+	font-size: 110%;
+	font-weight: bold;
 }
+
+.linkTableRow {
+  display: table-row;
+}
+
+.linkTableLink {
+  display: table-cell;
+  width: 33.33%;
+}
+
+.previousLink {
+
+}
+
 .nextLink {
-  float:right;
+  text-align: right;
+}
+
+.upLink {
+  text-align: center;
 }
 
 
@@ -456,15 +478,28 @@ height:14.8em;
 }
 
 .albumListContainer .pagination {
-  text-align: left;
+  
 }
 
 .clear {
 clear:both;
 }
 
+.step-links {
+	font-size:                 110%;
+}
 
+.step-links .first,
+.step-links .previous {
+  display:                   inline-block;
+  margin-right:              1em;
+}
 
+.step-links .next,
+.step-links .last {
+  display:                   inline-block;
+  margin-left:               1em;
+}
 
 
 

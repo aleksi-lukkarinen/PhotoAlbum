@@ -256,32 +256,6 @@ def list_all_public_albums(request):
 
 
 
-def view_album_slideshow(request, album_id):
-    myalbum = Album.by_id(album_id)
-    if not myalbum:
-        return render_to_response('album/album-not-found.html', RequestContext(request))
-
-    if myalbum.is_hidden_from_user(request.user):
-        return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
-
-    if not myalbum.has_pages():
-        request.user.message_set.create(message = "Can't start a slideshow with an empty album")
-        return HttpResponseRedirect(reverse("show_single_album", args = [myalbum.id]))
-
-    layouts = []
-    for page in myalbum.pages():
-        if not page.layout in layouts:
-            layouts.append(page.layout)
-
-    templateparameters = {
-        "album":myalbum,
-        "layouts":layouts}
-
-    return render_to_response('album/view-album-slideshow.html', RequestContext(request, templateparameters))
-
-
-
-
 def show_single_page_GET(request, album_id, page_number):
     myalbum = Album.by_id(album_id)
     if not myalbum:
@@ -317,6 +291,7 @@ def show_single_page_GET(request, album_id, page_number):
         context["nextLink"] = reverse('show_single_page', kwargs = {"album_id":album_id, "page_number":pageNumberInt + 1})
     if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
         context["previousLink"] = reverse('show_single_page', kwargs = {"album_id":album_id, "page_number":pageNumberInt - 1})
+    context["upLink"] = reverse('show_single_album', kwargs = {"album_id":album_id})
 
     if request.is_ajax() or request.GET.get("ajax", ""):
         data = {
@@ -368,23 +343,38 @@ def show_single_page_with_hash(request, album_id, page_number, secret_hash):
     context = {"pageNumber":mypage.pageNumber,
           "albumTitle":myalbum.title,
           "layoutCssClass":mypage.layout.cssClass,
-          "opened_using_secret_hash": True
-    }
+          "current_user_can_edit": myalbum.is_editable_to_user(request.user),
+          "current_user_can_delete": myalbum.is_editable_to_user(request.user),
+          "album_id": album_id
+          }
     images = []
     texts = []
 
     for pagecontent in mypage.pagecontents.all():
-        if pagecontent.placeHolderID.startswith("image"):
-            images.append(pagecontent.content)
-        elif pagecontent.placeHolderID.startswith("text"):
+        if pagecontent.image:
+            images.append(pagecontent.image)
+        elif pagecontent.content:
             texts.append(pagecontent.content)
     context["texts"] = texts
     context["images"] = images
     context["cssContent"] = mypage.layout.cssContent
     if myalbum.pages().filter(pageNumber = pageNumberInt + 1).exists():
-        context["nextLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt + 1})
+        context["nextLink"] = reverse('albumizer.views.show_single_page_with_hash',
+                        kwargs = {"album_id":album_id, "page_number":pageNumberInt + 1, "secret_hash": secret_hash})
     if myalbum.pages().filter(pageNumber = pageNumberInt - 1).exists():
-        context["previousLink"] = reverse('albumizer.views.show_single_page', kwargs = {"album_id":1, "page_number":pageNumberInt - 1})
+        context["previousLink"] = reverse('albumizer.views.show_single_page_with_hash',
+                        kwargs = {"album_id":album_id, "page_number":pageNumberInt - 1, "secret_hash": secret_hash})
+    context["upLink"] = reverse('albumizer.views.show_single_album_with_hash',
+                                kwargs = {"album_id":album_id, "secret_hash": secret_hash})
+
+    if request.is_ajax() or request.GET.get("ajax", ""):
+        data = {
+            "cssContainer":mypage.layout.cssContent,
+            "ajaxContainer":render_to_string('album/view-album-page-single-ajaxContainer.html',
+                                             RequestContext(request, context))
+        }
+        return HttpResponse(json.dumps(data), mimetype = "application/json")
+
     return render_to_response('album/view-album-page-single.html', RequestContext(request, context))
 
 
@@ -440,7 +430,8 @@ def show_single_album_GET(request, album_id):
         "album": album,
         "is_visible_to_current_user": album.is_visible_to_user(request.user),
         "current_user_can_edit": album.is_editable_to_user(request.user),
-        "current_user_can_delete": album.is_editable_to_user(request.user)
+        "current_user_can_delete": album.is_editable_to_user(request.user),
+        "slideShowLink": reverse("albumizer.views.view_album_slideshow", args = [album.id])
     }
     response = render_to_response_as_public('album/show-single.html', RequestContext(request, template_parameters))
     if not album.isPublic or album.is_editable_to_user(request.user):
@@ -573,9 +564,66 @@ def show_single_album_with_hash(request, album_id, secret_hash):
         "opened_using_secret_hash": True,
         "is_visible_to_current_user": album.is_visible_to_user(request.user),
         "current_user_can_edit": album.is_editable_to_user(request.user),
-        "current_user_can_delete": album.is_editable_to_user(request.user)
+        "current_user_can_delete": album.is_editable_to_user(request.user),
+        "slideShowLink": reverse("albumizer.views.view_album_slideshow_with_hash", args = [album.id, secret_hash])
     }
     return render_to_response('album/show-single.html', RequestContext(request, template_parameters))
+
+
+
+
+def view_album_slideshow(request, album_id):
+    myalbum = Album.by_id(album_id)
+    if not myalbum:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    if myalbum.is_hidden_from_user(request.user):
+        return render_to_response_as_public('album/view-access-denied.html', RequestContext(request))
+
+    if not myalbum.has_pages():
+        request.user.message_set.create(message = "Can't start a slideshow with an empty album")
+        return HttpResponseRedirect(reverse("show_single_album", args = [myalbum.id]))
+
+    layouts = []
+    for page in myalbum.pages():
+        if not page.layout in layouts:
+            layouts.append(page.layout)
+
+    templateparameters = {
+        "album":myalbum,
+        "layouts":layouts}
+
+    response = render_to_response('album/view-album-slideshow.html', RequestContext(request, templateparameters))
+    if not myalbum.isPublic or myalbum.is_editable_to_user(request.user):
+        add_caching_preventing_headers(response)
+    return response
+
+
+
+
+@prevent_all_caching
+def view_album_slideshow_with_hash(request, album_id, secret_hash):
+    myalbum = Album.by_id_and_secret_hash(album_id, secret_hash)
+    if not myalbum:
+        return render_to_response('album/album-not-found.html', RequestContext(request))
+
+    if myalbum.isPublic or myalbum.is_owned_by(request.user):
+        return HttpResponseRedirect(reverse("albumizer.views.view_album_slideshow", args = [myalbum.id]))
+
+    if not myalbum.has_pages():
+        request.user.message_set.create(message = "Can't start a slideshow with an empty album")
+        return HttpResponseRedirect(reverse("show_single_album", args = [myalbum.id]))
+
+    layouts = []
+    for page in myalbum.pages():
+        if not page.layout in layouts:
+            layouts.append(page.layout)
+
+    templateparameters = {
+        "album":myalbum,
+        "layouts":layouts}
+
+    return render_to_response('album/view-album-slideshow.html', RequestContext(request, templateparameters))
 
 
 

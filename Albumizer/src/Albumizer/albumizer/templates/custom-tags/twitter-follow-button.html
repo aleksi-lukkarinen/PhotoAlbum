@@ -1,5 +1,6 @@
 {% load url from future %}
 
+{% if twitter_account %}
   <div id="twitter-follow-button-container-{{ id }}" class="twitter-follow-button-container">
     <a href="https://twitter.com/{{ twitter_account }}" 
        class="twitter-follow-button" 
@@ -26,3 +27,5 @@
       });
     //]]>
   </script>
+{% endif %}
+  

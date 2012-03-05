@@ -71,7 +71,7 @@
    
     <div class="description">
       {% if album.pages|length > 0 %}
-        <a href="{% url "albumizer.views.view_album_slideshow" album.id %}">View slide show</a>
+        <a href="{{ slideShowLink }}">View Slide Show</a>
       {% endif %}
     </div> 
     {% if album.isPublic %}

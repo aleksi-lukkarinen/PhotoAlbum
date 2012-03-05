@@ -70,71 +70,72 @@
 
   <body>
 
-    {% cache template_cache_timeout base_fb_login %}  
-	    <div id="fb-root"></div>
-	    <script type="text/javascript">
-	      //<![CDATA[
-	      window.fbAsyncInit = function() {
-	        FB.init({
-	          appId      : '{{ FACEBOOK_APP_ID }}',
-	          status     : true, 
-	          cookie     : true,
-	          xfbml      : true,
-	          oauth      : true,
-	        });
-	        
-            //log the user out of facebook too. Leaving Facebook connected would break the fb login button.
-            $("#headerLinkLogOut").click(function() {
-             if(FB)
-                 FB.logout(function(response) {
-                     //user logged out..
-                 });
-            });
-	        var tokenhandler=function(response) {
-	        	if(response.status=='connected' && response.authResponse) {
-	        		var dialog=$("<div title='Facebook login'>Checking authentication token..</div>")
-	        			.dialog({ 
-	        				modal:true,
-	        				resizable:false
-	        		});
-	        		$.post('{% url "albumizer.views.facebook_login" %}',
-	        			response.authResponse)
-	        		.success(function(data, textStatus, jqXHR) {
-	        				if(data.success) {
-	        					//alert("great success, refrehing page");
-	        					window.location.href= "{% url "albumizer.views.show_profile" %}";
-	        				} else
-	        					alert("Login failed: "+data.reason);
-	        			})
-	        		.error(function() {
-	        			alert("Internal error while validating authentication token.");
-	        		})
-	        		.complete(function() {
-	        				dialog.dialog("close");
-	        				dialog.remove();          			
-	        		});
-	        	}
-	        };
-	        {% comment %}
-	        //Auto-login disables logut... so let's not do auto-login
-	        {% if not user.is_authenticated %}
-	        //user is not authenticated, check if the user is logged to facebook
-	        //TODO: if the user logs out, this will log her on again
-	        FB.getLoginStatus(tokenhandler);
-	        {% endif %}
-	        {% endcomment %}
-	        FB.Event.subscribe('auth.login', tokenhandler);
-	        
-	      };
-	      (function(d){
-	         var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
-	         js = d.createElement('script'); js.id = id; js.async = true;
-	         js.src = "//connect.facebook.net/en_US/all.js";
-	         d.getElementsByTagName('head')[0].appendChild(js);
-	      }(document));
-	      //]]>
-	    </script>
-    {% endcache %}
+    {% if FACEBOOK_APP_ID %}
+	    {% cache template_cache_timeout base_fb_login %}  
+		    <div id="fb-root"></div>
+		    <script type="text/javascript">
+		      //<![CDATA[
+		      window.fbAsyncInit = function() {
+		        FB.init({
+		          appId      : '{{ FACEBOOK_APP_ID }}',
+		          status     : true, 
+		          cookie     : true,
+		          xfbml      : true,
+		          oauth      : true,
+		        });
+		        
+	            //log the user out of facebook too. Leaving Facebook connected would break the fb login button.
+	            $("#headerLinkLogOut").click(function() {
+	             if(FB)
+	                 FB.logout(function(response) {
+	                     //user logged out..
+	                 });
+	            });
+		        var tokenhandler=function(response) {
+		        	if(response.status=='connected' && response.authResponse) {
+		        		var dialog=$("<div title='Facebook login'>Checking authentication token..</div>")
+		        			.dialog({ 
+		        				modal:true,
+		        				resizable:false
+		        		});
+		        		$.post('{% url "albumizer.views.facebook_login" %}',
+		        			response.authResponse)
+		        		.success(function(data, textStatus, jqXHR) {
+		        				if(data.success) {
+		        					window.location.href= "{% url "albumizer.views.show_profile" %}";
+		        				} else
+		        					alert("Login failed: "+data.reason);
+		        			})
+		        		.error(function() {
+		        			alert("Internal error while validating authentication token.");
+		        		})
+		        		.complete(function() {
+		        				dialog.dialog("close");
+		        				dialog.remove();          			
+		        		});
+		        	}
+		        };
+		        {% comment %}
+		        //Auto-login disables logut... so let's not do auto-login
+		        {% if not user.is_authenticated %}
+		        //user is not authenticated, check if the user is logged to facebook
+		        //TODO: if the user logs out, this will log her on again
+		        FB.getLoginStatus(tokenhandler);
+		        {% endif %}
+		        {% endcomment %}
+		        FB.Event.subscribe('auth.login', tokenhandler);
+		        
+		      };
+		      (function(d){
+		         var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+		         js = d.createElement('script'); js.id = id; js.async = true;
+		         js.src = "//connect.facebook.net/en_US/all.js";
+		         d.getElementsByTagName('head')[0].appendChild(js);
+		      }(document));
+		      //]]>
+		    </script>
+	    {% endcache %}
+    {% endif %}
 
     <div id="pageContainer">
       {% cache template_cache_timeout base_header request.user is_album_list_page is_registration_page is_login_page %}  
@@ -216,8 +217,10 @@
 			    <label for="txtLoginPassword">Password</label>
 			    <input type="password" name="txtLoginPassword" id="txtLoginPassword" value="" class="text ui-widget-content" />
 			  </fieldset>
-		  </form>		  
-		  <div class="fb-login-button">Login with Facebook</div>
+		  </form>
+		  {% if FACEBOOK_APP_ID %}		  
+		    <div class="fb-login-button">Login with Facebook</div>
+		  {% endif %}
     </div>
     {% endif %}
 	  
